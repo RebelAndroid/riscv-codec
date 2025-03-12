@@ -4,3 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+test-fuzz = "7.0.3"
+serde = "1.0.219"
+rand = "0.9.0"
+rand_chacha = "0.9.0"

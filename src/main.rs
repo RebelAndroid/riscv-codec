@@ -1,5 +1,7 @@
 #![allow(dead_code)]
+#![allow(unused_variables)]
 
+use rand::{Rng, SeedableRng};
 use std::fmt::{Display, Formatter};
 
 #[derive(Debug)]
@@ -118,6 +120,44 @@ impl IRegister {
             30 => Self::T5,
             31 => Self::T6,
             x => panic!("converted invalid to register {}", x),
+        };
+    }
+
+    fn from_string(str: &str) -> Result<Self, String> {
+        return match str {
+            "zero" => Ok(Self::Zero),
+            "ra" => Ok(Self::ReturnAddress),
+            "sp" => Ok(Self::StackPointer),
+            "gp" => Ok(Self::GlobalPointer),
+            "tp" => Ok(Self::ThreadPointer),
+            "t0" => Ok(Self::T0),
+            "t1" => Ok(Self::T1),
+            "t2" => Ok(Self::T2),
+            "s0" => Ok(Self::FramePointer),
+            "s1" => Ok(Self::S1),
+            "a0" => Ok(Self::A0),
+            "a1" => Ok(Self::A1),
+            "a2" => Ok(Self::A2),
+            "a3" => Ok(Self::A3),
+            "a4" => Ok(Self::A4),
+            "a5" => Ok(Self::A5),
+            "a6" => Ok(Self::A6),
+            "a7" => Ok(Self::A7),
+            "s2" => Ok(Self::S2),
+            "s3" => Ok(Self::S3),
+            "s4" => Ok(Self::S4),
+            "s5" => Ok(Self::S5),
+            "s6" => Ok(Self::S6),
+            "s7" => Ok(Self::S7),
+            "s8" => Ok(Self::S8),
+            "s9" => Ok(Self::S9),
+            "s10" => Ok(Self::S10),
+            "s11" => Ok(Self::S11),
+            "t3" => Ok(Self::T3),
+            "t4" => Ok(Self::T4),
+            "t5" => Ok(Self::T5),
+            "t6" => Ok(Self::T6),
+            x => Err(format!("converted invalid str to register {}", x)),
         };
     }
 }
@@ -285,10 +325,14 @@ enum Opcode {
     OpImm32 = 0b00_110_11,
     Jalr = 0b11_001_11,
     Jal = 0b11_011_11,
+    Reserved = 0,
 }
 
 impl Opcode {
     fn from_int(int: u32) -> Self {
+        if int > 0b11_111_11 {
+            panic!("attempted to convert too large int to opcode")
+        }
         return match int {
             0b00_000_11 => Self::Load,
             0b00_101_11 => Self::Auipc,
@@ -300,7 +344,7 @@ impl Opcode {
             0b00_110_11 => Self::OpImm32,
             0b11_001_11 => Self::Jalr,
             0b11_011_11 => Self::Jal,
-            x => panic!("attempted to decode invalid opcode: {}", x),
+            x => Self::Reserved,
         };
     }
 }
@@ -321,7 +365,72 @@ fn sign_extend_s_immediate(immediate: u16) -> i16 {
     }
 }
 
-fn decode_instruction(instruction: u32) -> Instruction {
+fn parse_int(str: &str) -> Result<i64, String> {
+    match str.parse::<i64>() {
+        Ok(e) => Ok(e),
+        Err(_) => Err("unable to parse int".to_owned()),
+    }
+}
+
+fn parse_address_expression(str: &str) -> Result<(IRegister, i16), String> {
+    let (offset, register): (&str, &str) = if let Some(x) = str.split_once("(") {
+        x
+    } else {
+        panic!("no (");
+    };
+    match register.strip_suffix(")") {
+        Some(y) => {
+            let r = IRegister::from_string(y)?;
+            let i = parse_int(offset)?;
+            Ok((r, i.try_into().unwrap()))
+        }
+        None => Err("Address expression should end in a )".to_owned()),
+    }
+}
+
+fn parse_line(line: &str) -> Result<Instruction, String> {
+    let (mnemonic, operands): (&str, &str) = if let Some(x) = line.split_once(" ") {
+        x
+    } else {
+        panic!("no space");
+    };
+
+    let operands: Vec<&str> = operands.split(',').collect();
+
+    return match mnemonic {
+        "addi" => {
+            if operands.len() != 3 {
+                Err("addi instruction requires 3 operands".to_owned())
+            } else {
+                Ok(Instruction::ADDI(
+                    IRegister::from_string(operands[0])?,
+                    IRegister::from_string(operands[1])?,
+                    parse_int(operands[2])?.try_into().unwrap(),
+                ))
+            }
+        }
+        "sd" => {
+            if operands.len() != 2 {
+                Err("sd instruction requires 2 operands".to_owned())
+            } else {
+                let (base, offset) = parse_address_expression(operands[1])?;
+                Ok(Instruction::SD(
+                    base,
+                    IRegister::from_string(operands[0])?,
+                    offset,
+                ))
+            }
+        }
+        _ => Err(format!("unknown mnemonic: {}", mnemonic)),
+    };
+}
+
+fn assemble_instruction(instruction: u32) -> u32 {
+    todo!();
+}
+
+#[test_fuzz::test_fuzz]
+fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
     let opcode = Opcode::from_int(instruction & 0b111_1111);
 
     let func3 = (instruction >> 12) & 0b111;
@@ -340,41 +449,62 @@ fn decode_instruction(instruction: u32) -> Instruction {
         .unwrap(),
     );
 
+    let u_immediate = instruction & (!0b1111_1111_1111);
+
     let shamt: u8 = ((instruction >> 20) & 0b1_1111).try_into().unwrap();
 
     match opcode {
         Opcode::Load => match func3 {
-            0b011 => Instruction::LD(rd, rs1, sign_extend_i_immediate(i_immediate)),
+            0b011 => Ok(Instruction::LD(
+                rd,
+                rs1,
+                sign_extend_i_immediate(i_immediate),
+            )),
             x => panic!("unexpected load func3: {}", x),
         },
         Opcode::Auipc => todo!(),
         Opcode::Store => match func3 {
-            0b011 => Instruction::SD(rs1, rs2, s_immediate),
-            0b010 => Instruction::SW(rs1, rs2, s_immediate),
-            x => panic!("unexpected store func3: {}", x),
+            0b000 => todo!(),
+            0b001 => todo!(),
+            0b010 => Ok(Instruction::SW(rs1, rs2, s_immediate)),
+            0b011 => Ok(Instruction::SD(rs1, rs2, s_immediate)),
+            x => Err(format!("invalid store func3: {}", x)),
         },
-        Opcode::Lui => todo!(),
+        Opcode::Lui => Ok(Instruction::LUI(rd, u_immediate)),
         Opcode::Op => todo!(),
         Opcode::Op32 => todo!(),
         Opcode::OpImm => match func3 {
-            0b000 => Instruction::ADDI(rd, rs1, sign_extend_i_immediate(i_immediate)),
-            0b001 => Instruction::SLLI(rd, rs1, shamt),
+            0b000 => Ok(Instruction::ADDI(
+                rd,
+                rs1,
+                sign_extend_i_immediate(i_immediate),
+            )),
+            0b001 => Ok(Instruction::SLLI(rd, rs1, shamt)),
             _ => unreachable!(),
         },
         Opcode::OpImm32 => todo!(),
-        Opcode::Jalr => Instruction::JALR(rd, rs1, i_immediate),
+        Opcode::Jalr => Ok(Instruction::JALR(rd, rs1, i_immediate)),
         Opcode::Jal => todo!(),
+        Opcode::Reserved => Err("instruction uses reserved opcode".to_owned()),
     }
 }
 
-const input: &str = include_str!("../input");
+const INPUT: &str = include_str!("../input");
 
 fn main() {
-    for line in input.lines() {
-        println!(
-            "{} {}",
-            line,
-            decode_instruction(u32::from_str_radix(line, 16).unwrap())
-        );
+    // println!("{}", parse_line("addi sp,sp,-32").unwrap());
+    // println!("{}", parse_line("sd ra,24(sp)").unwrap());
+    // println!("{}", parse_line("sd a0,-24(s0)").unwrap());
+    // for line in INPUT.lines() {
+    //     println!(
+    //         "{} {}",
+    //         line,
+    //         decode_instruction(u32::from_str_radix(line, 16).unwrap()).unwrap()
+    //     );
+    // }
+    let mut rng = rand_chacha::ChaCha8Rng::seed_from_u64(0);
+    loop {
+        let x: u32 = rng.random();
+        println!("{:x} {:?}", x, decode_instruction(x));
     }
 }
