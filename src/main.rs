@@ -172,9 +172,9 @@ enum Instruction {
     /// Add upper immediate to PC
     AUIPC(IRegister, u32),
     /// Jump and Link
-    JAL(IRegister, u32),
+    JAL(IRegister, i32),
     /// Jump and Link Register
-    JALR(IRegister, IRegister, u16),
+    JALR(IRegister, IRegister, i16),
     BEQ(IRegister, IRegister, u16),
     BNE(IRegister, IRegister, u16),
     BLT(IRegister, IRegister, u16),
@@ -198,10 +198,11 @@ enum Instruction {
     /// Store Word
     SW(IRegister, IRegister, i16),
     ADDI(IRegister, IRegister, i16),
-    SLTI(IRegister, IRegister, u16),
-    XORI(IRegister, IRegister, u16),
-    ORI(IRegister, IRegister, u16),
-    ANDI(IRegister, IRegister, u16),
+    SLTI(IRegister, IRegister, i16),
+    SLTIU(IRegister, IRegister, i16),
+    XORI(IRegister, IRegister, i16),
+    ORI(IRegister, IRegister, i16),
+    ANDI(IRegister, IRegister, i16),
     /// Left Shift Immediate
     SLLI(IRegister, IRegister, u8),
     /// Logical Right Shift Immediate
@@ -235,7 +236,7 @@ enum Instruction {
     /// Store Doubleword
     SD(IRegister, IRegister, i16),
     /// Add Immediate (word)
-    ADDIW(IRegister, IRegister, u16),
+    ADDIW(IRegister, IRegister, i16),
     /// Left Shift Immediate (word)
     SLLIW(IRegister, IRegister, u8),
     /// Logical Right Shift Immediate (word)
@@ -259,8 +260,8 @@ impl Display for Instruction {
         match self {
             Instruction::LUI(iregister, _) => todo!(),
             Instruction::AUIPC(iregister, _) => todo!(),
-            Instruction::JAL(iregister, _) => todo!(),
-            Instruction::JALR(rd, rs1, imm) => write!(f, "jal {}, {}({})", rd, imm, rs1),
+            Instruction::JAL(rd, offset) => write!(f, "jal {},{}", rd, offset),
+            Instruction::JALR(rd, rs1, imm) => write!(f, "jalr {},{}({})", rd, imm, rs1),
             Instruction::BEQ(iregister, iregister1, _) => todo!(),
             Instruction::BNE(iregister, iregister1, _) => todo!(),
             Instruction::BLT(iregister, iregister1, _) => todo!(),
@@ -277,6 +278,7 @@ impl Display for Instruction {
             Instruction::SW(iregister, iregister2, _) => todo!(),
             Instruction::ADDI(rd, rs1, imm) => write!(f, "addi {},{},{}", rd, rs1, imm),
             Instruction::SLTI(iregister, iregister1, _) => todo!(),
+            Instruction::SLTIU(iregister, iregister1, _) => todo!(),
             Instruction::XORI(iregister, iregister1, _) => todo!(),
             Instruction::ORI(iregister, iregister1, _) => todo!(),
             Instruction::ANDI(iregister, iregister1, _) => todo!(),
@@ -365,6 +367,16 @@ fn sign_extend_s_immediate(immediate: u16) -> i16 {
     }
 }
 
+fn j_immediate_from_u_immediate(u: u32) -> i32 {
+    let a = u >> 12 & 0b1111_1111;
+    let b = u >> 20 & 0b1;
+    let c = u >> 21 & 0b11_1111_1111;
+    let d = u >> 31;
+
+    let i = (c << 1) | (b << 11) | (a << 12) | (d << 20);
+    ((i << 12) as i32) >> 12
+}
+
 fn parse_int(str: &str) -> Result<i64, String> {
     match str.parse::<i64>() {
         Ok(e) => Ok(e),
@@ -429,11 +441,11 @@ fn assemble_instruction(instruction: u32) -> u32 {
     todo!();
 }
 
-#[test_fuzz::test_fuzz]
 fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
     let opcode = Opcode::from_int(instruction & 0b111_1111);
 
     let func3 = (instruction >> 12) & 0b111;
+    let func7 = (instruction >> 25) & 0b111_1111;
 
     let rd = IRegister::from_int((instruction >> 7) & 0b1_1111);
     let rs1 = IRegister::from_int((instruction >> 15) & 0b1_1111);
@@ -451,7 +463,7 @@ fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
 
     let u_immediate = instruction & (!0b1111_1111_1111);
 
-    let shamt: u8 = ((instruction >> 20) & 0b1_1111).try_into().unwrap();
+    let shamt: u8 = ((instruction >> 20) & 0b11_1111).try_into().unwrap();
 
     match opcode {
         Opcode::Load => match func3 {
@@ -462,7 +474,7 @@ fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
             )),
             x => panic!("unexpected load func3: {}", x),
         },
-        Opcode::Auipc => todo!(),
+        Opcode::Auipc => Ok(Instruction::AUIPC(rd, u_immediate)),
         Opcode::Store => match func3 {
             0b000 => todo!(),
             0b001 => todo!(),
@@ -472,7 +484,20 @@ fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
         },
         Opcode::Lui => Ok(Instruction::LUI(rd, u_immediate)),
         Opcode::Op => todo!(),
-        Opcode::Op32 => todo!(),
+        Opcode::Op32 => match func3 {
+            0b000 => match func7 {
+                0b000_0000 => Ok(Instruction::ADDW(rd, rs1, rs2)),
+                0b010_0000 => Ok(Instruction::SUBW(rd, rs1, rs2)),
+                x => Err(format!("unknown Op32(000) func 7: {}", x)),
+            },
+            0b001 => Ok(Instruction::SLLW(rd, rs1, rs2)),
+            0b101 => match func7 {
+                0b000_0000 => Ok(Instruction::SRLW(rd, rs1, rs2)),
+                0b010_0000 => Ok(Instruction::SRAW(rd, rs1, rs2)),
+                x => Err(format!("unknown Op32(101) func 7: {}", x)),
+            },
+            x => Err(format!("unknown Op32: {}", x)),
+        },
         Opcode::OpImm => match func3 {
             0b000 => Ok(Instruction::ADDI(
                 rd,
@@ -480,11 +505,74 @@ fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
                 sign_extend_i_immediate(i_immediate),
             )),
             0b001 => Ok(Instruction::SLLI(rd, rs1, shamt)),
-            _ => unreachable!(),
+            0b010 => Ok(Instruction::SLTI(
+                rd,
+                rs1,
+                sign_extend_i_immediate(i_immediate),
+            )),
+            0b011 => Ok(Instruction::SLTIU(
+                rd,
+                rs1,
+                sign_extend_i_immediate(i_immediate),
+            )),
+            0b100 => Ok(Instruction::XORI(
+                rd,
+                rs1,
+                sign_extend_i_immediate(i_immediate),
+            )),
+            0b110 => Ok(Instruction::ORI(
+                rd,
+                rs1,
+                sign_extend_i_immediate(i_immediate),
+            )),
+            0b111 => Ok(Instruction::ANDI(
+                rd,
+                rs1,
+                sign_extend_i_immediate(i_immediate),
+            )),
+            x => Err(format!("unknown OpImm func3: {}", x)),
         },
-        Opcode::OpImm32 => todo!(),
-        Opcode::Jalr => Ok(Instruction::JALR(rd, rs1, i_immediate)),
-        Opcode::Jal => todo!(),
+        Opcode::OpImm32 => match func3 {
+            0b000 => Ok(Instruction::ADDIW(
+                rd,
+                rs1,
+                sign_extend_i_immediate(i_immediate),
+            )),
+            0b001 => {
+                if shamt & 0b100000 != 0 {
+                    Err("SLLIW with shamt[5] set".to_owned())
+                } else {
+                    Ok(Instruction::SLLIW(rd, rs1, shamt))
+                }
+            }
+            0b101 => match func7 {
+                0b000_0000 => {
+                    if shamt & 0b100000 != 0 {
+                        Err("SRLIW with shamt[5] set".to_owned())
+                    } else {
+                        Ok(Instruction::SLLIW(rd, rs1, shamt))
+                    }
+                }
+                0b010_0000 => {
+                    if shamt & 0b100000 != 0 {
+                        Err("SRAIW with shamt[5] set".to_owned())
+                    } else {
+                        Ok(Instruction::SLLIW(rd, rs1, shamt))
+                    }
+                }
+                x => panic!("unknown OpImm32(101) func7: {}", x),
+            },
+            x => Err(format!("unkown OpImm32 func3: {}", x).to_owned()),
+        },
+        Opcode::Jalr => Ok(Instruction::JALR(
+            rd,
+            rs1,
+            sign_extend_i_immediate(i_immediate),
+        )),
+        Opcode::Jal => Ok(Instruction::JAL(
+            rd,
+            j_immediate_from_u_immediate(u_immediate),
+        )),
         Opcode::Reserved => Err("instruction uses reserved opcode".to_owned()),
     }
 }
@@ -492,19 +580,11 @@ fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
 const INPUT: &str = include_str!("../input");
 
 fn main() {
-    // println!("{}", parse_line("addi sp,sp,-32").unwrap());
-    // println!("{}", parse_line("sd ra,24(sp)").unwrap());
-    // println!("{}", parse_line("sd a0,-24(s0)").unwrap());
-    // for line in INPUT.lines() {
-    //     println!(
-    //         "{} {}",
-    //         line,
-    //         decode_instruction(u32::from_str_radix(line, 16).unwrap()).unwrap()
-    //     );
-    // }
     let mut rng = rand_chacha::ChaCha8Rng::seed_from_u64(0);
+    let mut i = 0;
     loop {
         let x: u32 = rng.random();
-        println!("{:x} {:?}", x, decode_instruction(x));
+        println!("{}: {:x} {:?}", i, x, decode_instruction(x));
+        i += 1;
     }
 }
