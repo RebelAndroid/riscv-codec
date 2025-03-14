@@ -467,23 +467,68 @@ fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
 
     match opcode {
         Opcode::Load => match func3 {
+            0b000 => Ok(Instruction::LB(
+                rd,
+                rs1,
+                sign_extend_i_immediate(i_immediate),
+            )),
+            0b001 => Ok(Instruction::LH(
+                rd,
+                rs1,
+                sign_extend_i_immediate(i_immediate),
+            )),
+            0b010 => Ok(Instruction::LW(
+                rd,
+                rs1,
+                sign_extend_i_immediate(i_immediate),
+            )),
             0b011 => Ok(Instruction::LD(
                 rd,
                 rs1,
                 sign_extend_i_immediate(i_immediate),
             )),
-            x => panic!("unexpected load func3: {}", x),
+            0b100 => Ok(Instruction::LBU(
+                rd,
+                rs1,
+                sign_extend_i_immediate(i_immediate),
+            )),
+            0b101 => Ok(Instruction::LHU(
+                rd,
+                rs1,
+                sign_extend_i_immediate(i_immediate),
+            )),
+            0b110 => Ok(Instruction::LWU(
+                rd,
+                rs1,
+                sign_extend_i_immediate(i_immediate),
+            )),
+            0b111 => Err("Invalid load func3".to_owned()),
+            _ => unreachable!(),
         },
         Opcode::Auipc => Ok(Instruction::AUIPC(rd, u_immediate)),
         Opcode::Store => match func3 {
-            0b000 => todo!(),
-            0b001 => todo!(),
+            0b000 => Ok(Instruction::SB(rs1, rs2, s_immediate)),
+            0b001 => Ok(Instruction::SH(rs1, rs2, s_immediate)),
             0b010 => Ok(Instruction::SW(rs1, rs2, s_immediate)),
             0b011 => Ok(Instruction::SD(rs1, rs2, s_immediate)),
             x => Err(format!("invalid store func3: {}", x)),
         },
         Opcode::Lui => Ok(Instruction::LUI(rd, u_immediate)),
-        Opcode::Op => todo!(),
+        Opcode::Op => match func3 {
+            0b000 => match func7 {
+                0b000_0000 => Ok(Instruction::ADD(rd, rs1, rs2)),
+                0b010_0000 => Ok(Instruction::SUB(rd, rs1, rs2)),
+                x => Err(format!("unknown Op(000) func 7: {}", x)),
+            },
+            0b001 => Ok(Instruction::SLL(rd, rs1, rs2)),
+            0b010 => Ok(Instruction::SLT(rd, rs1, rs2)),
+            0b011 => Ok(Instruction::SLTU(rd, rs1, rs2)),
+            0b100 => todo!(),
+            0b101 => todo!(),
+            0b110 => Ok(Instruction::OR(rd, rs1, rs2)),
+            0b111 => Ok(Instruction::AND(rd, rs1, rs2)),
+            x => unreachable!(),
+        },
         Opcode::Op32 => match func3 {
             0b000 => match func7 {
                 0b000_0000 => Ok(Instruction::ADDW(rd, rs1, rs2)),
@@ -496,7 +541,7 @@ fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
                 0b010_0000 => Ok(Instruction::SRAW(rd, rs1, rs2)),
                 x => Err(format!("unknown Op32(101) func 7: {}", x)),
             },
-            x => Err(format!("unknown Op32: {}", x)),
+            x => Err(format!("unknown Op32 func3: {}", x)),
         },
         Opcode::OpImm => match func3 {
             0b000 => Ok(Instruction::ADDI(
@@ -557,10 +602,10 @@ fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
                     if shamt & 0b100000 != 0 {
                         Err("SRAIW with shamt[5] set".to_owned())
                     } else {
-                        Ok(Instruction::SLLIW(rd, rs1, shamt))
+                        Ok(Instruction::SRAIW(rd, rs1, shamt))
                     }
                 }
-                x => panic!("unknown OpImm32(101) func7: {}", x),
+                x => Err(format!("unknown OpImm32(101) func7: {}", x).to_owned()),
             },
             x => Err(format!("unkown OpImm32 func3: {}", x).to_owned()),
         },
