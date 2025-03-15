@@ -1,6 +1,3 @@
-#![allow(dead_code)]
-#![allow(unused_variables)]
-
 use rand::{Rng, SeedableRng};
 use std::fmt::{Display, Formatter};
 
@@ -258,43 +255,43 @@ enum Instruction {
 impl Display for Instruction {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
-            Instruction::LUI(iregister, _) => todo!(),
-            Instruction::AUIPC(iregister, _) => todo!(),
+            Instruction::LUI(rd, imm) => write!(f, "lui {},{}", rd, imm),
+            Instruction::AUIPC(rd, imm) => write!(f, "auipc {},{}", rd, imm),
             Instruction::JAL(rd, offset) => write!(f, "jal {},{}", rd, offset),
             Instruction::JALR(rd, rs1, imm) => write!(f, "jalr {},{}({})", rd, imm, rs1),
-            Instruction::BEQ(iregister, iregister1, _) => todo!(),
-            Instruction::BNE(iregister, iregister1, _) => todo!(),
-            Instruction::BLT(iregister, iregister1, _) => todo!(),
-            Instruction::BGE(iregister, iregister1, _) => todo!(),
-            Instruction::BLTU(iregister, iregister1, _) => todo!(),
-            Instruction::BGEU(iregister, iregister1, _) => todo!(),
-            Instruction::LB(iregister, iregister1, _) => todo!(),
-            Instruction::LH(iregister, iregister1, _) => todo!(),
-            Instruction::LW(iregister, iregister1, _) => todo!(),
-            Instruction::LBU(iregister, iregister1, _) => todo!(),
-            Instruction::LHU(iregister, iregister1, _) => todo!(),
-            Instruction::SB(iregister, iregister2, _) => todo!(),
-            Instruction::SH(iregister, iregister2, _) => todo!(),
-            Instruction::SW(iregister, iregister2, _) => todo!(),
-            Instruction::ADDI(rd, rs1, imm) => write!(f, "addi {},{},{}", rd, rs1, imm),
-            Instruction::SLTI(iregister, iregister1, _) => todo!(),
-            Instruction::SLTIU(iregister, iregister1, _) => todo!(),
-            Instruction::XORI(iregister, iregister1, _) => todo!(),
-            Instruction::ORI(iregister, iregister1, _) => todo!(),
-            Instruction::ANDI(iregister, iregister1, _) => todo!(),
+            Instruction::BEQ(rs1, rs2, imm) => write!(f, "beq {},{},{}", rs1, rs2, imm),
+            Instruction::BNE(rs1, rs2, imm) => write!(f, "bne {},{},{}", rs1, rs2, imm),
+            Instruction::BLT(rs1, rs2, imm) => write!(f, "blt {},{},{}", rs1, rs2, imm),
+            Instruction::BGE(rs1, rs2, imm) => write!(f, "bge {rs1},{rs2},{imm}"),
+            Instruction::BLTU(rs1, rs2, imm) => write!(f, "bltu {rs1},{rs2},{imm}"),
+            Instruction::BGEU(rs1, rs2, imm) => write!(f, "bgeu {rs1},{rs2},{imm}"),
+            Instruction::LB(rd, rs1, imm) => write!(f, "lb {rd}, {imm}({rs1})"),
+            Instruction::LH(rd, rs1, imm) => write!(f, "lh {rd}, {imm}({rs1})"),
+            Instruction::LW(rd, rs1, imm) => write!(f, "lw {rd}, {imm}({rs1})"),
+            Instruction::LBU(rd, rs1, imm) => write!(f, "lbu {rd}, {imm}({rs1})"),
+            Instruction::LHU(rd, rs1, imm) => write!(f, "lhu {rd}, {imm}({rs1})"),
+            Instruction::SB(rs1, rs2, imm) => write!(f, "sb {rs2} {imm}({rs1})"),
+            Instruction::SH(rs1, rs2, imm) => write!(f, "sh {rs2} {imm}({rs1})"),
+            Instruction::SW(rs1, rs2, imm) => write!(f, "sw {rs2} {imm}({rs1})"),
+            Instruction::ADDI(rd, rs1, imm) => write!(f, "addi {rd},{rs1},{imm}"),
+            Instruction::SLTI(rd, rs1, imm) => write!(f, "slti {rd},{rs1},{imm}"),
+            Instruction::SLTIU(rd, rs1, imm) => write!(f, "sltiu {rd},{rs1},{imm}"),
+            Instruction::XORI(rd, rs1, imm) => write!(f, "xori {rd},{rs1},{imm}"),
+            Instruction::ORI(rd, rs1, imm) => write!(f, "ori {rd},{rs1},{imm}"),
+            Instruction::ANDI(rd, rs1, imm) => write!(f, "andi {rd},{rs1},{imm}"),
             Instruction::SLLI(rd, rs1, imm) => write!(f, "slli {},{},0x{:x}", rd, rs1, imm),
-            Instruction::SRLI(iregister, iregister1, _) => todo!(),
-            Instruction::SRAI(iregister, iregister1, _) => todo!(),
-            Instruction::ADD(iregister, iregister1, iregister2) => todo!(),
-            Instruction::SUB(iregister, iregister1, iregister2) => todo!(),
-            Instruction::SLL(iregister, iregister1, iregister2) => todo!(),
-            Instruction::SLT(iregister, iregister1, iregister2) => todo!(),
-            Instruction::SLTU(iregister, iregister1, iregister2) => todo!(),
-            Instruction::XOR(iregister, iregister1, iregister2) => todo!(),
-            Instruction::SRL(iregister, iregister1, iregister2) => todo!(),
-            Instruction::SRA(iregister, iregister1, iregister2) => todo!(),
-            Instruction::OR(iregister, iregister1, iregister2) => todo!(),
-            Instruction::AND(iregister, iregister1, iregister2) => todo!(),
+            Instruction::SRLI(rd, rs1, imm) => write!(f, "srli {rd},{rs1},{imm}"),
+            Instruction::SRAI(rd, rs1, imm) => write!(f, "srai {rd},{rs1},{imm}"),
+            Instruction::ADD(rd, rs1, rs2) => write!(f, "add {rd},{rs1},{rs2}"),
+            Instruction::SUB(rd, rs1, rs2) => write!(f, "sub {rd},{rs1},{rs2}"),
+            Instruction::SLL(rd, rs1, rs2) => write!(f, "sll {rd},{rs1},{rs2}"),
+            Instruction::SLT(rd, rs1, rs2) => write!(f, "slt {rd},{rs1},{rs2}"),
+            Instruction::SLTU(rd, rs1, rs2) => write!(f, "sltu {rd},{rs1},{rs2}"),
+            Instruction::XOR(rd, rs1, rs2) => write!(f, "xor {rd},{rs1},{rs2}"),
+            Instruction::SRL(rd, rs1, rs2) => write!(f, "srl {rd},{rs1},{rs2}"),
+            Instruction::SRA(rd, rs1, rs2) => write!(f, "sra {rd},{rs1},{rs2}"),
+            Instruction::OR(rd, rs1, rs2) => write!(f, "or {rd},{rs1},{rs2}"),
+            Instruction::AND(rd, rs1, rs2) => write!(f, "and {rd},{rs1},{rs2}"),
             Instruction::FENCE(iregister, iregister1, _, _, _) => todo!(),
             Instruction::ECALL => todo!(),
             Instruction::EBREAK => todo!(),
@@ -346,7 +343,7 @@ impl Opcode {
             0b00_110_11 => Self::OpImm32,
             0b11_001_11 => Self::Jalr,
             0b11_011_11 => Self::Jal,
-            x => Self::Reserved,
+            _ => Self::Reserved,
         };
     }
 }
@@ -523,8 +520,12 @@ fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
             0b001 => Ok(Instruction::SLL(rd, rs1, rs2)),
             0b010 => Ok(Instruction::SLT(rd, rs1, rs2)),
             0b011 => Ok(Instruction::SLTU(rd, rs1, rs2)),
-            0b100 => todo!(),
-            0b101 => todo!(),
+            0b100 => Ok(Instruction::XOR(rd, rs1, rs2)),
+            0b101 => match func7 {
+                0b000_0000 => Ok(Instruction::SRL(rd, rs1, rs2)),
+                0b010_0000 => Ok(Instruction::SRA(rd, rs1, rs2)),
+                x => Err(format!("unknown Op(000) func 7: {}", x)),
+            },
             0b110 => Ok(Instruction::OR(rd, rs1, rs2)),
             0b111 => Ok(Instruction::AND(rd, rs1, rs2)),
             x => unreachable!(),
@@ -595,7 +596,7 @@ fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
                     if shamt & 0b100000 != 0 {
                         Err("SRLIW with shamt[5] set".to_owned())
                     } else {
-                        Ok(Instruction::SLLIW(rd, rs1, shamt))
+                        Ok(Instruction::SRLIW(rd, rs1, shamt))
                     }
                 }
                 0b010_0000 => {
@@ -629,7 +630,11 @@ fn main() {
     let mut i = 0;
     loop {
         let x: u32 = rng.random();
-        println!("{}: {:x} {:?}", i, x, decode_instruction(x));
+        let d = decode_instruction(x);
+        if let Ok(instr) = d {
+            println!("{}: {:x} {}", i, x, instr);
+        }
+
         i += 1;
     }
 }
