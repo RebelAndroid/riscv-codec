@@ -11,6 +11,7 @@ pub enum Opcode {
     OpImm32 = 0b00_110_11,
     Jalr = 0b11_001_11,
     Jal = 0b11_011_11,
+    Branch = 0b11_000_11,
     Reserved = 0,
 }
 
@@ -30,6 +31,7 @@ impl Opcode {
             0b00_110_11 => Self::OpImm32,
             0b11_001_11 => Self::Jalr,
             0b11_011_11 => Self::Jal,
+            0b11_000_11 => Self::Branch,
             _ => Self::Reserved,
         };
     }

@@ -15,12 +15,12 @@ pub enum Instruction {
     JAL(IRegister, i32),
     /// Jump and Link Register
     JALR(IRegister, IRegister, i16),
-    BEQ(IRegister, IRegister, u16),
-    BNE(IRegister, IRegister, u16),
-    BLT(IRegister, IRegister, u16),
-    BGE(IRegister, IRegister, u16),
-    BLTU(IRegister, IRegister, u16),
-    BGEU(IRegister, IRegister, u16),
+    BEQ(IRegister, IRegister, i16),
+    BNE(IRegister, IRegister, i16),
+    BLT(IRegister, IRegister, i16),
+    BGE(IRegister, IRegister, i16),
+    BLTU(IRegister, IRegister, i16),
+    BGEU(IRegister, IRegister, i16),
     /// Load Byte
     LB(IRegister, IRegister, i16),
     /// Load Halfword
@@ -63,7 +63,7 @@ pub enum Instruction {
     SRA(IRegister, IRegister, IRegister),
     OR(IRegister, IRegister, IRegister),
     AND(IRegister, IRegister, IRegister),
-    FENCE(IRegister, IRegister, u8, u8, u8),
+    FENCE(IRegister, IRegister, u8, u8),
     ECALL,
     EBREAK,
     //
@@ -135,7 +135,7 @@ impl Display for Instruction {
             Instruction::SRA(rd, rs1, rs2) => write!(f, "sra {rd},{rs1},{rs2}"),
             Instruction::OR(rd, rs1, rs2) => write!(f, "or {rd},{rs1},{rs2}"),
             Instruction::AND(rd, rs1, rs2) => write!(f, "and {rd},{rs1},{rs2}"),
-            Instruction::FENCE(iregister, iregister1, _, _, _) => todo!(),
+            Instruction::FENCE(rd, rs1, ops, fm) => todo!(),
             Instruction::ECALL => write!(f, "ecall"),
             Instruction::EBREAK => write!(f, "ebreak"),
             Instruction::LWU(rd, rs1, imm) => write!(f, "lwu {rd},{imm}({rs1})"),
@@ -269,6 +269,13 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
 
     let u_immediate = instruction & (!0b1111_1111_1111);
 
+    let b = (((instruction >> 7) & 0b1) << 11)
+        | (((instruction >> 8) & 0b1111) << 1)
+        | (((instruction >> 25) & 0b11_1111) << 5)
+        | ((instruction >> 31) << 12);
+
+    let mut b_immediate = ((b << 20 as i32) >> 20) as i16;
+
     let shamt: u8 = ((instruction >> 20) & 0b11_1111).try_into().unwrap();
 
     match opcode {
@@ -375,6 +382,12 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
                 rs1,
                 sign_extend_i_immediate(i_immediate),
             )),
+            // the bottom bit of func7 is actually the top bit of shamt, so we need to ignore it
+            0b101 => match func7 | 0b1 {
+                0b000000_1 => Ok(Instruction::SRLI(rd, rs1, shamt)),
+                0b010000_1 => Ok(Instruction::SRAI(rd, rs1, shamt)),
+                x => Err(format!("unknown OpImm(101) func 7: {x}").to_owned()),
+            },
             0b110 => Ok(Instruction::ORI(
                 rd,
                 rs1,
@@ -428,6 +441,15 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
             rd,
             j_immediate_from_u_immediate(u_immediate),
         )),
+        Opcode::Branch => match func3 {
+            0b000 => Ok(Instruction::BEQ(rs1, rs2, b_immediate)),
+            0b001 => Ok(Instruction::BNE(rs1, rs2, b_immediate)),
+            0b100 => Ok(Instruction::BLT(rs1, rs2, b_immediate)),
+            0b101 => Ok(Instruction::BGE(rs1, rs2, b_immediate)),
+            0b110 => Ok(Instruction::BLTU(rs1, rs2, b_immediate)),
+            0b111 => Ok(Instruction::BGEU(rs1, rs2, b_immediate)),
+            x => Err(format!("invalid branch func3: {x}").to_owned()),
+        },
         Opcode::Reserved => Err("instruction uses reserved opcode".to_owned()),
     }
 }
