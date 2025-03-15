@@ -12,6 +12,7 @@ pub enum Opcode {
     Jalr = 0b11_001_11,
     Jal = 0b11_011_11,
     Branch = 0b11_000_11,
+    MiscMem = 0b00_011_11,
     Reserved = 0,
 }
 
@@ -32,6 +33,7 @@ impl Opcode {
             0b11_001_11 => Self::Jalr,
             0b11_011_11 => Self::Jal,
             0b11_000_11 => Self::Branch,
+            0b00_011_11 => Self::MiscMem,
             _ => Self::Reserved,
         };
     }

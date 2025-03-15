@@ -135,7 +135,7 @@ impl Display for Instruction {
             Instruction::SRA(rd, rs1, rs2) => write!(f, "sra {rd},{rs1},{rs2}"),
             Instruction::OR(rd, rs1, rs2) => write!(f, "or {rd},{rs1},{rs2}"),
             Instruction::AND(rd, rs1, rs2) => write!(f, "and {rd},{rs1},{rs2}"),
-            Instruction::FENCE(rd, rs1, ops, fm) => todo!(),
+            Instruction::FENCE(_, _, ops, fm) => write!(f, "{}", self.fmt_fence()),
             Instruction::ECALL => write!(f, "ecall"),
             Instruction::EBREAK => write!(f, "ebreak"),
             Instruction::LWU(rd, rs1, imm) => write!(f, "lwu {rd},{imm}({rs1})"),
@@ -150,6 +150,28 @@ impl Display for Instruction {
             Instruction::SLLW(rd, rs1, rs2) => write!(f, "sllw {rd}{rs1}{rs2}"),
             Instruction::SRLW(rd, rs1, rs2) => write!(f, "srlw {rd}{rs1}{rs2}"),
             Instruction::SRAW(rd, rs1, rs2) => write!(f, "sraw {rd}{rs1}{rs2}"),
+        }
+    }
+}
+
+impl Instruction {
+    fn fmt_fence(&self) -> String {
+        if let Instruction::FENCE(_, _, ops, fm) = *self {
+            if fm == 0b1000 {
+                return "fence.tso".to_owned();
+            }
+            let sw = if ops & 0b0000_0001 != 0 { "w" } else { "" };
+            let sr = if ops & 0b0000_0010 != 0 { "r" } else { "" };
+            let so = if ops & 0b0000_0100 != 0 { "o" } else { "" };
+            let si = if ops & 0b0000_1000 != 0 { "i" } else { "" };
+            let pw = if ops & 0b0001_0000 != 0 { "w" } else { "" };
+            let pr = if ops & 0b0010_0000 != 0 { "r" } else { "" };
+            let po = if ops & 0b0100_0000 != 0 { "o" } else { "" };
+            let pi = if ops & 0b1000_0000 != 0 { "i" } else { "" };
+
+            return format!("fence {pi}{po}{pr}{pw},{si}{so}{sr}{sw}");
+        } else {
+            unreachable!();
         }
     }
 }
@@ -449,6 +471,15 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
             0b110 => Ok(Instruction::BLTU(rs1, rs2, b_immediate)),
             0b111 => Ok(Instruction::BGEU(rs1, rs2, b_immediate)),
             x => Err(format!("invalid branch func3: {x}").to_owned()),
+        },
+        Opcode::MiscMem => match func3 {
+            0b000 => Ok(Instruction::FENCE(
+                rd,
+                rs1,
+                ((instruction >> 20) & 0xFF) as u8,
+                ((instruction >> 28) & 0b1111) as u8,
+            )),
+            x => Err(format!("unknown fence func3: {x}")),
         },
         Opcode::Reserved => Err("instruction uses reserved opcode".to_owned()),
     }
