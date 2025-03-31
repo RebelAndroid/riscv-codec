@@ -279,6 +279,27 @@ pub fn assemble_line(line: &str) -> Result<Instruction, String> {
                 Ok(Instruction::LUI(IRegister::from_string(operands[0])?, int))
             }
         }
+        "slti" => {
+            if operands.len() != 3 {
+                Err("slti instruction requires 3 operands".to_owned())
+            } else {
+                Ok(Instruction::SLTI(
+                    IRegister::from_string(operands[0])?,
+                    IRegister::from_string(operands[1])?,
+                    parse_int(operands[2])? as i16,
+                ))
+            }
+        }
+        "jal" => {
+            if operands.len() != 2 {
+                Err("jal instruction requires 2 operands".to_owned())
+            } else {
+                Ok(Instruction::JAL(
+                    IRegister::from_string(operands[0])?,
+                    parse_int(operands[1])? as i32,
+                ))
+            }
+        }
         _ => Err(format!("unknown mnemonic: {}", mnemonic)),
     };
 }
