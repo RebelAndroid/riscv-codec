@@ -2,7 +2,7 @@ use crate::opcode::Opcode;
 use crate::register::IRegister;
 use std::fmt::{Display, Formatter};
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum Instruction {
     //
     // Instructions from RV32I
@@ -226,7 +226,7 @@ fn parse_address_expression(str: &str) -> Result<(IRegister, i16), String> {
 }
 
 /// Constructs an `Instruction` from a line of assembly.
-pub fn disassemble_instruction(line: &str) -> Result<Instruction, String> {
+pub fn assemble_line(line: &str) -> Result<Instruction, String> {
     let (mnemonic, operands): (&str, &str) = if let Some(x) = line.split_once(" ") {
         x
     } else {
@@ -263,9 +263,9 @@ pub fn disassemble_instruction(line: &str) -> Result<Instruction, String> {
     };
 }
 
-/// Assembles an instruction.
-pub fn assemble_instruction(instruction: Instruction) -> String {
-    todo!();
+/// Disassembles an instruction.
+pub fn disassemble_instruction(instruction: &Instruction) -> String {
+    return format!("{}", instruction);
 }
 
 /// Constructs an `Instruction` from it's machine code representation.

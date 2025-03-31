@@ -18,7 +18,12 @@ fn main() {
         let x: u32 = rng.random();
         let d = decode_instruction(x);
         if let Ok(instr) = d {
-            println!("{}: {:x} {}", i, x, instr);
+            let asm: String = disassemble_instruction(&instr);
+            println!("{i} assembly: {asm}");
+            let new_instr = assemble_line(&asm).unwrap();
+            if (instr != new_instr) {
+                println!("original: {instr}, new: {new_instr}");
+            }
         }
 
         i += 1;
