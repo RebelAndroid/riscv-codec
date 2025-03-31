@@ -23,7 +23,7 @@ fn main() {
             let new_instr = assemble_line(&asm).unwrap();
             if instr != new_instr {
                 println!(
-                    "ERROR WITH INSTRUCTION DISASSEMBLING: original: {instr}, new: {new_instr}"
+                    "ERROR WITH INSTRUCTION DISASSEMBLING: original: {instr:?}, new: {new_instr:?}"
                 );
                 std::process::exit(1);
             }

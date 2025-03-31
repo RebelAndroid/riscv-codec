@@ -300,8 +300,40 @@ pub fn assemble_line(line: &str) -> Result<Instruction, String> {
                 ))
             }
         }
+        "fence" => {
+            if operands.len() != 2 {
+                Err("fence instruction requires 2 operands".to_owned())
+            } else {
+                let ops = parse_fence_set(operands[1]) | (parse_fence_set(operands[0]) << 4);
+                Ok(Instruction::FENCE(
+                    // rd and rs1 are currently unused
+                    IRegister::Zero,
+                    IRegister::Zero,
+                    ops,
+                    0, //fm field, always zero for a non-tso fence
+                ))
+            }
+        }
         _ => Err(format!("unknown mnemonic: {}", mnemonic)),
     };
+}
+
+/// Converts a string representing operations into a
+pub fn parse_fence_set(s: &str) -> u8 {
+    let mut x = 0;
+    if (s.contains("w")) {
+        x |= 0b1;
+    }
+    if (s.contains("r")) {
+        x |= 0b10;
+    }
+    if (s.contains("o")) {
+        x |= 0b100;
+    }
+    if (s.contains("i")) {
+        x |= 0b1000;
+    }
+    return x;
 }
 
 /// Disassembles an instruction.
@@ -514,12 +546,19 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
             x => Err(format!("invalid branch func3: {x}").to_owned()),
         },
         Opcode::MiscMem => match func3 {
-            0b000 => Ok(Instruction::FENCE(
-                rd,
-                rs1,
-                ((instruction >> 20) & 0xFF) as u8,
-                ((instruction >> 28) & 0b1111) as u8,
-            )),
+            0b000 => {
+                if rd != IRegister::Zero || rs1 != IRegister::Zero {
+                    // technicially, we are supposed to ignore these fields
+                    Err(format!("reserved register fields not set to zero").to_owned())
+                } else {
+                    Ok(Instruction::FENCE(
+                        rd,
+                        rs1,
+                        ((instruction >> 20) & 0xFF) as u8,
+                        ((instruction >> 28) & 0b1111) as u8,
+                    ))
+                }
+            }
             x => Err(format!("unknown fence func3: {x}")),
         },
         Opcode::Reserved => Err("instruction uses reserved opcode".to_owned()),
