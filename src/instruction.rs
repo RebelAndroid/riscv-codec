@@ -259,6 +259,26 @@ pub fn assemble_line(line: &str) -> Result<Instruction, String> {
                 ))
             }
         }
+        "jalr" => {
+            if operands.len() != 2 {
+                Err("jalr instruction requires 2 operands".to_owned())
+            } else {
+                let (base, offset) = parse_address_expression(operands[1])?;
+                Ok(Instruction::JALR(
+                    IRegister::from_string(operands[0])?,
+                    base,
+                    offset,
+                ))
+            }
+        }
+        "lui" => {
+            if operands.len() != 2 {
+                Err("lui instruction requires 2 operands".to_owned())
+            } else {
+                let int: u32 = parse_int(operands[1])? as u32;
+                Ok(Instruction::LUI(IRegister::from_string(operands[0])?, int))
+            }
+        }
         _ => Err(format!("unknown mnemonic: {}", mnemonic)),
     };
 }
@@ -296,7 +316,7 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
         | (((instruction >> 25) & 0b11_1111) << 5)
         | ((instruction >> 31) << 12);
 
-    let mut b_immediate = ((b << 20 as i32) >> 20) as i16;
+    let b_immediate = ((b << 20 as i32) >> 20) as i16;
 
     let shamt: u8 = ((instruction >> 20) & 0b11_1111).try_into().unwrap();
 
