@@ -108,14 +108,14 @@ impl Display for Instruction {
             Instruction::BGE(rs1, rs2, imm) => write!(f, "bge {rs1},{rs2},{imm}"),
             Instruction::BLTU(rs1, rs2, imm) => write!(f, "bltu {rs1},{rs2},{imm}"),
             Instruction::BGEU(rs1, rs2, imm) => write!(f, "bgeu {rs1},{rs2},{imm}"),
-            Instruction::LB(rd, rs1, imm) => write!(f, "lb {rd}, {imm}({rs1})"),
-            Instruction::LH(rd, rs1, imm) => write!(f, "lh {rd}, {imm}({rs1})"),
-            Instruction::LW(rd, rs1, imm) => write!(f, "lw {rd}, {imm}({rs1})"),
-            Instruction::LBU(rd, rs1, imm) => write!(f, "lbu {rd}, {imm}({rs1})"),
-            Instruction::LHU(rd, rs1, imm) => write!(f, "lhu {rd}, {imm}({rs1})"),
-            Instruction::SB(rs1, rs2, imm) => write!(f, "sb {rs2} {imm}({rs1})"),
-            Instruction::SH(rs1, rs2, imm) => write!(f, "sh {rs2} {imm}({rs1})"),
-            Instruction::SW(rs1, rs2, imm) => write!(f, "sw {rs2} {imm}({rs1})"),
+            Instruction::LB(rd, rs1, imm) => write!(f, "lb {rd},{imm}({rs1})"),
+            Instruction::LH(rd, rs1, imm) => write!(f, "lh {rd},{imm}({rs1})"),
+            Instruction::LW(rd, rs1, imm) => write!(f, "lw {rd},{imm}({rs1})"),
+            Instruction::LBU(rd, rs1, imm) => write!(f, "lbu {rd},{imm}({rs1})"),
+            Instruction::LHU(rd, rs1, imm) => write!(f, "lhu {rd},{imm}({rs1})"),
+            Instruction::SB(rs1, rs2, imm) => write!(f, "sb {rs2},{imm}({rs1})"),
+            Instruction::SH(rs1, rs2, imm) => write!(f, "sh {rs2},{imm}({rs1})"),
+            Instruction::SW(rs1, rs2, imm) => write!(f, "sw {rs2},{imm}({rs1})"),
             Instruction::ADDI(rd, rs1, imm) => write!(f, "addi {rd},{rs1},{imm}"),
             Instruction::SLTI(rd, rs1, imm) => write!(f, "slti {rd},{rs1},{imm}"),
             Instruction::SLTIU(rd, rs1, imm) => write!(f, "sltiu {rd},{rs1},{imm}"),
@@ -205,7 +205,7 @@ fn j_immediate_from_u_immediate(u: u32) -> i32 {
 fn parse_int(str: &str) -> Result<i64, String> {
     match str.parse::<i64>() {
         Ok(e) => Ok(e),
-        Err(_) => Err("unable to parse int".to_owned()),
+        Err(_) => Err(format!("unable to parse int:{str}").to_owned()),
     }
 }
 
@@ -247,6 +247,51 @@ pub fn assemble_line(line: &str) -> Result<Instruction, String> {
                 ))
             }
         }
+        "ori" => {
+            if operands.len() != 3 {
+                Err("ori instruction requires 3 operands".to_owned())
+            } else {
+                Ok(Instruction::ORI(
+                    IRegister::from_string(operands[0])?,
+                    IRegister::from_string(operands[1])?,
+                    parse_int(operands[2])?.try_into().unwrap(),
+                ))
+            }
+        }
+        "slti" => {
+            if operands.len() != 3 {
+                Err("slti instruction requires 3 operands".to_owned())
+            } else {
+                Ok(Instruction::SLTI(
+                    IRegister::from_string(operands[0])?,
+                    IRegister::from_string(operands[1])?,
+                    parse_int(operands[2])? as i16,
+                ))
+            }
+        }
+        "or" => {
+            if operands.len() != 3 {
+                Err("or instruction requires 3 operands".to_owned())
+            } else {
+                Ok(Instruction::OR(
+                    IRegister::from_string(operands[0])?,
+                    IRegister::from_string(operands[1])?,
+                    IRegister::from_string(operands[2])?,
+                ))
+            }
+        }
+        "lhu" => {
+            if operands.len() != 2 {
+                Err("lhu instruction requires 2 operands".to_owned())
+            } else {
+                let (base, offset) = parse_address_expression(operands[1])?;
+                Ok(Instruction::LHU(
+                    IRegister::from_string(operands[0])?,
+                    base,
+                    offset,
+                ))
+            }
+        }
         "sd" => {
             if operands.len() != 2 {
                 Err("sd instruction requires 2 operands".to_owned())
@@ -276,18 +321,24 @@ pub fn assemble_line(line: &str) -> Result<Instruction, String> {
                 Err("lui instruction requires 2 operands".to_owned())
             } else {
                 let int: u32 = parse_int(operands[1])? as u32;
-                Ok(Instruction::LUI(IRegister::from_string(operands[0])?, int))
+                if int & 0xFFF != 0 {
+                    Err("auipc immediate must be divisible by 0x1000".to_owned())
+                } else {
+                    Ok(Instruction::LUI(IRegister::from_string(operands[0])?, int))
+                }
+                
             }
         }
-        "slti" => {
-            if operands.len() != 3 {
-                Err("slti instruction requires 3 operands".to_owned())
+        "auipc" => {
+            if operands.len() != 2 {
+                Err("auipc instruction requires 2 operands".to_owned())
             } else {
-                Ok(Instruction::SLTI(
-                    IRegister::from_string(operands[0])?,
-                    IRegister::from_string(operands[1])?,
-                    parse_int(operands[2])? as i16,
-                ))
+                let int: u32 = parse_int(operands[1])? as u32;
+                if int & 0xFFF != 0 {
+                    Err("auipc immediate must be divisible by 0x1000".to_owned())
+                } else {
+                    Ok(Instruction::AUIPC(IRegister::from_string(operands[0])?, int))
+                }
             }
         }
         "jal" => {
