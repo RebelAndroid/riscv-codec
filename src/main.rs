@@ -14,6 +14,7 @@ mod opcode;
 fn main() {
     let mut rng = rand_chacha::ChaCha8Rng::seed_from_u64(0);
     let mut i = 0;
+    // println!("size: {}", std::mem::size_of::<Instruction>());
     loop {
         let x: u32 = rng.random();
         let d = decode_instruction(x);

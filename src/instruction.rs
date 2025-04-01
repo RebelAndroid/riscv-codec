@@ -145,11 +145,11 @@ impl Display for Instruction {
             Instruction::SLLIW(rd, rs1, imm) => write!(f, "slliw {rd},{rs1},{imm}"),
             Instruction::SRLIW(rd, rs1, imm) => write!(f, "srliw {rd},{rs1},{imm}"),
             Instruction::SRAIW(rd, rs1, imm) => write!(f, "sraiw {rd},{rs1},{imm}"),
-            Instruction::ADDW(rd, rs1, rs2) => write!(f, "addw {rd}{rs1}{rs2}"),
-            Instruction::SUBW(rd, rs1, rs2) => write!(f, "subw {rd}{rs1}{rs2}"),
-            Instruction::SLLW(rd, rs1, rs2) => write!(f, "sllw {rd}{rs1}{rs2}"),
-            Instruction::SRLW(rd, rs1, rs2) => write!(f, "srlw {rd}{rs1}{rs2}"),
-            Instruction::SRAW(rd, rs1, rs2) => write!(f, "sraw {rd}{rs1}{rs2}"),
+            Instruction::ADDW(rd, rs1, rs2) => write!(f, "addw {rd},{rs1},{rs2}"),
+            Instruction::SUBW(rd, rs1, rs2) => write!(f, "subw {rd},{rs1},{rs2}"),
+            Instruction::SLLW(rd, rs1, rs2) => write!(f, "sllw {rd},{rs1},{rs2}"),
+            Instruction::SRLW(rd, rs1, rs2) => write!(f, "srlw {rd},{rs1},{rs2}"),
+            Instruction::SRAW(rd, rs1, rs2) => write!(f, "sraw {rd},{rs1},{rs2}"),
         }
     }
 }
@@ -269,11 +269,55 @@ pub fn assemble_line(line: &str) -> Result<Instruction, String> {
                 ))
             }
         }
+        "slliw" => {
+            if operands.len() != 3 {
+                Err("slliw instruction requires 3 operands".to_owned())
+            } else {
+                Ok(Instruction::SLLIW(
+                    IRegister::from_string(operands[0])?,
+                    IRegister::from_string(operands[1])?,
+                    parse_int(operands[2])? as u8,
+                ))
+            }
+        }
         "or" => {
             if operands.len() != 3 {
                 Err("or instruction requires 3 operands".to_owned())
             } else {
                 Ok(Instruction::OR(
+                    IRegister::from_string(operands[0])?,
+                    IRegister::from_string(operands[1])?,
+                    IRegister::from_string(operands[2])?,
+                ))
+            }
+        }
+        "sllw" => {
+            if operands.len() != 3 {
+                Err("sllw instruction requires 3 operands".to_owned())
+            } else {
+                Ok(Instruction::SLLW(
+                    IRegister::from_string(operands[0])?,
+                    IRegister::from_string(operands[1])?,
+                    IRegister::from_string(operands[2])?,
+                ))
+            }
+        }
+        "slt" => {
+            if operands.len() != 3 {
+                Err("slt instruction requires 3 operands".to_owned())
+            } else {
+                Ok(Instruction::SLT(
+                    IRegister::from_string(operands[0])?,
+                    IRegister::from_string(operands[1])?,
+                    IRegister::from_string(operands[2])?,
+                ))
+            }
+        }
+        "sltu" => {
+            if operands.len() != 3 {
+                Err("slt instruction requires 3 operands".to_owned())
+            } else {
+                Ok(Instruction::SLTU(
                     IRegister::from_string(operands[0])?,
                     IRegister::from_string(operands[1])?,
                     IRegister::from_string(operands[2])?,
@@ -286,6 +330,30 @@ pub fn assemble_line(line: &str) -> Result<Instruction, String> {
             } else {
                 let (base, offset) = parse_address_expression(operands[1])?;
                 Ok(Instruction::LHU(
+                    IRegister::from_string(operands[0])?,
+                    base,
+                    offset,
+                ))
+            }
+        }
+        "lw" => {
+            if operands.len() != 2 {
+                Err("lw instruction requires 2 operands".to_owned())
+            } else {
+                let (base, offset) = parse_address_expression(operands[1])?;
+                Ok(Instruction::LW(
+                    IRegister::from_string(operands[0])?,
+                    base,
+                    offset,
+                ))
+            }
+        }
+        "lwu" => {
+            if operands.len() != 2 {
+                Err("lwu instruction requires 2 operands".to_owned())
+            } else {
+                let (base, offset) = parse_address_expression(operands[1])?;
+                Ok(Instruction::LWU(
                     IRegister::from_string(operands[0])?,
                     base,
                     offset,
@@ -316,6 +384,27 @@ pub fn assemble_line(line: &str) -> Result<Instruction, String> {
                 ))
             }
         }
+        "jal" => {
+            if operands.len() != 2 {
+                Err("jal instruction requires 2 operands".to_owned())
+            } else {
+                Ok(Instruction::JAL(
+                    IRegister::from_string(operands[0])?,
+                    parse_int(operands[1])? as i32,
+                ))
+            }
+        }
+        "blt" => {
+            if operands.len() != 3 {
+                Err("blt instruction requires 3 operands".to_owned())
+            } else {
+                Ok(Instruction::BLT(
+                    IRegister::from_string(operands[0])?,
+                    IRegister::from_string(operands[1])?,
+                    parse_int(operands[2])? as i16,
+                ))
+            }
+        }
         "lui" => {
             if operands.len() != 2 {
                 Err("lui instruction requires 2 operands".to_owned())
@@ -341,16 +430,7 @@ pub fn assemble_line(line: &str) -> Result<Instruction, String> {
                 }
             }
         }
-        "jal" => {
-            if operands.len() != 2 {
-                Err("jal instruction requires 2 operands".to_owned())
-            } else {
-                Ok(Instruction::JAL(
-                    IRegister::from_string(operands[0])?,
-                    parse_int(operands[1])? as i32,
-                ))
-            }
-        }
+        
         "fence" => {
             if operands.len() != 2 {
                 Err("fence instruction requires 2 operands".to_owned())
