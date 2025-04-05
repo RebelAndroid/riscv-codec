@@ -135,7 +135,7 @@ impl Display for Instruction {
             Instruction::SRA(rd, rs1, rs2) => write!(f, "sra {rd},{rs1},{rs2}"),
             Instruction::OR(rd, rs1, rs2) => write!(f, "or {rd},{rs1},{rs2}"),
             Instruction::AND(rd, rs1, rs2) => write!(f, "and {rd},{rs1},{rs2}"),
-            Instruction::FENCE(_, _, ops, fm) => write!(f, "{}", self.fmt_fence()),
+            Instruction::FENCE(_, _, _, _) => write!(f, "{}", self.fmt_fence()),
             Instruction::ECALL => write!(f, "ecall"),
             Instruction::EBREAK => write!(f, "ebreak"),
             Instruction::LWU(rd, rs1, imm) => write!(f, "lwu {rd},{imm}({rs1})"),
@@ -157,9 +157,6 @@ impl Display for Instruction {
 impl Instruction {
     fn fmt_fence(&self) -> String {
         if let Instruction::FENCE(_, _, ops, fm) = *self {
-            if fm == 0b1000 {
-                return "fence.tso".to_owned();
-            }
             let sw = if ops & 0b0000_0001 != 0 { "w" } else { "" };
             let sr = if ops & 0b0000_0010 != 0 { "r" } else { "" };
             let so = if ops & 0b0000_0100 != 0 { "o" } else { "" };
@@ -168,8 +165,11 @@ impl Instruction {
             let pr = if ops & 0b0010_0000 != 0 { "r" } else { "" };
             let po = if ops & 0b0100_0000 != 0 { "o" } else { "" };
             let pi = if ops & 0b1000_0000 != 0 { "i" } else { "" };
-
-            return format!("fence {pi}{po}{pr}{pw},{si}{so}{sr}{sw}");
+            if fm == 0b1000 {
+                format!("fence.tso {pi}{po}{pr}{pw},{si}{so}{sr}{sw}")
+            } else {
+                format!("fence {pi}{po}{pr}{pw},{si}{so}{sr}{sw}")
+            }
         } else {
             unreachable!();
         }
@@ -230,10 +230,14 @@ pub fn assemble_line(line: &str) -> Result<Instruction, String> {
     let (mnemonic, operands): (&str, &str) = if let Some(x) = line.split_once(" ") {
         x
     } else {
-        panic!("no space");
+        (line, "")
     };
 
-    let operands: Vec<&str> = operands.split(',').collect();
+    let operands: Vec<&str> = if operands.len() == 0 {
+        vec![]
+    } else {
+        operands.split(',').collect()
+    };
 
     return match mnemonic {
         "addi" => {
@@ -324,11 +328,44 @@ pub fn assemble_line(line: &str) -> Result<Instruction, String> {
                 ))
             }
         }
+        "srai" => {
+            if operands.len() != 3 {
+                Err("srai instruction requires 3 operands".to_owned())
+            } else {
+                Ok(Instruction::SRAI(
+                    IRegister::from_string(operands[0])?,
+                    IRegister::from_string(operands[1])?,
+                    parse_int(operands[2])? as u8,
+                ))
+            }
+        }
+        "sraiw" => {
+            if operands.len() != 3 {
+                Err("srai instruction requires 3 operands".to_owned())
+            } else {
+                Ok(Instruction::SRAIW(
+                    IRegister::from_string(operands[0])?,
+                    IRegister::from_string(operands[1])?,
+                    parse_int(operands[2])? as u8,
+                ))
+            }
+        }
         "srli" => {
             if operands.len() != 3 {
                 Err("srli instruction requires 3 operands".to_owned())
             } else {
                 Ok(Instruction::SRLI(
+                    IRegister::from_string(operands[0])?,
+                    IRegister::from_string(operands[1])?,
+                    parse_int(operands[2])? as u8,
+                ))
+            }
+        }
+        "srliw" => {
+            if operands.len() != 3 {
+                Err("srliw instruction requires 3 operands".to_owned())
+            } else {
+                Ok(Instruction::SRLIW(
                     IRegister::from_string(operands[0])?,
                     IRegister::from_string(operands[1])?,
                     parse_int(operands[2])? as u8,
@@ -357,11 +394,44 @@ pub fn assemble_line(line: &str) -> Result<Instruction, String> {
                 ))
             }
         }
+        "addw" => {
+            if operands.len() != 3 {
+                Err("addw instruction requires 3 operands".to_owned())
+            } else {
+                Ok(Instruction::ADDW(
+                    IRegister::from_string(operands[0])?,
+                    IRegister::from_string(operands[1])?,
+                    IRegister::from_string(operands[2])?,
+                ))
+            }
+        }
+        "subw" => {
+            if operands.len() != 3 {
+                Err("subw instruction requires 3 operands".to_owned())
+            } else {
+                Ok(Instruction::SUBW(
+                    IRegister::from_string(operands[0])?,
+                    IRegister::from_string(operands[1])?,
+                    IRegister::from_string(operands[2])?,
+                ))
+            }
+        }
         "and" => {
             if operands.len() != 3 {
                 Err("and instruction requires 3 operands".to_owned())
             } else {
                 Ok(Instruction::AND(
+                    IRegister::from_string(operands[0])?,
+                    IRegister::from_string(operands[1])?,
+                    IRegister::from_string(operands[2])?,
+                ))
+            }
+        }
+        "sub" => {
+            if operands.len() != 3 {
+                Err("sub instruction requires 3 operands".to_owned())
+            } else {
+                Ok(Instruction::SUB(
                     IRegister::from_string(operands[0])?,
                     IRegister::from_string(operands[1])?,
                     IRegister::from_string(operands[2])?,
@@ -401,11 +471,44 @@ pub fn assemble_line(line: &str) -> Result<Instruction, String> {
                 ))
             }
         }
+        "srl" => {
+            if operands.len() != 3 {
+                Err("srl instruction requires 3 operands".to_owned())
+            } else {
+                Ok(Instruction::SRL(
+                    IRegister::from_string(operands[0])?,
+                    IRegister::from_string(operands[1])?,
+                    IRegister::from_string(operands[2])?,
+                ))
+            }
+        }
+        "sra" => {
+            if operands.len() != 3 {
+                Err("sra instruction requires 3 operands".to_owned())
+            } else {
+                Ok(Instruction::SRA(
+                    IRegister::from_string(operands[0])?,
+                    IRegister::from_string(operands[1])?,
+                    IRegister::from_string(operands[2])?,
+                ))
+            }
+        }
         "srlw" => {
             if operands.len() != 3 {
                 Err("srlw instruction requires 3 operands".to_owned())
             } else {
                 Ok(Instruction::SRLW(
+                    IRegister::from_string(operands[0])?,
+                    IRegister::from_string(operands[1])?,
+                    IRegister::from_string(operands[2])?,
+                ))
+            }
+        }
+        "sraw" => {
+            if operands.len() != 3 {
+                Err("sraw instruction requires 3 operands".to_owned())
+            } else {
+                Ok(Instruction::SRAW(
                     IRegister::from_string(operands[0])?,
                     IRegister::from_string(operands[1])?,
                     IRegister::from_string(operands[2])?,
@@ -692,7 +795,6 @@ pub fn assemble_line(line: &str) -> Result<Instruction, String> {
                 }
             }
         }
-
         "fence" => {
             if operands.len() != 2 {
                 Err("fence instruction requires 2 operands".to_owned())
@@ -707,11 +809,29 @@ pub fn assemble_line(line: &str) -> Result<Instruction, String> {
                 ))
             }
         }
+        "fence.tso" => {
+            if operands.len() != 2 {
+                Err("fence.tso instruction requires 2 operands".to_owned())
+            } else {
+                let ops = parse_fence_set(operands[1]) | (parse_fence_set(operands[0]) << 4);
+                if ops != (parse_fence_set("rw") | (parse_fence_set("rw") << 4)) {
+                    Err("fence.tso should be rw,rw".to_owned())
+                } else {
+                    Ok(Instruction::FENCE(
+                        // rd and rs1 are currently unused
+                        IRegister::Zero,
+                        IRegister::Zero,
+                        ops,
+                        0b1000, // tso fence
+                    ))
+                }
+            }
+        }
         _ => Err(format!("unknown mnemonic: {}", mnemonic)),
     };
 }
 
-/// Converts a string representing operations into a
+/// Converts a string representing operations into a fence u8
 pub fn parse_fence_set(s: &str) -> u8 {
     let mut x = 0;
     if (s.contains("w")) {
@@ -944,12 +1064,19 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
                     // technicially, we are supposed to ignore these fields
                     Err(format!("reserved register fields not set to zero").to_owned())
                 } else {
-                    Ok(Instruction::FENCE(
-                        rd,
-                        rs1,
-                        ((instruction >> 20) & 0xFF) as u8,
-                        ((instruction >> 28) & 0b1111) as u8,
-                    ))
+                    let fm = ((instruction >> 28) & 0b1111) as u8;
+                    if (fm != 0 && fm != 0b1000) {
+                        Err(format!("reserved fence FM: {fm}").to_owned())
+                    } else if fm == 0b1000 && ((instruction >> 20) & 0xFF) != 0b0011_0011 {
+                        Err(format!("fence.tso must be rw,rw").to_owned())
+                    } else {
+                        Ok(Instruction::FENCE(
+                            rd,
+                            rs1,
+                            ((instruction >> 20) & 0xFF) as u8,
+                            ((instruction >> 28) & 0b1111) as u8,
+                        ))
+                    }
                 }
             }
             x => Err(format!("unknown fence func3: {x}")),
