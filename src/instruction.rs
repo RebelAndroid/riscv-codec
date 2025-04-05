@@ -2,6 +2,8 @@ use crate::opcode::Opcode;
 use crate::register::IRegister;
 use std::fmt::{Display, Formatter};
 
+use proc_macros::{i_assemble, r_assemble};
+
 #[derive(Debug, PartialEq)]
 pub enum Instruction {
     //
@@ -240,314 +242,34 @@ pub fn assemble_line(line: &str) -> Result<Instruction, String> {
     };
 
     return match mnemonic {
-        "addi" => {
-            if operands.len() != 3 {
-                Err("addi instruction requires 3 operands".to_owned())
-            } else {
-                Ok(Instruction::ADDI(
-                    IRegister::from_string(operands[0])?,
-                    IRegister::from_string(operands[1])?,
-                    parse_int(operands[2])?.try_into().unwrap(),
-                ))
-            }
-        }
-        "addiw" => {
-            if operands.len() != 3 {
-                Err("addiw instruction requires 3 operands".to_owned())
-            } else {
-                Ok(Instruction::ADDIW(
-                    IRegister::from_string(operands[0])?,
-                    IRegister::from_string(operands[1])?,
-                    parse_int(operands[2])?.try_into().unwrap(),
-                ))
-            }
-        }
-        "andi" => {
-            if operands.len() != 3 {
-                Err("andi instruction requires 3 operands".to_owned())
-            } else {
-                Ok(Instruction::ANDI(
-                    IRegister::from_string(operands[0])?,
-                    IRegister::from_string(operands[1])?,
-                    parse_int(operands[2])?.try_into().unwrap(),
-                ))
-            }
-        }
-        "ori" => {
-            if operands.len() != 3 {
-                Err("ori instruction requires 3 operands".to_owned())
-            } else {
-                Ok(Instruction::ORI(
-                    IRegister::from_string(operands[0])?,
-                    IRegister::from_string(operands[1])?,
-                    parse_int(operands[2])?.try_into().unwrap(),
-                ))
-            }
-        }
-        "xori" => {
-            if operands.len() != 3 {
-                Err("xori instruction requires 3 operands".to_owned())
-            } else {
-                Ok(Instruction::XORI(
-                    IRegister::from_string(operands[0])?,
-                    IRegister::from_string(operands[1])?,
-                    parse_int(operands[2])?.try_into().unwrap(),
-                ))
-            }
-        }
-        "slti" => {
-            if operands.len() != 3 {
-                Err("slti instruction requires 3 operands".to_owned())
-            } else {
-                Ok(Instruction::SLTI(
-                    IRegister::from_string(operands[0])?,
-                    IRegister::from_string(operands[1])?,
-                    parse_int(operands[2])? as i16,
-                ))
-            }
-        }
-        "sltiu" => {
-            if operands.len() != 3 {
-                Err("sltiu instruction requires 3 operands".to_owned())
-            } else {
-                Ok(Instruction::SLTIU(
-                    IRegister::from_string(operands[0])?,
-                    IRegister::from_string(operands[1])?,
-                    parse_int(operands[2])? as i16,
-                ))
-            }
-        }
-        "slli" => {
-            if operands.len() != 3 {
-                Err("slli instruction requires 3 operands".to_owned())
-            } else {
-                Ok(Instruction::SLLI(
-                    IRegister::from_string(operands[0])?,
-                    IRegister::from_string(operands[1])?,
-                    parse_int(operands[2])? as u8,
-                ))
-            }
-        }
-        "srai" => {
-            if operands.len() != 3 {
-                Err("srai instruction requires 3 operands".to_owned())
-            } else {
-                Ok(Instruction::SRAI(
-                    IRegister::from_string(operands[0])?,
-                    IRegister::from_string(operands[1])?,
-                    parse_int(operands[2])? as u8,
-                ))
-            }
-        }
-        "sraiw" => {
-            if operands.len() != 3 {
-                Err("srai instruction requires 3 operands".to_owned())
-            } else {
-                Ok(Instruction::SRAIW(
-                    IRegister::from_string(operands[0])?,
-                    IRegister::from_string(operands[1])?,
-                    parse_int(operands[2])? as u8,
-                ))
-            }
-        }
-        "srli" => {
-            if operands.len() != 3 {
-                Err("srli instruction requires 3 operands".to_owned())
-            } else {
-                Ok(Instruction::SRLI(
-                    IRegister::from_string(operands[0])?,
-                    IRegister::from_string(operands[1])?,
-                    parse_int(operands[2])? as u8,
-                ))
-            }
-        }
-        "srliw" => {
-            if operands.len() != 3 {
-                Err("srliw instruction requires 3 operands".to_owned())
-            } else {
-                Ok(Instruction::SRLIW(
-                    IRegister::from_string(operands[0])?,
-                    IRegister::from_string(operands[1])?,
-                    parse_int(operands[2])? as u8,
-                ))
-            }
-        }
-        "slliw" => {
-            if operands.len() != 3 {
-                Err("slliw instruction requires 3 operands".to_owned())
-            } else {
-                Ok(Instruction::SLLIW(
-                    IRegister::from_string(operands[0])?,
-                    IRegister::from_string(operands[1])?,
-                    parse_int(operands[2])? as u8,
-                ))
-            }
-        }
-        "add" => {
-            if operands.len() != 3 {
-                Err("add instruction requires 3 operands".to_owned())
-            } else {
-                Ok(Instruction::ADD(
-                    IRegister::from_string(operands[0])?,
-                    IRegister::from_string(operands[1])?,
-                    IRegister::from_string(operands[2])?,
-                ))
-            }
-        }
-        "addw" => {
-            if operands.len() != 3 {
-                Err("addw instruction requires 3 operands".to_owned())
-            } else {
-                Ok(Instruction::ADDW(
-                    IRegister::from_string(operands[0])?,
-                    IRegister::from_string(operands[1])?,
-                    IRegister::from_string(operands[2])?,
-                ))
-            }
-        }
-        "subw" => {
-            if operands.len() != 3 {
-                Err("subw instruction requires 3 operands".to_owned())
-            } else {
-                Ok(Instruction::SUBW(
-                    IRegister::from_string(operands[0])?,
-                    IRegister::from_string(operands[1])?,
-                    IRegister::from_string(operands[2])?,
-                ))
-            }
-        }
-        "and" => {
-            if operands.len() != 3 {
-                Err("and instruction requires 3 operands".to_owned())
-            } else {
-                Ok(Instruction::AND(
-                    IRegister::from_string(operands[0])?,
-                    IRegister::from_string(operands[1])?,
-                    IRegister::from_string(operands[2])?,
-                ))
-            }
-        }
-        "sub" => {
-            if operands.len() != 3 {
-                Err("sub instruction requires 3 operands".to_owned())
-            } else {
-                Ok(Instruction::SUB(
-                    IRegister::from_string(operands[0])?,
-                    IRegister::from_string(operands[1])?,
-                    IRegister::from_string(operands[2])?,
-                ))
-            }
-        }
-        "or" => {
-            if operands.len() != 3 {
-                Err("or instruction requires 3 operands".to_owned())
-            } else {
-                Ok(Instruction::OR(
-                    IRegister::from_string(operands[0])?,
-                    IRegister::from_string(operands[1])?,
-                    IRegister::from_string(operands[2])?,
-                ))
-            }
-        }
-        "xor" => {
-            if operands.len() != 3 {
-                Err("xor instruction requires 3 operands".to_owned())
-            } else {
-                Ok(Instruction::XOR(
-                    IRegister::from_string(operands[0])?,
-                    IRegister::from_string(operands[1])?,
-                    IRegister::from_string(operands[2])?,
-                ))
-            }
-        }
-        "sllw" => {
-            if operands.len() != 3 {
-                Err("sllw instruction requires 3 operands".to_owned())
-            } else {
-                Ok(Instruction::SLLW(
-                    IRegister::from_string(operands[0])?,
-                    IRegister::from_string(operands[1])?,
-                    IRegister::from_string(operands[2])?,
-                ))
-            }
-        }
-        "srl" => {
-            if operands.len() != 3 {
-                Err("srl instruction requires 3 operands".to_owned())
-            } else {
-                Ok(Instruction::SRL(
-                    IRegister::from_string(operands[0])?,
-                    IRegister::from_string(operands[1])?,
-                    IRegister::from_string(operands[2])?,
-                ))
-            }
-        }
-        "sra" => {
-            if operands.len() != 3 {
-                Err("sra instruction requires 3 operands".to_owned())
-            } else {
-                Ok(Instruction::SRA(
-                    IRegister::from_string(operands[0])?,
-                    IRegister::from_string(operands[1])?,
-                    IRegister::from_string(operands[2])?,
-                ))
-            }
-        }
-        "srlw" => {
-            if operands.len() != 3 {
-                Err("srlw instruction requires 3 operands".to_owned())
-            } else {
-                Ok(Instruction::SRLW(
-                    IRegister::from_string(operands[0])?,
-                    IRegister::from_string(operands[1])?,
-                    IRegister::from_string(operands[2])?,
-                ))
-            }
-        }
-        "sraw" => {
-            if operands.len() != 3 {
-                Err("sraw instruction requires 3 operands".to_owned())
-            } else {
-                Ok(Instruction::SRAW(
-                    IRegister::from_string(operands[0])?,
-                    IRegister::from_string(operands[1])?,
-                    IRegister::from_string(operands[2])?,
-                ))
-            }
-        }
-        "sll" => {
-            if operands.len() != 3 {
-                Err("sll instruction requires 3 operands".to_owned())
-            } else {
-                Ok(Instruction::SLL(
-                    IRegister::from_string(operands[0])?,
-                    IRegister::from_string(operands[1])?,
-                    IRegister::from_string(operands[2])?,
-                ))
-            }
-        }
-        "slt" => {
-            if operands.len() != 3 {
-                Err("slt instruction requires 3 operands".to_owned())
-            } else {
-                Ok(Instruction::SLT(
-                    IRegister::from_string(operands[0])?,
-                    IRegister::from_string(operands[1])?,
-                    IRegister::from_string(operands[2])?,
-                ))
-            }
-        }
-        "sltu" => {
-            if operands.len() != 3 {
-                Err("slt instruction requires 3 operands".to_owned())
-            } else {
-                Ok(Instruction::SLTU(
-                    IRegister::from_string(operands[0])?,
-                    IRegister::from_string(operands[1])?,
-                    IRegister::from_string(operands[2])?,
-                ))
-            }
-        }
+        "addi" => i_assemble!(ADDI),
+        "addiw" => i_assemble!(ADDIW),
+        "andi" => i_assemble!(ANDI),
+        "ori" => i_assemble!(ORI),
+        "xori" => i_assemble!(XORI),
+        "slti" => i_assemble!(SLTI),
+        "sltiu" => i_assemble!(SLTIU),
+        "slli" => i_assemble!(SLLI),
+        "srai" => i_assemble!(SRAI),
+        "sraiw" => i_assemble!(SRAIW),
+        "srli" => i_assemble!(SRLI),
+        "srliw" => i_assemble!(SRLIW),
+        "slliw" => i_assemble!(SLLIW),
+        "add" => r_assemble!(ADD),
+        "addw" => r_assemble!(ADDW),
+        "subw" => r_assemble!(SUBW),
+        "and" => r_assemble!(AND),
+        "sub" => r_assemble!(SUB),
+        "or" => r_assemble!(OR),
+        "xor" => r_assemble!(XOR),
+        "sllw" => r_assemble!(SLLW),
+        "srl" => r_assemble!(SRL),
+        "sra" => r_assemble!(SRA),
+        "srlw" => r_assemble!(SRLW),
+        "sraw" => r_assemble!(SRAW),
+        "sll" => r_assemble!(SLL),
+        "slt" => r_assemble!(SLT),
+        "sltu" => r_assemble!(SLTU),
         "lb" => {
             if operands.len() != 2 {
                 Err("lb instruction requires 2 operands".to_owned())
@@ -834,16 +556,16 @@ pub fn assemble_line(line: &str) -> Result<Instruction, String> {
 /// Converts a string representing operations into a fence u8
 pub fn parse_fence_set(s: &str) -> u8 {
     let mut x = 0;
-    if (s.contains("w")) {
+    if s.contains("w") {
         x |= 0b1;
     }
-    if (s.contains("r")) {
+    if s.contains("r") {
         x |= 0b10;
     }
-    if (s.contains("o")) {
+    if s.contains("o") {
         x |= 0b100;
     }
-    if (s.contains("i")) {
+    if s.contains("i") {
         x |= 0b1000;
     }
     return x;
@@ -952,7 +674,7 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
             },
             0b110 => Ok(Instruction::OR(rd, rs1, rs2)),
             0b111 => Ok(Instruction::AND(rd, rs1, rs2)),
-            x => unreachable!(),
+            _ => unreachable!(),
         },
         Opcode::Op32 => match func3 {
             0b000 => match func7 {
@@ -1065,7 +787,7 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
                     Err(format!("reserved register fields not set to zero").to_owned())
                 } else {
                     let fm = ((instruction >> 28) & 0b1111) as u8;
-                    if (fm != 0 && fm != 0b1000) {
+                    if fm != 0 && fm != 0b1000 {
                         Err(format!("reserved fence FM: {fm}").to_owned())
                     } else if fm == 0b1000 && ((instruction >> 20) & 0xFF) != 0b0011_0011 {
                         Err(format!("fence.tso must be rw,rw").to_owned())

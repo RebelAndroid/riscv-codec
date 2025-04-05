@@ -51,6 +51,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "proc-macros"
+version = "0.1.0"
+
+[[package]]
 name = "quote"
 version = "1.0.40"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -93,6 +97,7 @@ dependencies = [
 name = "riscv-disassembler"
 version = "0.1.0"
 dependencies = [
+ "proc-macros",
  "rand",
  "rand_chacha",
 ]
