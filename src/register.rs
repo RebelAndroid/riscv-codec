@@ -82,7 +82,7 @@ impl Display for IRegister {
 
 impl IRegister {
     pub fn from_int(int: u32) -> Self {
-        return match int {
+        match int {
             0 => Self::Zero,
             1 => Self::ReturnAddress,
             2 => Self::StackPointer,
@@ -116,11 +116,11 @@ impl IRegister {
             30 => Self::T5,
             31 => Self::T6,
             x => panic!("converted invalid to register {}", x),
-        };
+        }
     }
 
     pub fn from_string(str: &str) -> Result<Self, String> {
-        return match str {
+        match str {
             "zero" => Ok(Self::Zero),
             "ra" => Ok(Self::ReturnAddress),
             "sp" => Ok(Self::StackPointer),
@@ -154,6 +154,6 @@ impl IRegister {
             "t5" => Ok(Self::T5),
             "t6" => Ok(Self::T6),
             x => Err(format!("converted invalid str to register {}", x)),
-        };
+        }
     }
 }

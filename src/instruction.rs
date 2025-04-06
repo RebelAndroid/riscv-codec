@@ -223,7 +223,7 @@ fn parse_address_expression(str: &str) -> Result<(IRegister, i16), String> {
             let i = parse_int(offset)?;
             Ok((r, i.try_into().unwrap()))
         }
-        None => Err("Address expression should end in a )".to_owned()),
+        _ => Err("Address expression should end in a )".to_owned()),
     }
 }
 
@@ -235,7 +235,7 @@ pub fn assemble_line(line: &str) -> Result<Instruction, String> {
         (line, "")
     };
 
-    let operands: Vec<&str> = if operands.len() == 0 {
+    let operands: Vec<&str> = if operands.is_empty() {
         vec![]
     } else {
         operands.split(',').collect()
@@ -392,12 +392,12 @@ pub fn parse_fence_set(s: &str) -> u8 {
     if s.contains("i") {
         x |= 0b1000;
     }
-    return x;
+    x
 }
 
 /// Disassembles an instruction.
 pub fn disassemble_instruction(instruction: &Instruction) -> String {
-    return format!("{}", instruction);
+    format!("{}", instruction)
 }
 
 /// Constructs an `Instruction` from it's machine code representation.
@@ -410,7 +410,6 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
     let rd = IRegister::from_int((instruction >> 7) & 0b1_1111);
     let rs1 = IRegister::from_int((instruction >> 15) & 0b1_1111);
     let rs2 = IRegister::from_int((instruction >> 20) & 0b1_1111);
-    // println!("0b{:b}", instruction);
 
     let i_immediate: u16 = ((instruction >> 20) & 0b1111_1111_1111).try_into().unwrap();
 
@@ -428,7 +427,7 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
         | (((instruction >> 25) & 0b11_1111) << 5)
         | ((instruction >> 31) << 12);
 
-    let b_immediate = ((b << 20 as i32) >> 20) as i16;
+    let b_immediate = ((b << 20_i32) >> 20) as i16;
 
     let shamt: u8 = ((instruction >> 20) & 0b11_1111).try_into().unwrap();
 
@@ -608,13 +607,13 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
             0b000 => {
                 if rd != IRegister::Zero || rs1 != IRegister::Zero {
                     // technicially, we are supposed to ignore these fields
-                    Err(format!("reserved register fields not set to zero").to_owned())
+                    Err("reserved register fields not set to zero".to_owned())
                 } else {
                     let fm = ((instruction >> 28) & 0b1111) as u8;
                     if fm != 0 && fm != 0b1000 {
                         Err(format!("reserved fence FM: {fm}").to_owned())
                     } else if fm == 0b1000 && ((instruction >> 20) & 0xFF) != 0b0011_0011 {
-                        Err(format!("fence.tso must be rw,rw").to_owned())
+                        Err("fence.tso must be rw,rw".to_owned())
                     } else {
                         Ok(Instruction::FENCE(
                             rd,

@@ -21,7 +21,7 @@ impl Opcode {
         if int > 0b11_111_11 {
             panic!("attempted to convert too large int to opcode")
         }
-        return match int {
+        match int {
             0b00_000_11 => Self::Load,
             0b00_101_11 => Self::Auipc,
             0b01_000_11 => Self::Store,
@@ -35,6 +35,6 @@ impl Opcode {
             0b11_000_11 => Self::Branch,
             0b00_011_11 => Self::MiscMem,
             _ => Self::Reserved,
-        };
+        }
     }
 }
