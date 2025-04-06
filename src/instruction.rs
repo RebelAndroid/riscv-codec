@@ -2,7 +2,7 @@ use crate::opcode::Opcode;
 use crate::register::IRegister;
 use std::fmt::{Display, Formatter};
 
-use proc_macros::{i_assemble, r_assemble};
+use proc_macros::{b_assemble, i_assemble, l_assemble, r_assemble, s_assemble};
 
 #[derive(Debug, PartialEq)]
 pub enum Instruction {
@@ -242,6 +242,7 @@ pub fn assemble_line(line: &str) -> Result<Instruction, String> {
     };
 
     return match mnemonic {
+        // register-immediate instructions
         "addi" => i_assemble!(ADDI),
         "addiw" => i_assemble!(ADDIW),
         "andi" => i_assemble!(ANDI),
@@ -255,6 +256,7 @@ pub fn assemble_line(line: &str) -> Result<Instruction, String> {
         "srli" => i_assemble!(SRLI),
         "srliw" => i_assemble!(SRLIW),
         "slliw" => i_assemble!(SLLIW),
+        // register-register instructions
         "add" => r_assemble!(ADD),
         "addw" => r_assemble!(ADDW),
         "subw" => r_assemble!(SUBW),
@@ -270,138 +272,26 @@ pub fn assemble_line(line: &str) -> Result<Instruction, String> {
         "sll" => r_assemble!(SLL),
         "slt" => r_assemble!(SLT),
         "sltu" => r_assemble!(SLTU),
-        "lb" => {
-            if operands.len() != 2 {
-                Err("lb instruction requires 2 operands".to_owned())
-            } else {
-                let (base, offset) = parse_address_expression(operands[1])?;
-                Ok(Instruction::LB(
-                    IRegister::from_string(operands[0])?,
-                    base,
-                    offset,
-                ))
-            }
-        }
-        "lbu" => {
-            if operands.len() != 2 {
-                Err("lbu instruction requires 2 operands".to_owned())
-            } else {
-                let (base, offset) = parse_address_expression(operands[1])?;
-                Ok(Instruction::LBU(
-                    IRegister::from_string(operands[0])?,
-                    base,
-                    offset,
-                ))
-            }
-        }
-        "lhu" => {
-            if operands.len() != 2 {
-                Err("lhu instruction requires 2 operands".to_owned())
-            } else {
-                let (base, offset) = parse_address_expression(operands[1])?;
-                Ok(Instruction::LHU(
-                    IRegister::from_string(operands[0])?,
-                    base,
-                    offset,
-                ))
-            }
-        }
-        "lw" => {
-            if operands.len() != 2 {
-                Err("lw instruction requires 2 operands".to_owned())
-            } else {
-                let (base, offset) = parse_address_expression(operands[1])?;
-                Ok(Instruction::LW(
-                    IRegister::from_string(operands[0])?,
-                    base,
-                    offset,
-                ))
-            }
-        }
-        "lwu" => {
-            if operands.len() != 2 {
-                Err("lwu instruction requires 2 operands".to_owned())
-            } else {
-                let (base, offset) = parse_address_expression(operands[1])?;
-                Ok(Instruction::LWU(
-                    IRegister::from_string(operands[0])?,
-                    base,
-                    offset,
-                ))
-            }
-        }
-        "lh" => {
-            if operands.len() != 2 {
-                Err("lh instruction requires 2 operands".to_owned())
-            } else {
-                let (base, offset) = parse_address_expression(operands[1])?;
-                Ok(Instruction::LH(
-                    IRegister::from_string(operands[0])?,
-                    base,
-                    offset,
-                ))
-            }
-        }
-        "ld" => {
-            if operands.len() != 2 {
-                Err("lw instruction requires 2 operands".to_owned())
-            } else {
-                let (base, offset) = parse_address_expression(operands[1])?;
-                Ok(Instruction::LD(
-                    IRegister::from_string(operands[0])?,
-                    base,
-                    offset,
-                ))
-            }
-        }
-        "sd" => {
-            if operands.len() != 2 {
-                Err("sd instruction requires 2 operands".to_owned())
-            } else {
-                let (base, offset) = parse_address_expression(operands[1])?;
-                Ok(Instruction::SD(
-                    base,
-                    IRegister::from_string(operands[0])?,
-                    offset,
-                ))
-            }
-        }
-        "sw" => {
-            if operands.len() != 2 {
-                Err("sw instruction requires 2 operands".to_owned())
-            } else {
-                let (base, offset) = parse_address_expression(operands[1])?;
-                Ok(Instruction::SW(
-                    base,
-                    IRegister::from_string(operands[0])?,
-                    offset,
-                ))
-            }
-        }
-        "sh" => {
-            if operands.len() != 2 {
-                Err("sh instruction requires 2 operands".to_owned())
-            } else {
-                let (base, offset) = parse_address_expression(operands[1])?;
-                Ok(Instruction::SH(
-                    base,
-                    IRegister::from_string(operands[0])?,
-                    offset,
-                ))
-            }
-        }
-        "sb" => {
-            if operands.len() != 2 {
-                Err("sh instruction requires 2 operands".to_owned())
-            } else {
-                let (base, offset) = parse_address_expression(operands[1])?;
-                Ok(Instruction::SB(
-                    base,
-                    IRegister::from_string(operands[0])?,
-                    offset,
-                ))
-            }
-        }
+        // load instructions
+        "lb" => l_assemble!(LB),
+        "lbu" => l_assemble!(LBU),
+        "lhu" => l_assemble!(LHU),
+        "lw" => l_assemble!(LW),
+        "lwu" => l_assemble!(LWU),
+        "lh" => l_assemble!(LH),
+        // store instructions
+        "ld" => l_assemble!(LD),
+        "sd" => s_assemble!(SD),
+        "sw" => s_assemble!(SW),
+        "sh" => s_assemble!(SH),
+        "sb" => s_assemble!(SB),
+        // branch instructions
+        "blt" => b_assemble!(BLT),
+        "beq" => b_assemble!(BEQ),
+        "bne" => b_assemble!(BNE),
+        "bge" => b_assemble!(BGE),
+        "bgeu" => b_assemble!(BGEU),
+        "bltu" => b_assemble!(BLTU),
         "jalr" => {
             if operands.len() != 2 {
                 Err("jalr instruction requires 2 operands".to_owned())
@@ -421,72 +311,6 @@ pub fn assemble_line(line: &str) -> Result<Instruction, String> {
                 Ok(Instruction::JAL(
                     IRegister::from_string(operands[0])?,
                     parse_int(operands[1])? as i32,
-                ))
-            }
-        }
-        "blt" => {
-            if operands.len() != 3 {
-                Err("blt instruction requires 3 operands".to_owned())
-            } else {
-                Ok(Instruction::BLT(
-                    IRegister::from_string(operands[0])?,
-                    IRegister::from_string(operands[1])?,
-                    parse_int(operands[2])? as i16,
-                ))
-            }
-        }
-        "beq" => {
-            if operands.len() != 3 {
-                Err("beq instruction requires 3 operands".to_owned())
-            } else {
-                Ok(Instruction::BEQ(
-                    IRegister::from_string(operands[0])?,
-                    IRegister::from_string(operands[1])?,
-                    parse_int(operands[2])? as i16,
-                ))
-            }
-        }
-        "bne" => {
-            if operands.len() != 3 {
-                Err("beq instruction requires 3 operands".to_owned())
-            } else {
-                Ok(Instruction::BNE(
-                    IRegister::from_string(operands[0])?,
-                    IRegister::from_string(operands[1])?,
-                    parse_int(operands[2])? as i16,
-                ))
-            }
-        }
-        "bge" => {
-            if operands.len() != 3 {
-                Err("bge instruction requires 3 operands".to_owned())
-            } else {
-                Ok(Instruction::BGE(
-                    IRegister::from_string(operands[0])?,
-                    IRegister::from_string(operands[1])?,
-                    parse_int(operands[2])? as i16,
-                ))
-            }
-        }
-        "bgeu" => {
-            if operands.len() != 3 {
-                Err("bgeu instruction requires 3 operands".to_owned())
-            } else {
-                Ok(Instruction::BGEU(
-                    IRegister::from_string(operands[0])?,
-                    IRegister::from_string(operands[1])?,
-                    parse_int(operands[2])? as i16,
-                ))
-            }
-        }
-        "bltu" => {
-            if operands.len() != 3 {
-                Err("bltu instruction requires 3 operands".to_owned())
-            } else {
-                Ok(Instruction::BLTU(
-                    IRegister::from_string(operands[0])?,
-                    IRegister::from_string(operands[1])?,
-                    parse_int(operands[2])? as i16,
                 ))
             }
         }

@@ -82,3 +82,108 @@ pub fn r_assemble(input: TokenStream) -> TokenStream {
         panic!("expected identifier");
     }
 }
+
+/// Assembles a load type instruction
+#[proc_macro]
+pub fn l_assemble(input: TokenStream) -> TokenStream {
+    // if operands.len() != 2 {
+    //     Err("lb instruction requires 2 operands".to_owned())
+    // } else {
+    //     let (base, offset) = parse_address_expression(operands[1])?;
+    //     Ok(Instruction::LB(
+    //         IRegister::from_string(operands[0])?,
+    //         base,
+    //         offset,
+    //     ))
+    // }
+    if let TokenTree::Ident(i) = input.into_iter().next().unwrap() {
+        let name = i.to_string();
+        let lower = name.to_lowercase();
+        format!(
+            "
+        if operands.len() != 2 {{
+            Err(\"{lower} instruction requires 2 operands\".to_owned())
+        }} else {{
+            let (base, offset) = parse_address_expression(operands[1])?;
+            Ok(Instruction::{name}(
+                IRegister::from_string(operands[0])?,
+                base,
+                offset,
+            ))
+        }}"
+        )
+        .parse()
+        .unwrap()
+    } else {
+        panic!("expected identifier");
+    }
+}
+/// Assembles a store instruction
+#[proc_macro]
+pub fn s_assemble(input: TokenStream) -> TokenStream {
+    // if operands.len() != 2 {
+    //     Err("sd instruction requires 2 operands".to_owned())
+    // } else {
+    //     let (base, offset) = parse_address_expression(operands[1])?;
+    //     Ok(Instruction::SD(
+    //         base,
+    //         IRegister::from_string(operands[0])?,
+    //         offset,
+    //     ))
+    // }
+    if let TokenTree::Ident(i) = input.into_iter().next().unwrap() {
+        let name = i.to_string();
+        let lower = name.to_lowercase();
+        format!(
+            "
+        if operands.len() != 2 {{
+            Err(\"{lower} instruction requires 2 operands\".to_owned())
+        }} else {{
+            let (base, offset) = parse_address_expression(operands[1])?;
+            Ok(Instruction::{name}(
+                base,
+                IRegister::from_string(operands[0])?,
+                offset,
+            ))
+        }}"
+        )
+        .parse()
+        .unwrap()
+    } else {
+        panic!("expected identifier");
+    }
+}
+
+/// Assembles a branc instruction
+#[proc_macro]
+pub fn b_assemble(input: TokenStream) -> TokenStream {
+    // if operands.len() != 3 {
+    //     Err("blt instruction requires 3 operands".to_owned())
+    // } else {
+    //     Ok(Instruction::BLT(
+    //         IRegister::from_string(operands[0])?,
+    //         IRegister::from_string(operands[1])?,
+    //         parse_int(operands[2])? as i16,
+    //     ))
+    // }
+    if let TokenTree::Ident(i) = input.into_iter().next().unwrap() {
+        let name = i.to_string();
+        let lower = name.to_lowercase();
+        format!(
+            "
+        if operands.len() != 3 {{
+            Err(\"{lower} instruction requires 3 operands\".to_owned())
+        }} else {{
+            Ok(Instruction::{name}(
+                IRegister::from_string(operands[0])?,
+                IRegister::from_string(operands[1])?,
+                parse_int(operands[2])? as i16,
+            ))
+        }}"
+        )
+        .parse()
+        .unwrap()
+    } else {
+        panic!("expected identifier");
+    }
+}
