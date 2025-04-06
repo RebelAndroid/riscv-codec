@@ -1,8 +1,11 @@
-use crate::opcode::Opcode;
+use crate::immediates::{SImmediate, Shamt, ShamtW};
 use crate::register::IRegister;
+use crate::{immediates::IImmediate, opcode::Opcode};
 use std::fmt::{Display, Formatter};
 
-use proc_macros::{b_assemble, i_assemble, l_assemble, r_assemble, s_assemble};
+use proc_macros::{
+    b_assemble, i_assemble, l_assemble, r_assemble, s_assemble, sh_assemble, shw_assemble,
+};
 
 #[derive(Debug, PartialEq)]
 pub enum Instruction {
@@ -16,7 +19,7 @@ pub enum Instruction {
     /// Jump and Link
     JAL(IRegister, i32),
     /// Jump and Link Register
-    JALR(IRegister, IRegister, i16),
+    JALR(IRegister, IRegister, IImmediate),
     BEQ(IRegister, IRegister, i16),
     BNE(IRegister, IRegister, i16),
     BLT(IRegister, IRegister, i16),
@@ -24,33 +27,33 @@ pub enum Instruction {
     BLTU(IRegister, IRegister, i16),
     BGEU(IRegister, IRegister, i16),
     /// Load Byte
-    LB(IRegister, IRegister, i16),
+    LB(IRegister, IRegister, IImmediate),
     /// Load Halfword
-    LH(IRegister, IRegister, i16),
+    LH(IRegister, IRegister, IImmediate),
     /// Load Word
-    LW(IRegister, IRegister, i16),
+    LW(IRegister, IRegister, IImmediate),
     /// Load Byte Unsigned
-    LBU(IRegister, IRegister, i16),
+    LBU(IRegister, IRegister, IImmediate),
     /// Load Halfword Unsigned
-    LHU(IRegister, IRegister, i16),
+    LHU(IRegister, IRegister, IImmediate),
     /// Store Byte
-    SB(IRegister, IRegister, i16),
+    SB(IRegister, IRegister, SImmediate),
     /// Store Halfword
-    SH(IRegister, IRegister, i16),
+    SH(IRegister, IRegister, SImmediate),
     /// Store Word
-    SW(IRegister, IRegister, i16),
-    ADDI(IRegister, IRegister, i16),
-    SLTI(IRegister, IRegister, i16),
-    SLTIU(IRegister, IRegister, i16),
-    XORI(IRegister, IRegister, i16),
-    ORI(IRegister, IRegister, i16),
-    ANDI(IRegister, IRegister, i16),
+    SW(IRegister, IRegister, SImmediate),
+    ADDI(IRegister, IRegister, IImmediate),
+    SLTI(IRegister, IRegister, IImmediate),
+    SLTIU(IRegister, IRegister, IImmediate),
+    XORI(IRegister, IRegister, IImmediate),
+    ORI(IRegister, IRegister, IImmediate),
+    ANDI(IRegister, IRegister, IImmediate),
     /// Left Shift Immediate
-    SLLI(IRegister, IRegister, u8),
+    SLLI(IRegister, IRegister, Shamt),
     /// Logical Right Shift Immediate
-    SRLI(IRegister, IRegister, u8),
+    SRLI(IRegister, IRegister, Shamt),
     /// Arithmetic Right Shift Immediate
-    SRAI(IRegister, IRegister, u8),
+    SRAI(IRegister, IRegister, Shamt),
     ADD(IRegister, IRegister, IRegister),
     SUB(IRegister, IRegister, IRegister),
     /// Left Shift
@@ -72,19 +75,19 @@ pub enum Instruction {
     // Instructions Added In RV64I
     //
     /// Load Word Unsigned
-    LWU(IRegister, IRegister, i16),
+    LWU(IRegister, IRegister, IImmediate),
     /// Load Doubleword
-    LD(IRegister, IRegister, i16),
+    LD(IRegister, IRegister, IImmediate),
     /// Store Doubleword
-    SD(IRegister, IRegister, i16),
+    SD(IRegister, IRegister, SImmediate),
     /// Add Immediate (word)
-    ADDIW(IRegister, IRegister, i16),
+    ADDIW(IRegister, IRegister, IImmediate),
     /// Left Shift Immediate (word)
-    SLLIW(IRegister, IRegister, u8),
+    SLLIW(IRegister, IRegister, ShamtW),
     /// Logical Right Shift Immediate (word)
-    SRLIW(IRegister, IRegister, u8),
+    SRLIW(IRegister, IRegister, ShamtW),
     /// Arithmetic Right Shift Immediate (word)
-    SRAIW(IRegister, IRegister, u8),
+    SRAIW(IRegister, IRegister, ShamtW),
     /// Add (word)
     ADDW(IRegister, IRegister, IRegister),
     /// Subtract (word)
@@ -211,7 +214,7 @@ fn parse_int(str: &str) -> Result<i64, String> {
     }
 }
 
-fn parse_address_expression(str: &str) -> Result<(IRegister, i16), String> {
+fn parse_address_expression(str: &str) -> Result<(IRegister, i64), String> {
     let (offset, register): (&str, &str) = if let Some(x) = str.split_once("(") {
         x
     } else {
@@ -221,7 +224,7 @@ fn parse_address_expression(str: &str) -> Result<(IRegister, i16), String> {
         Some(y) => {
             let r = IRegister::from_string(y)?;
             let i = parse_int(offset)?;
-            Ok((r, i.try_into().unwrap()))
+            Ok((r, i))
         }
         _ => Err("Address expression should end in a )".to_owned()),
     }
@@ -250,12 +253,12 @@ pub fn assemble_line(line: &str) -> Result<Instruction, String> {
         "xori" => i_assemble!(XORI),
         "slti" => i_assemble!(SLTI),
         "sltiu" => i_assemble!(SLTIU),
-        "slli" => i_assemble!(SLLI),
-        "srai" => i_assemble!(SRAI),
-        "sraiw" => i_assemble!(SRAIW),
-        "srli" => i_assemble!(SRLI),
-        "srliw" => i_assemble!(SRLIW),
-        "slliw" => i_assemble!(SLLIW),
+        "slli" => sh_assemble!(SLLI),
+        "srai" => sh_assemble!(SRAI),
+        "sraiw" => shw_assemble!(SRAIW),
+        "srli" => sh_assemble!(SRLI),
+        "srliw" => shw_assemble!(SRLIW),
+        "slliw" => shw_assemble!(SLLIW),
         // register-register instructions
         "add" => r_assemble!(ADD),
         "addw" => r_assemble!(ADDW),
@@ -300,7 +303,7 @@ pub fn assemble_line(line: &str) -> Result<Instruction, String> {
                 Ok(Instruction::JALR(
                     IRegister::from_string(operands[0])?,
                     base,
-                    offset,
+                    IImmediate::from_val(offset),
                 ))
             }
         }
@@ -411,14 +414,9 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
     let rs1 = IRegister::from_int((instruction >> 15) & 0b1_1111);
     let rs2 = IRegister::from_int((instruction >> 20) & 0b1_1111);
 
-    let i_immediate: u16 = ((instruction >> 20) & 0b1111_1111_1111).try_into().unwrap();
+    let i_immediate: IImmediate = IImmediate::from_u32(instruction);
 
-    let s_immediate: i16 = sign_extend_s_immediate(
-        <u32 as TryInto<u16>>::try_into(
-            (((instruction >> 25) & 0b111_1111) << 5) | ((instruction >> 7) & 0b1_1111),
-        )
-        .unwrap(),
-    );
+    let s_immediate: SImmediate = SImmediate::from_u32(instruction);
 
     let u_immediate = instruction & (!0b1111_1111_1111);
 
@@ -429,45 +427,19 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
 
     let b_immediate = ((b << 20_i32) >> 20) as i16;
 
-    let shamt: u8 = ((instruction >> 20) & 0b11_1111).try_into().unwrap();
+    let shamt: Shamt = Shamt::from_u32(instruction);
+
+    let shamtw: ShamtW = ShamtW::from_u32(instruction);
 
     match opcode {
         Opcode::Load => match func3 {
-            0b000 => Ok(Instruction::LB(
-                rd,
-                rs1,
-                sign_extend_i_immediate(i_immediate),
-            )),
-            0b001 => Ok(Instruction::LH(
-                rd,
-                rs1,
-                sign_extend_i_immediate(i_immediate),
-            )),
-            0b010 => Ok(Instruction::LW(
-                rd,
-                rs1,
-                sign_extend_i_immediate(i_immediate),
-            )),
-            0b011 => Ok(Instruction::LD(
-                rd,
-                rs1,
-                sign_extend_i_immediate(i_immediate),
-            )),
-            0b100 => Ok(Instruction::LBU(
-                rd,
-                rs1,
-                sign_extend_i_immediate(i_immediate),
-            )),
-            0b101 => Ok(Instruction::LHU(
-                rd,
-                rs1,
-                sign_extend_i_immediate(i_immediate),
-            )),
-            0b110 => Ok(Instruction::LWU(
-                rd,
-                rs1,
-                sign_extend_i_immediate(i_immediate),
-            )),
+            0b000 => Ok(Instruction::LB(rd, rs1, i_immediate)),
+            0b001 => Ok(Instruction::LH(rd, rs1, i_immediate)),
+            0b010 => Ok(Instruction::LW(rd, rs1, i_immediate)),
+            0b011 => Ok(Instruction::LD(rd, rs1, i_immediate)),
+            0b100 => Ok(Instruction::LBU(rd, rs1, i_immediate)),
+            0b101 => Ok(Instruction::LHU(rd, rs1, i_immediate)),
+            0b110 => Ok(Instruction::LWU(rd, rs1, i_immediate)),
             0b111 => Err("Invalid load func3".to_owned()),
             _ => unreachable!(),
         },
@@ -514,27 +486,11 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
             x => Err(format!("unknown Op32 func3: {}", x)),
         },
         Opcode::OpImm => match func3 {
-            0b000 => Ok(Instruction::ADDI(
-                rd,
-                rs1,
-                sign_extend_i_immediate(i_immediate),
-            )),
+            0b000 => Ok(Instruction::ADDI(rd, rs1, i_immediate)),
             0b001 => Ok(Instruction::SLLI(rd, rs1, shamt)),
-            0b010 => Ok(Instruction::SLTI(
-                rd,
-                rs1,
-                sign_extend_i_immediate(i_immediate),
-            )),
-            0b011 => Ok(Instruction::SLTIU(
-                rd,
-                rs1,
-                sign_extend_i_immediate(i_immediate),
-            )),
-            0b100 => Ok(Instruction::XORI(
-                rd,
-                rs1,
-                sign_extend_i_immediate(i_immediate),
-            )),
+            0b010 => Ok(Instruction::SLTI(rd, rs1, i_immediate)),
+            0b011 => Ok(Instruction::SLTIU(rd, rs1, i_immediate)),
+            0b100 => Ok(Instruction::XORI(rd, rs1, i_immediate)),
             // the bottom bit of func7 is actually the top bit of shamt, so we need to ignore it
             0b101 => match func7 | 0b1 {
                 #[allow(clippy::unusual_byte_groupings)]
@@ -543,55 +499,21 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
                 0b010000_1 => Ok(Instruction::SRAI(rd, rs1, shamt)),
                 x => Err(format!("unknown OpImm(101) func 7: {x}").to_owned()),
             },
-            0b110 => Ok(Instruction::ORI(
-                rd,
-                rs1,
-                sign_extend_i_immediate(i_immediate),
-            )),
-            0b111 => Ok(Instruction::ANDI(
-                rd,
-                rs1,
-                sign_extend_i_immediate(i_immediate),
-            )),
+            0b110 => Ok(Instruction::ORI(rd, rs1, i_immediate)),
+            0b111 => Ok(Instruction::ANDI(rd, rs1, i_immediate)),
             x => Err(format!("unknown OpImm func3: {}", x)),
         },
         Opcode::OpImm32 => match func3 {
-            0b000 => Ok(Instruction::ADDIW(
-                rd,
-                rs1,
-                sign_extend_i_immediate(i_immediate),
-            )),
-            0b001 => {
-                if shamt & 0b100000 != 0 {
-                    Err("SLLIW with shamt[5] set".to_owned())
-                } else {
-                    Ok(Instruction::SLLIW(rd, rs1, shamt))
-                }
-            }
+            0b000 => Ok(Instruction::ADDIW(rd, rs1, i_immediate)),
+            0b001 => Ok(Instruction::SLLIW(rd, rs1, shamtw)),
             0b101 => match func7 {
-                0b000_0000 => {
-                    if shamt & 0b100000 != 0 {
-                        Err("SRLIW with shamt[5] set".to_owned())
-                    } else {
-                        Ok(Instruction::SRLIW(rd, rs1, shamt))
-                    }
-                }
-                0b010_0000 => {
-                    if shamt & 0b100000 != 0 {
-                        Err("SRAIW with shamt[5] set".to_owned())
-                    } else {
-                        Ok(Instruction::SRAIW(rd, rs1, shamt))
-                    }
-                }
+                0b000_0000 => Ok(Instruction::SRLIW(rd, rs1, shamtw)),
+                0b010_0000 => Ok(Instruction::SRAIW(rd, rs1, shamtw)),
                 x => Err(format!("unknown OpImm32(101) func7: {}", x).to_owned()),
             },
             x => Err(format!("unkown OpImm32 func3: {}", x).to_owned()),
         },
-        Opcode::Jalr => Ok(Instruction::JALR(
-            rd,
-            rs1,
-            sign_extend_i_immediate(i_immediate),
-        )),
+        Opcode::Jalr => Ok(Instruction::JALR(rd, rs1, i_immediate)),
         Opcode::Jal => Ok(Instruction::JAL(
             rd,
             j_immediate_from_u_immediate(u_immediate),
