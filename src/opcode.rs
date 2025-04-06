@@ -1,3 +1,5 @@
+// the unusual bit groupings are used to match the ISA manual table
+#[allow(clippy::unusual_byte_groupings)]
 // Table 70, page 553 of the Unprivileged ISA Manual
 #[derive(Debug)]
 pub enum Opcode {
@@ -16,6 +18,7 @@ pub enum Opcode {
     Reserved = 0,
 }
 
+#[allow(clippy::unusual_byte_groupings)]
 impl Opcode {
     pub fn from_int(int: u32) -> Self {
         if int > 0b11_111_11 {

@@ -180,24 +180,24 @@ impl Instruction {
 
 fn sign_extend_i_immediate(immediate: u16) -> i16 {
     if immediate & 0b1000_0000_0000 == 0 {
-        return immediate as i16;
+        immediate as i16
     } else {
-        return -((0b1_0000_0000_0000 - immediate) as i16);
+        -((0b1_0000_0000_0000 - immediate) as i16)
     }
 }
 
 fn sign_extend_s_immediate(immediate: u16) -> i16 {
     if immediate & 0b1000_0000_0000 == 0 {
-        return immediate as i16;
+        immediate as i16
     } else {
-        return -((0b1_0000_0000_0000 - immediate) as i16);
+        -((0b1_0000_0000_0000 - immediate) as i16)
     }
 }
 
 fn j_immediate_from_u_immediate(u: u32) -> i32 {
-    let a = u >> 12 & 0b1111_1111;
-    let b = u >> 20 & 0b1;
-    let c = u >> 21 & 0b11_1111_1111;
+    let a = (u >> 12) & 0b1111_1111;
+    let b = (u >> 20) & 0b1;
+    let c = (u >> 21) & 0b11_1111_1111;
     let d = u >> 31;
 
     let i = (c << 1) | (b << 11) | (a << 12) | (d << 20);
@@ -241,7 +241,7 @@ pub fn assemble_line(line: &str) -> Result<Instruction, String> {
         operands.split(',').collect()
     };
 
-    return match mnemonic {
+    match mnemonic {
         // register-immediate instructions
         "addi" => i_assemble!(ADDI),
         "addiw" => i_assemble!(ADDIW),
@@ -374,7 +374,7 @@ pub fn assemble_line(line: &str) -> Result<Instruction, String> {
             }
         }
         _ => Err(format!("unknown mnemonic: {}", mnemonic)),
-    };
+    }
 }
 
 /// Converts a string representing operations into a fence u8
@@ -537,7 +537,9 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
             )),
             // the bottom bit of func7 is actually the top bit of shamt, so we need to ignore it
             0b101 => match func7 | 0b1 {
+                #[allow(clippy::unusual_byte_groupings)]
                 0b000000_1 => Ok(Instruction::SRLI(rd, rs1, shamt)),
+                #[allow(clippy::unusual_byte_groupings)]
                 0b010000_1 => Ok(Instruction::SRAI(rd, rs1, shamt)),
                 x => Err(format!("unknown OpImm(101) func 7: {x}").to_owned()),
             },
