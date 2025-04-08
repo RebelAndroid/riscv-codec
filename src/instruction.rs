@@ -98,6 +98,35 @@ pub enum Instruction {
     SRLW(IRegister, IRegister, IRegister),
     /// Arithmetic Right Shift (word)
     SRAW(IRegister, IRegister, IRegister),
+    //
+    // Instructions In M Extension
+    //
+    /// Multiply
+    MUL(IRegister, IRegister, IRegister),
+    /// Multiply (High bits)
+    MULH(IRegister, IRegister, IRegister),
+    /// Multiply Signed-Unsigned (High bits)
+    MULHSU(IRegister, IRegister, IRegister),
+    /// Multiply Unsigned (High)
+    MULHU(IRegister, IRegister, IRegister),
+    /// Divide
+    DIV(IRegister, IRegister, IRegister),
+    /// Divide (Unsigned)
+    DIVU(IRegister, IRegister, IRegister),
+    /// Remainder
+    REM(IRegister, IRegister, IRegister),
+    /// Remainder (Unsigned)
+    REMU(IRegister, IRegister, IRegister),
+    /// Multiply Word
+    MULW(IRegister, IRegister, IRegister),
+    /// Divide Word
+    DIVW(IRegister, IRegister, IRegister),
+    /// Divide Unsigned Word
+    DIVUW(IRegister, IRegister, IRegister),
+    /// Remainder Word
+    REMW(IRegister, IRegister, IRegister),
+    /// Remainder Unsigned Word
+    REMUW(IRegister, IRegister, IRegister),
 }
 
 impl Display for Instruction {
@@ -155,6 +184,19 @@ impl Display for Instruction {
             Instruction::SLLW(rd, rs1, rs2) => write!(f, "sllw {rd},{rs1},{rs2}"),
             Instruction::SRLW(rd, rs1, rs2) => write!(f, "srlw {rd},{rs1},{rs2}"),
             Instruction::SRAW(rd, rs1, rs2) => write!(f, "sraw {rd},{rs1},{rs2}"),
+            Instruction::MUL(rd, rs1, rs2) => write!(f, "mul {rd},{rs1},{rs2}"),
+            Instruction::MULH(rd, rs1, rs2) => write!(f, "mulh {rd},{rs1},{rs2}"),
+            Instruction::MULHSU(rd, rs1, rs2) => write!(f, "mulhsu {rd},{rs1},{rs2}"),
+            Instruction::MULHU(rd, rs1, rs2) => write!(f, "mulhu {rd},{rs1},{rs2}"),
+            Instruction::DIV(rd, rs1, rs2) => write!(f, "div {rd},{rs1},{rs2}"),
+            Instruction::DIVU(rd, rs1, rs2) => write!(f, "divu {rd},{rs1},{rs2}"),
+            Instruction::REM(rd, rs1, rs2) => write!(f, "rem {rd},{rs1},{rs2}"),
+            Instruction::REMU(rd, rs1, rs2) => write!(f, "remu {rd},{rs1},{rs2}"),
+            Instruction::MULW(rd, rs1, rs2) => write!(f, "mulw {rd},{rs1},{rs2}"),
+            Instruction::DIVW(rd, rs1, rs2) => write!(f, "divw {rd},{rs1},{rs2}"),
+            Instruction::DIVUW(rd, rs1, rs2) => write!(f, "divuw {rd},{rs1},{rs2}"),
+            Instruction::REMW(rd, rs1, rs2) => write!(f, "remw {rd},{rs1},{rs2}"),
+            Instruction::REMUW(rd, rs1, rs2) => write!(f, "remuw {rd},{rs1},{rs2}"),
         }
     }
 }
@@ -275,6 +317,19 @@ pub fn assemble_line(line: &str) -> Result<Instruction, String> {
         "sll" => r_assemble!(SLL),
         "slt" => r_assemble!(SLT),
         "sltu" => r_assemble!(SLTU),
+        "mul" => r_assemble!(MUL),
+        "mulh" => r_assemble!(MULH),
+        "mulhsu" => r_assemble!(MULHSU),
+        "mulhu" => r_assemble!(MULHU),
+        "div" => r_assemble!(DIV),
+        "divu" => r_assemble!(DIVU),
+        "rem" => r_assemble!(REM),
+        "remu" => r_assemble!(REMU),
+        "mulw" => r_assemble!(MULW),
+        "divw" => r_assemble!(DIVW),
+        "divuw" => r_assemble!(DIVUW),
+        "remw" => r_assemble!(REMW),
+        "remuw" => r_assemble!(REMUW),
         // load instructions
         "lb" => l_assemble!(LB),
         "lbu" => l_assemble!(LBU),
@@ -452,7 +507,35 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
             x => Err(format!("invalid store func3: {}", x)),
         },
         Opcode::Lui => Ok(Instruction::LUI(rd, u_immediate)),
-        Opcode::Op => match func3 {
+        Opcode::Op => 
+        match func7 {
+            0b000_0000 => match func3 {
+                0b000 => Ok(Instruction::ADD(rd, rs1, rs2)),
+                0b001 => Ok(Instruction::SLL(rd, rs1, rs2)),
+                0b010 => Ok(Instruction::SLT(rd, rs1, rs2)),
+                0b011 => Ok(Instruction::SLTU(rd, rs1, rs2)),
+                0b100 => Ok(Instruction::XOR(rd, rs1, rs2)),
+                0b101 => Ok(Instruction::SRL(rd, rs1, rs2)),
+                0b110 => Ok(Instruction::OR(rd, rs1, rs2)),
+                0b111 => Ok(Instruction::AND(rd, rs1, rs2)),
+                _ => unreachable!(),
+            },
+            0b010_0000 => match func3 {
+                0b000 => Ok(Instruction::SUB(rd, rs1, rs2)),
+                0b101 => Ok(Instruction::SRA(rd, rs1, rs2))
+                x => Err(format!("unknown func3: {x} in Opcode=Op,func7=0b010_0000")),
+            },
+            0b000_0001 => match func3 {
+                0b000 => Ok(Instruction::MUL(rd, rs1, rs2)),
+                0b001 => Ok(Instruction::MULH(rd, rs1, rs2)),
+                0b010 => Ok(Instruction::MULHSU(rd, rs1, rs2)),
+                0b011 => Ok(Instruction::MULHU(rd, rs1, rs2)),
+                0b100 => Ok(Instruction::DIV(rd, rs1, rs2)),
+                0b101 => Ok(Instruction::DIVU(rd, rs1, rs2)),
+                0b110 => Ok(Instruction::REM(rd, rs1, rs2)),
+                0b111 => Ok(Instruction::REMU(rd, rs1, rs2)),
+            },
+        }/*match func3 {
             0b000 => match func7 {
                 0b000_0000 => Ok(Instruction::ADD(rd, rs1, rs2)),
                 0b010_0000 => Ok(Instruction::SUB(rd, rs1, rs2)),
@@ -470,7 +553,7 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
             0b110 => Ok(Instruction::OR(rd, rs1, rs2)),
             0b111 => Ok(Instruction::AND(rd, rs1, rs2)),
             _ => unreachable!(),
-        },
+        },*/
         Opcode::Op32 => match func3 {
             0b000 => match func7 {
                 0b000_0000 => Ok(Instruction::ADDW(rd, rs1, rs2)),
