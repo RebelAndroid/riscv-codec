@@ -507,8 +507,7 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
             x => Err(format!("invalid store func3: {}", x)),
         },
         Opcode::Lui => Ok(Instruction::LUI(rd, u_immediate)),
-        Opcode::Op => 
-        match func7 {
+        Opcode::Op => match func7 {
             0b000_0000 => match func3 {
                 0b000 => Ok(Instruction::ADD(rd, rs1, rs2)),
                 0b001 => Ok(Instruction::SLL(rd, rs1, rs2)),
@@ -522,7 +521,7 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
             },
             0b010_0000 => match func3 {
                 0b000 => Ok(Instruction::SUB(rd, rs1, rs2)),
-                0b101 => Ok(Instruction::SRA(rd, rs1, rs2))
+                0b101 => Ok(Instruction::SRA(rd, rs1, rs2)),
                 x => Err(format!("unknown func3: {x} in Opcode=Op,func7=0b010_0000")),
             },
             0b000_0001 => match func3 {
@@ -534,29 +533,32 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
                 0b101 => Ok(Instruction::DIVU(rd, rs1, rs2)),
                 0b110 => Ok(Instruction::REM(rd, rs1, rs2)),
                 0b111 => Ok(Instruction::REMU(rd, rs1, rs2)),
+                _ => unreachable!(),
             },
-        }/*match func3 {
-            0b000 => match func7 {
-                0b000_0000 => Ok(Instruction::ADD(rd, rs1, rs2)),
-                0b010_0000 => Ok(Instruction::SUB(rd, rs1, rs2)),
-                x => Err(format!("unknown Op(000) func 7: {}", x)),
-            },
-            0b001 => Ok(Instruction::SLL(rd, rs1, rs2)),
-            0b010 => Ok(Instruction::SLT(rd, rs1, rs2)),
-            0b011 => Ok(Instruction::SLTU(rd, rs1, rs2)),
-            0b100 => Ok(Instruction::XOR(rd, rs1, rs2)),
-            0b101 => match func7 {
-                0b000_0000 => Ok(Instruction::SRL(rd, rs1, rs2)),
-                0b010_0000 => Ok(Instruction::SRA(rd, rs1, rs2)),
-                x => Err(format!("unknown Op(000) func 7: {}", x)),
-            },
-            0b110 => Ok(Instruction::OR(rd, rs1, rs2)),
-            0b111 => Ok(Instruction::AND(rd, rs1, rs2)),
-            _ => unreachable!(),
+            x => Err(format!("unknown func7 in Opcode=Op: {x}")),
+        }, /*match func3 {
+        0b000 => match func7 {
+        0b000_0000 => Ok(Instruction::ADD(rd, rs1, rs2)),
+        0b010_0000 => Ok(Instruction::SUB(rd, rs1, rs2)),
+        x => Err(format!("unknown Op(000) func 7: {}", x)),
+        },
+        0b001 => Ok(Instruction::SLL(rd, rs1, rs2)),
+        0b010 => Ok(Instruction::SLT(rd, rs1, rs2)),
+        0b011 => Ok(Instruction::SLTU(rd, rs1, rs2)),
+        0b100 => Ok(Instruction::XOR(rd, rs1, rs2)),
+        0b101 => match func7 {
+        0b000_0000 => Ok(Instruction::SRL(rd, rs1, rs2)),
+        0b010_0000 => Ok(Instruction::SRA(rd, rs1, rs2)),
+        x => Err(format!("unknown Op(000) func 7: {}", x)),
+        },
+        0b110 => Ok(Instruction::OR(rd, rs1, rs2)),
+        0b111 => Ok(Instruction::AND(rd, rs1, rs2)),
+        _ => unreachable!(),
         },*/
         Opcode::Op32 => match func3 {
             0b000 => match func7 {
                 0b000_0000 => Ok(Instruction::ADDW(rd, rs1, rs2)),
+                0b000_0001 => Ok(Instruction::MULW(rd, rs1, rs2)),
                 0b010_0000 => Ok(Instruction::SUBW(rd, rs1, rs2)),
                 x => Err(format!("unknown Op32(000) func 7: {}", x)),
             },
