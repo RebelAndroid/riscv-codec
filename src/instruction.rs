@@ -536,25 +536,7 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
                 _ => unreachable!(),
             },
             x => Err(format!("unknown func7 in Opcode=Op: {x}")),
-        }, /*match func3 {
-        0b000 => match func7 {
-        0b000_0000 => Ok(Instruction::ADD(rd, rs1, rs2)),
-        0b010_0000 => Ok(Instruction::SUB(rd, rs1, rs2)),
-        x => Err(format!("unknown Op(000) func 7: {}", x)),
         },
-        0b001 => Ok(Instruction::SLL(rd, rs1, rs2)),
-        0b010 => Ok(Instruction::SLT(rd, rs1, rs2)),
-        0b011 => Ok(Instruction::SLTU(rd, rs1, rs2)),
-        0b100 => Ok(Instruction::XOR(rd, rs1, rs2)),
-        0b101 => match func7 {
-        0b000_0000 => Ok(Instruction::SRL(rd, rs1, rs2)),
-        0b010_0000 => Ok(Instruction::SRA(rd, rs1, rs2)),
-        x => Err(format!("unknown Op(000) func 7: {}", x)),
-        },
-        0b110 => Ok(Instruction::OR(rd, rs1, rs2)),
-        0b111 => Ok(Instruction::AND(rd, rs1, rs2)),
-        _ => unreachable!(),
-        },*/
         Opcode::Op32 => match func3 {
             0b000 => match func7 {
                 0b000_0000 => Ok(Instruction::ADDW(rd, rs1, rs2)),
@@ -563,10 +545,23 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
                 x => Err(format!("unknown Op32(000) func 7: {}", x)),
             },
             0b001 => Ok(Instruction::SLLW(rd, rs1, rs2)),
+            0b100 => match func7 {
+                0b000_001 => Ok(Instruction::DIVW(rd, rs1, rs2)),
+                x => Err(format!("unknown Op32(100) func 7: {}", x)),
+            },
             0b101 => match func7 {
                 0b000_0000 => Ok(Instruction::SRLW(rd, rs1, rs2)),
+                0b000_0001 => Ok(Instruction::DIVUW(rd, rs1, rs2)),
                 0b010_0000 => Ok(Instruction::SRAW(rd, rs1, rs2)),
                 x => Err(format!("unknown Op32(101) func 7: {}", x)),
+            },
+            0b110 => match func7 {
+                0b000_0001 => Ok(Instruction::REMW(rd, rs1, rs2)),
+                x => Err(format!("unknown Op32(110) func 7: {}", x)),
+            },
+            0b111 => match func7 {
+                0b000_0001 => Ok(Instruction::REMUW(rd, rs1, rs2)),
+                x => Err(format!("unknown Op32(111) func 7: {}", x)),
             },
             x => Err(format!("unknown Op32 func3: {}", x)),
         },

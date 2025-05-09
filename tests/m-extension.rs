@@ -25,27 +25,6 @@ fn multiply() {
 }
 
 #[test]
-fn multiply_word() {
-    // check assembler
-    let i = assemble_line("mulw sp,t4,a2").unwrap();
-    assert_eq!(
-        i,
-        Instruction::MULW(IRegister::StackPointer, IRegister::T4, IRegister::A2)
-    );
-
-    // check decoder
-    let i2 = decode_instruction(0x02ce813b).unwrap();
-    assert_eq!(
-        i2,
-        Instruction::MULW(IRegister::StackPointer, IRegister::T4, IRegister::A2),
-    );
-
-    // check disassembler
-    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap();
-    assert_eq!(i, i3);
-}
-
-#[test]
 fn multiply_high() {
     // check assembler
     let i = assemble_line("mulh t3,t4,s8").unwrap();
@@ -67,27 +46,6 @@ fn multiply_high() {
 }
 
 #[test]
-fn multiply_high_unsigned() {
-    // check assembler
-    let i = assemble_line("mulhu ra,t5,s11").unwrap();
-    assert_eq!(
-        i,
-        Instruction::MULHU(IRegister::ReturnAddress, IRegister::T5, IRegister::S11)
-    );
-
-    // check decoder
-    let i2 = decode_instruction(0x03bf30b3).unwrap();
-    assert_eq!(
-        i2,
-        Instruction::MULHU(IRegister::ReturnAddress, IRegister::T5, IRegister::S11),
-    );
-
-    // check disassembler
-    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap();
-    assert_eq!(i, i3);
-}
-
-#[test]
 fn multiply_high_signed_unsigned() {
     // check assembler
     let i = assemble_line("mulhsu t0,a1,s3").unwrap();
@@ -101,6 +59,27 @@ fn multiply_high_signed_unsigned() {
     assert_eq!(
         i2,
         Instruction::MULHSU(IRegister::T0, IRegister::A1, IRegister::S3),
+    );
+
+    // check disassembler
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap();
+    assert_eq!(i, i3);
+}
+
+#[test]
+fn multiply_high_unsigned() {
+    // check assembler
+    let i = assemble_line("mulhu ra,t5,s11").unwrap();
+    assert_eq!(
+        i,
+        Instruction::MULHU(IRegister::ReturnAddress, IRegister::T5, IRegister::S11)
+    );
+
+    // check decoder
+    let i2 = decode_instruction(0x03bf30b3).unwrap();
+    assert_eq!(
+        i2,
+        Instruction::MULHU(IRegister::ReturnAddress, IRegister::T5, IRegister::S11),
     );
 
     // check disassembler
@@ -185,6 +164,27 @@ fn remainder_unsigned() {
     assert_eq!(
         i2,
         Instruction::REMU(IRegister::A4, IRegister::S4, IRegister::T4),
+    );
+
+    // check disassembler
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap();
+    assert_eq!(i, i3);
+}
+
+#[test]
+fn multiply_word() {
+    // check assembler
+    let i = assemble_line("mulw sp,t4,a2").unwrap();
+    assert_eq!(
+        i,
+        Instruction::MULW(IRegister::StackPointer, IRegister::T4, IRegister::A2)
+    );
+
+    // check decoder
+    let i2 = decode_instruction(0x02ce813b).unwrap();
+    assert_eq!(
+        i2,
+        Instruction::MULW(IRegister::StackPointer, IRegister::T4, IRegister::A2),
     );
 
     // check disassembler

@@ -129,6 +129,7 @@ impl IRegister {
             "t0" => Ok(Self::T0),
             "t1" => Ok(Self::T1),
             "t2" => Ok(Self::T2),
+            "fp" => Ok(Self::FramePointer),
             "s0" => Ok(Self::FramePointer),
             "s1" => Ok(Self::S1),
             "a0" => Ok(Self::A0),
