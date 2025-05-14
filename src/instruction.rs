@@ -127,6 +127,34 @@ pub enum Instruction {
     REMW(IRegister, IRegister, IRegister),
     /// Remainder Unsigned Word
     REMUW(IRegister, IRegister, IRegister),
+    //
+    // Instructions In A Extension
+    //
+    /// Load Reserved Word
+    // rd, rs1, ac, rl
+    LRW(IRegister, IRegister, bool, bool),
+    SCW(IRegister, IRegister, IRegister, bool, bool),
+    AMOSWAPW(IRegister, IRegister, IRegister, bool, bool),
+    AMOADDW(IRegister, IRegister, IRegister, bool, bool),
+    AMOXORW(IRegister, IRegister, IRegister, bool, bool),
+    AMOANDW(IRegister, IRegister, IRegister, bool, bool),
+    AMOORW(IRegister, IRegister, IRegister, bool, bool),
+    AMOMINW(IRegister, IRegister, IRegister, bool, bool),
+    AMOMAXW(IRegister, IRegister, IRegister, bool, bool),
+    AMOMINUW(IRegister, IRegister, IRegister, bool, bool),
+    AMOMAXUW(IRegister, IRegister, IRegister, bool, bool),
+    //
+    LRD(IRegister, IRegister, bool, bool),
+    SCD(IRegister, IRegister, IRegister, bool, bool),
+    AMOSWAPD(IRegister, IRegister, IRegister, bool, bool),
+    AMOADDD(IRegister, IRegister, IRegister, bool, bool),
+    AMOXORD(IRegister, IRegister, IRegister, bool, bool),
+    AMOANDD(IRegister, IRegister, IRegister, bool, bool),
+    AMOORD(IRegister, IRegister, IRegister, bool, bool),
+    AMOMIND(IRegister, IRegister, IRegister, bool, bool),
+    AMOMAXD(IRegister, IRegister, IRegister, bool, bool),
+    AMOMINUD(IRegister, IRegister, IRegister, bool, bool),
+    AMOMAXUD(IRegister, IRegister, IRegister, bool, bool),
 }
 
 impl Display for Instruction {
@@ -197,6 +225,65 @@ impl Display for Instruction {
             Instruction::DIVUW(rd, rs1, rs2) => write!(f, "divuw {rd},{rs1},{rs2}"),
             Instruction::REMW(rd, rs1, rs2) => write!(f, "remw {rd},{rs1},{rs2}"),
             Instruction::REMUW(rd, rs1, rs2) => write!(f, "remuw {rd},{rs1},{rs2}"),
+            // TODO: fix this aqrl syntax
+            Instruction::LRW(rd, rs1, aq, rl) => write!(f, "lr.w.{aq}{rl} {rd},{rs1}"),
+            Instruction::SCW(rd, rs1, rs2, aq, rl) => write!(f, "sc.w.{aq}{rl} {rd},{rs1},{rs2}"),
+            Instruction::AMOSWAPW(rd, rs1, rs2, aq, rl) => {
+                write!(f, "amoswap.w.{aq}{rl} {rd},{rs1},{rs2}")
+            }
+            Instruction::AMOADDW(rd, rs1, rs2, aq, rl) => {
+                write!(f, "amoadd.w.{aq}{rl} {rd},{rs1},{rs2}")
+            }
+            Instruction::AMOXORW(rd, rs1, rs2, aq, rl) => {
+                write!(f, "amoxor.w.{aq}{rl} {rd},{rs1},{rs2}")
+            }
+            Instruction::AMOANDW(rd, rs1, rs2, aq, rl) => {
+                write!(f, "amoand.w.{aq}{rl} {rd},{rs1},{rs2}")
+            }
+            Instruction::AMOORW(rd, rs1, rs2, aq, rl) => {
+                write!(f, "amoor.w.{aq}{rl} {rd},{rs1},{rs2}")
+            }
+            Instruction::AMOMINW(rd, rs1, rs2, aq, rl) => {
+                write!(f, "amomin.w.{aq}{rl} {rd},{rs1},{rs2}")
+            }
+            Instruction::AMOMAXW(rd, rs1, rs2, aq, rl) => {
+                write!(f, "amomax.w.{aq}{rl} {rd},{rs1},{rs2}")
+            }
+            Instruction::AMOMINUW(rd, rs1, rs2, aq, rl) => {
+                write!(f, "amominu.w.{aq}{rl} {rd},{rs1},{rs2}")
+            }
+            Instruction::AMOMAXUW(rd, rs1, rs2, aq, rl) => {
+                write!(f, "amomaxu.w.{aq}{rl} {rd},{rs1},{rs2}")
+            }
+            Instruction::LRD(rd, rs1, aq, rl) => write!(f, "lr.d.{aq}{rl} {rd},{rs1}"),
+            Instruction::SCD(rd, rs1, rs2, aq, rl) => write!(f, "sc.d.{aq}{rl} {rd},{rs1},{rs2}"),
+            Instruction::AMOSWAPD(rd, rs1, rs2, aq, rl) => {
+                write!(f, "amoswap.d.{aq}{rl} {rd},{rs1},{rs2}")
+            }
+            Instruction::AMOADDD(rd, rs1, rs2, aq, rl) => {
+                write!(f, "amoswap.w.{aq}{rl} {rd},{rs1},{rs2}")
+            }
+            Instruction::AMOXORD(rd, rs1, rs2, aq, rl) => {
+                write!(f, "amoxor.d.{aq}{rl} {rd},{rs1},{rs2}")
+            }
+            Instruction::AMOANDD(rd, rs1, rs2, aq, rl) => {
+                write!(f, "amoand.d.{aq}{rl} {rd},{rs1},{rs2}")
+            }
+            Instruction::AMOORD(rd, rs1, rs2, aq, rl) => {
+                write!(f, "amoor.d.{aq}{rl} {rd},{rs1},{rs2}")
+            }
+            Instruction::AMOMIND(rd, rs1, rs2, aq, rl) => {
+                write!(f, "amomin.d.{aq}{rl} {rd},{rs1},{rs2}")
+            }
+            Instruction::AMOMAXD(rd, rs1, rs2, aq, rl) => {
+                write!(f, "amomax.d.{aq}{rl} {rd},{rs1},{rs2}")
+            }
+            Instruction::AMOMINUD(rd, rs1, rs2, aq, rl) => {
+                write!(f, "amominu.d.{aq}{rl} {rd},{rs1},{rs2}")
+            }
+            Instruction::AMOMAXUD(rd, rs1, rs2, aq, rl) => {
+                write!(f, "amomaxu.d.{aq}{rl} {rd},{rs1},{rs2}")
+            }
         }
     }
 }
@@ -220,22 +307,6 @@ impl Instruction {
         } else {
             unreachable!();
         }
-    }
-}
-
-fn sign_extend_i_immediate(immediate: u16) -> i16 {
-    if immediate & 0b1000_0000_0000 == 0 {
-        immediate as i16
-    } else {
-        -((0b1_0000_0000_0000 - immediate) as i16)
-    }
-}
-
-fn sign_extend_s_immediate(immediate: u16) -> i16 {
-    if immediate & 0b1000_0000_0000 == 0 {
-        immediate as i16
-    } else {
-        -((0b1_0000_0000_0000 - immediate) as i16)
     }
 }
 
@@ -486,6 +557,9 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
 
     let shamtw: ShamtW = ShamtW::from_u32(instruction);
 
+    let aq: bool = ((instruction >> 25) & 0b1) == 0b1;
+    let rl: bool = ((instruction >> 26) & 0b1) == 0b1;
+
     match opcode {
         Opcode::Load => match func3 {
             0b000 => Ok(Instruction::LB(rd, rs1, i_immediate)),
@@ -507,81 +581,59 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
             x => Err(format!("invalid store func3: {}", x)),
         },
         Opcode::Lui => Ok(Instruction::LUI(rd, u_immediate)),
-        Opcode::Op => match func7 {
-            0b000_0000 => match func3 {
-                0b000 => Ok(Instruction::ADD(rd, rs1, rs2)),
-                0b001 => Ok(Instruction::SLL(rd, rs1, rs2)),
-                0b010 => Ok(Instruction::SLT(rd, rs1, rs2)),
-                0b011 => Ok(Instruction::SLTU(rd, rs1, rs2)),
-                0b100 => Ok(Instruction::XOR(rd, rs1, rs2)),
-                0b101 => Ok(Instruction::SRL(rd, rs1, rs2)),
-                0b110 => Ok(Instruction::OR(rd, rs1, rs2)),
-                0b111 => Ok(Instruction::AND(rd, rs1, rs2)),
-                _ => unreachable!(),
-            },
-            0b010_0000 => match func3 {
-                0b000 => Ok(Instruction::SUB(rd, rs1, rs2)),
-                0b101 => Ok(Instruction::SRA(rd, rs1, rs2)),
-                x => Err(format!("unknown func3: {x} in Opcode=Op,func7=0b010_0000")),
-            },
-            0b000_0001 => match func3 {
-                0b000 => Ok(Instruction::MUL(rd, rs1, rs2)),
-                0b001 => Ok(Instruction::MULH(rd, rs1, rs2)),
-                0b010 => Ok(Instruction::MULHSU(rd, rs1, rs2)),
-                0b011 => Ok(Instruction::MULHU(rd, rs1, rs2)),
-                0b100 => Ok(Instruction::DIV(rd, rs1, rs2)),
-                0b101 => Ok(Instruction::DIVU(rd, rs1, rs2)),
-                0b110 => Ok(Instruction::REM(rd, rs1, rs2)),
-                0b111 => Ok(Instruction::REMU(rd, rs1, rs2)),
-                _ => unreachable!(),
-            },
-            x => Err(format!("unknown func7 in Opcode=Op: {x}")),
+        Opcode::Op => match (func7, func3) {
+            (0b000_0000, 0b000) => Ok(Instruction::ADD(rd, rs1, rs2)),
+            (0b000_0000, 0b001) => Ok(Instruction::SLL(rd, rs1, rs2)),
+            (0b000_0000, 0b010) => Ok(Instruction::SLT(rd, rs1, rs2)),
+            (0b000_0000, 0b011) => Ok(Instruction::SLTU(rd, rs1, rs2)),
+            (0b000_0000, 0b100) => Ok(Instruction::XOR(rd, rs1, rs2)),
+            (0b000_0000, 0b101) => Ok(Instruction::SRL(rd, rs1, rs2)),
+            (0b000_0000, 0b110) => Ok(Instruction::OR(rd, rs1, rs2)),
+            (0b000_0000, 0b111) => Ok(Instruction::AND(rd, rs1, rs2)),
+            (0b010_0000, 0b000) => Ok(Instruction::SUB(rd, rs1, rs2)),
+            (0b010_0000, 0b101) => Ok(Instruction::SRA(rd, rs1, rs2)),
+            (0b000_0001, 0b000) => Ok(Instruction::MUL(rd, rs1, rs2)),
+            (0b000_0001, 0b001) => Ok(Instruction::MULH(rd, rs1, rs2)),
+            (0b000_0001, 0b010) => Ok(Instruction::MULHSU(rd, rs1, rs2)),
+            (0b000_0001, 0b011) => Ok(Instruction::MULHU(rd, rs1, rs2)),
+            (0b000_0001, 0b100) => Ok(Instruction::DIV(rd, rs1, rs2)),
+            (0b000_0001, 0b101) => Ok(Instruction::DIVU(rd, rs1, rs2)),
+            (0b000_0001, 0b110) => Ok(Instruction::REM(rd, rs1, rs2)),
+            (0b000_0001, 0b111) => Ok(Instruction::REMU(rd, rs1, rs2)),
+            _ => Err(format!("unknown Op. func3: {}, func7: {}", func3, func7)),
         },
-        Opcode::Op32 => match func3 {
-            0b000 => match func7 {
-                0b000_0000 => Ok(Instruction::ADDW(rd, rs1, rs2)),
-                0b000_0001 => Ok(Instruction::MULW(rd, rs1, rs2)),
-                0b010_0000 => Ok(Instruction::SUBW(rd, rs1, rs2)),
-                x => Err(format!("unknown Op32(000) func 7: {}", x)),
-            },
-            0b001 => Ok(Instruction::SLLW(rd, rs1, rs2)),
-            0b100 => match func7 {
-                0b000_001 => Ok(Instruction::DIVW(rd, rs1, rs2)),
-                x => Err(format!("unknown Op32(100) func 7: {}", x)),
-            },
-            0b101 => match func7 {
-                0b000_0000 => Ok(Instruction::SRLW(rd, rs1, rs2)),
-                0b000_0001 => Ok(Instruction::DIVUW(rd, rs1, rs2)),
-                0b010_0000 => Ok(Instruction::SRAW(rd, rs1, rs2)),
-                x => Err(format!("unknown Op32(101) func 7: {}", x)),
-            },
-            0b110 => match func7 {
-                0b000_0001 => Ok(Instruction::REMW(rd, rs1, rs2)),
-                x => Err(format!("unknown Op32(110) func 7: {}", x)),
-            },
-            0b111 => match func7 {
-                0b000_0001 => Ok(Instruction::REMUW(rd, rs1, rs2)),
-                x => Err(format!("unknown Op32(111) func 7: {}", x)),
-            },
-            x => Err(format!("unknown Op32 func3: {}", x)),
+        Opcode::Op32 => match (func3, func7) {
+            (0b000, 0b000_0000) => Ok(Instruction::ADDW(rd, rs1, rs2)),
+            (0b000, 0b000_0001) => Ok(Instruction::MULW(rd, rs1, rs2)),
+            (0b000, 0b010_0000) => Ok(Instruction::SUBW(rd, rs1, rs2)),
+            (0b001, 0b000_0000) => Ok(Instruction::SLLW(rd, rs1, rs2)),
+            (0b100, 0b0000_001) => Ok(Instruction::DIVW(rd, rs1, rs2)),
+            (0b101, 0b000_0000) => Ok(Instruction::SRLW(rd, rs1, rs2)),
+            (0b101, 0b000_0001) => Ok(Instruction::DIVUW(rd, rs1, rs2)),
+            (0b101, 0b010_0000) => Ok(Instruction::SRAW(rd, rs1, rs2)),
+            (0b110, 0b000_0001) => Ok(Instruction::REMW(rd, rs1, rs2)),
+            (0b111, 0b000_0001) => Ok(Instruction::REMUW(rd, rs1, rs2)),
+            _ => Err(format!("unknown Op32. func3: {}, func7: {}", func3, func7)),
         },
         Opcode::OpImm => match func3 {
             0b000 => Ok(Instruction::ADDI(rd, rs1, i_immediate)),
-            0b001 => Ok(Instruction::SLLI(rd, rs1, shamt)),
+            // SLLi requires special handling because shamt uses the bottom bit of func7
+            0b001 => match func7 | 0b1 {
+                0b000000_1 => Ok(Instruction::SLLI(rd, rs1, shamt)),
+                _ => Err(format!("unknown OpImm. func3: {}, func7: {}", func3, func7)),
+            },
             0b010 => Ok(Instruction::SLTI(rd, rs1, i_immediate)),
             0b011 => Ok(Instruction::SLTIU(rd, rs1, i_immediate)),
             0b100 => Ok(Instruction::XORI(rd, rs1, i_immediate)),
-            // the bottom bit of func7 is actually the top bit of shamt, so we need to ignore it
+            // SRLI SRAI require special handling because shamt uses the bottom bit of func7
             0b101 => match func7 | 0b1 {
-                #[allow(clippy::unusual_byte_groupings)]
                 0b000000_1 => Ok(Instruction::SRLI(rd, rs1, shamt)),
-                #[allow(clippy::unusual_byte_groupings)]
                 0b010000_1 => Ok(Instruction::SRAI(rd, rs1, shamt)),
-                x => Err(format!("unknown OpImm(101) func 7: {x}").to_owned()),
+                _ => Err(format!("unknown OpImm. func3: {}, func7: {}", func3, func7)),
             },
             0b110 => Ok(Instruction::ORI(rd, rs1, i_immediate)),
             0b111 => Ok(Instruction::ANDI(rd, rs1, i_immediate)),
-            x => Err(format!("unknown OpImm func3: {}", x)),
+            _ => Err(format!("unknown OpImm. func3: {}, func7: {}", func3, func7)),
         },
         Opcode::OpImm32 => match func3 {
             0b000 => Ok(Instruction::ADDIW(rd, rs1, i_immediate)),
@@ -629,6 +681,44 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
                 }
             }
             x => Err(format!("unknown fence func3: {x}")),
+        },
+        // shift func7 left 2 to clear aq,rl
+        Opcode::AMO => match (func3, func7 >> 2) {
+            (0b010, 0b00010) => {
+                if rs2 != IRegister::Zero {
+                    Err("LR.W expects rs2 to be 0".to_owned())
+                } else {
+                    Ok(Instruction::LRW(rd, rs1, aq, rl))
+                }
+            }
+            (0b011, 0b00010) => {
+                if rs2 != IRegister::Zero {
+                    Err("LR.D expects rs2 to be 0".to_owned())
+                } else {
+                    Ok(Instruction::LRD(rd, rs1, aq, rl))
+                }
+            }
+            (0b010, 0b00011) => Ok(Instruction::SCW(rd, rs1, rs2, aq, rl)),
+            (0b011, 0b00011) => Ok(Instruction::SCD(rd, rs1, rs2, aq, rl)),
+            (0b010, 0b00001) => Ok(Instruction::AMOSWAPW(rd, rs1, rs2, aq, rl)),
+            (0b011, 0b00001) => Ok(Instruction::AMOSWAPD(rd, rs1, rs2, aq, rl)),
+            (0b010, 0b00000) => Ok(Instruction::AMOADDW(rd, rs1, rs2, aq, rl)),
+            (0b011, 0b00000) => Ok(Instruction::AMOADDD(rd, rs1, rs2, aq, rl)),
+            (0b010, 0b00100) => Ok(Instruction::AMOXORW(rd, rs1, rs2, aq, rl)),
+            (0b011, 0b00100) => Ok(Instruction::AMOXORD(rd, rs1, rs2, aq, rl)),
+            (0b010, 0b01100) => Ok(Instruction::AMOANDW(rd, rs1, rs2, aq, rl)),
+            (0b011, 0b01100) => Ok(Instruction::AMOANDD(rd, rs1, rs2, aq, rl)),
+            (0b010, 0b01000) => Ok(Instruction::AMOORW(rd, rs1, rs2, aq, rl)),
+            (0b011, 0b01000) => Ok(Instruction::AMOORD(rd, rs1, rs2, aq, rl)),
+            (0b010, 0b10000) => Ok(Instruction::AMOMINW(rd, rs1, rs2, aq, rl)),
+            (0b011, 0b10000) => Ok(Instruction::AMOMIND(rd, rs1, rs2, aq, rl)),
+            (0b010, 0b10100) => Ok(Instruction::AMOMAXW(rd, rs1, rs2, aq, rl)),
+            (0b011, 0b10100) => Ok(Instruction::AMOMAXD(rd, rs1, rs2, aq, rl)),
+            (0b010, 0b11000) => Ok(Instruction::AMOMINUW(rd, rs1, rs2, aq, rl)),
+            (0b011, 0b11000) => Ok(Instruction::AMOMINUD(rd, rs1, rs2, aq, rl)),
+            (0b010, 0b11100) => Ok(Instruction::AMOMAXUW(rd, rs1, rs2, aq, rl)),
+            (0b011, 0b11100) => Ok(Instruction::AMOMAXUD(rd, rs1, rs2, aq, rl)),
+            _ => Err(format!("unknown AMO. func3: {func3}, func7: {func7}")),
         },
         Opcode::Reserved => Err("instruction uses reserved opcode".to_owned()),
     }

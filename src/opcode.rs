@@ -15,6 +15,7 @@ pub enum Opcode {
     Jal = 0b11_011_11,
     Branch = 0b11_000_11,
     MiscMem = 0b00_011_11,
+    AMO = 0b01_011_11,
     Reserved = 0,
 }
 
