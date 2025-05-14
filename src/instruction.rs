@@ -157,6 +157,15 @@ pub enum Instruction {
     AMOMAXUD(IRegister, IRegister, IRegister, bool, bool),
 }
 
+fn aq_rl_suffix(aq: &bool, rl: &bool) -> &'static str {
+    match (aq, rl) {
+        (true, true) => ".aqrl",
+        (true, false) => ".aq",
+        (false, true) => ".rl",
+        (false, false) => "",
+    }
+}
+
 impl Display for Instruction {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
@@ -225,35 +234,38 @@ impl Display for Instruction {
             Instruction::DIVUW(rd, rs1, rs2) => write!(f, "divuw {rd},{rs1},{rs2}"),
             Instruction::REMW(rd, rs1, rs2) => write!(f, "remw {rd},{rs1},{rs2}"),
             Instruction::REMUW(rd, rs1, rs2) => write!(f, "remuw {rd},{rs1},{rs2}"),
-            // TODO: fix this aqrl syntax
-            Instruction::LRW(rd, rs1, aq, rl) => write!(f, "lr.w.{aq}{rl} {rd},{rs1}"),
-            Instruction::SCW(rd, rs1, rs2, aq, rl) => write!(f, "sc.w.{aq}{rl} {rd},{rs1},{rs2}"),
+            Instruction::LRW(rd, rs1, aq, rl) => {
+                write!(f, "lr.w{} {rd},{rs1}", aq_rl_suffix(aq, rl))
+            }
+            Instruction::SCW(rd, rs1, rs2, aq, rl) => {
+                write!(f, "sc.w{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
+            }
             Instruction::AMOSWAPW(rd, rs1, rs2, aq, rl) => {
-                write!(f, "amoswap.w.{aq}{rl} {rd},{rs1},{rs2}")
+                write!(f, "amoswap.w{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
             }
             Instruction::AMOADDW(rd, rs1, rs2, aq, rl) => {
-                write!(f, "amoadd.w.{aq}{rl} {rd},{rs1},{rs2}")
+                write!(f, "amoadd.w{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
             }
             Instruction::AMOXORW(rd, rs1, rs2, aq, rl) => {
-                write!(f, "amoxor.w.{aq}{rl} {rd},{rs1},{rs2}")
+                write!(f, "amoxor.w{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
             }
             Instruction::AMOANDW(rd, rs1, rs2, aq, rl) => {
-                write!(f, "amoand.w.{aq}{rl} {rd},{rs1},{rs2}")
+                write!(f, "amoand.w{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
             }
             Instruction::AMOORW(rd, rs1, rs2, aq, rl) => {
-                write!(f, "amoor.w.{aq}{rl} {rd},{rs1},{rs2}")
+                write!(f, "amoor.w{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
             }
             Instruction::AMOMINW(rd, rs1, rs2, aq, rl) => {
-                write!(f, "amomin.w.{aq}{rl} {rd},{rs1},{rs2}")
+                write!(f, "amomin.w{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
             }
             Instruction::AMOMAXW(rd, rs1, rs2, aq, rl) => {
-                write!(f, "amomax.w.{aq}{rl} {rd},{rs1},{rs2}")
+                write!(f, "amomax.w{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
             }
             Instruction::AMOMINUW(rd, rs1, rs2, aq, rl) => {
-                write!(f, "amominu.w.{aq}{rl} {rd},{rs1},{rs2}")
+                write!(f, "amominu.w{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
             }
             Instruction::AMOMAXUW(rd, rs1, rs2, aq, rl) => {
-                write!(f, "amomaxu.w.{aq}{rl} {rd},{rs1},{rs2}")
+                write!(f, "amomaxu.w{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
             }
             Instruction::LRD(rd, rs1, aq, rl) => write!(f, "lr.d.{aq}{rl} {rd},{rs1}"),
             Instruction::SCD(rd, rs1, rs2, aq, rl) => write!(f, "sc.d.{aq}{rl} {rd},{rs1},{rs2}"),
@@ -351,13 +363,15 @@ pub fn assemble_line(line: &str) -> Result<Instruction, String> {
         (line, "")
     };
 
+    let mnemonics: Vec<&str> = mnemonic.split(".").collect();
+
     let operands: Vec<&str> = if operands.is_empty() {
         vec![]
     } else {
         operands.split(',').collect()
     };
 
-    match mnemonic {
+    match mnemonics[0] {
         // register-immediate instructions
         "addi" => i_assemble!(ADDI),
         "addiw" => i_assemble!(ADDIW),
@@ -471,35 +485,88 @@ pub fn assemble_line(line: &str) -> Result<Instruction, String> {
             }
         }
         "fence" => {
-            if operands.len() != 2 {
-                Err("fence instruction requires 2 operands".to_owned())
-            } else {
-                let ops = parse_fence_set(operands[1]) | (parse_fence_set(operands[0]) << 4);
-                Ok(Instruction::FENCE(
-                    // rd and rs1 are currently unused
-                    IRegister::Zero,
-                    IRegister::Zero,
-                    ops,
-                    0, //fm field, always zero for a non-tso fence
-                ))
-            }
-        }
-        "fence.tso" => {
-            if operands.len() != 2 {
-                Err("fence.tso instruction requires 2 operands".to_owned())
-            } else {
-                let ops = parse_fence_set(operands[1]) | (parse_fence_set(operands[0]) << 4);
-                if ops != (parse_fence_set("rw") | (parse_fence_set("rw") << 4)) {
-                    Err("fence.tso should be rw,rw".to_owned())
+            if mnemonics.len() == 1 {
+                if operands.len() != 2 {
+                    Err("fence instruction requires 2 operands".to_owned())
                 } else {
+                    let ops = parse_fence_set(operands[1]) | (parse_fence_set(operands[0]) << 4);
                     Ok(Instruction::FENCE(
                         // rd and rs1 are currently unused
                         IRegister::Zero,
                         IRegister::Zero,
                         ops,
-                        0b1000, // tso fence
+                        0, //fm field, always zero for a non-tso fence
                     ))
                 }
+            } else if mnemonics[1] == ".tso" {
+                if operands.len() != 2 {
+                    Err("fence.tso instruction requires 2 operands".to_owned())
+                } else {
+                    let ops = parse_fence_set(operands[1]) | (parse_fence_set(operands[0]) << 4);
+                    if ops != (parse_fence_set("rw") | (parse_fence_set("rw") << 4)) {
+                        Err("fence.tso should be rw,rw".to_owned())
+                    } else {
+                        Ok(Instruction::FENCE(
+                            // rd and rs1 are currently unused
+                            IRegister::Zero,
+                            IRegister::Zero,
+                            ops,
+                            0b1000, // tso fence
+                        ))
+                    }
+                }
+            } else {
+                Err("invalid fence".to_owned())
+            }
+        }
+        "lr" => {
+            if mnemonics.len() == 1 {
+                Err("lr must have size (w/d)".to_owned())
+            } else if mnemonics.len() == 2 {
+                if mnemonics[1] == "w" {
+                    Ok(Instruction::LRW(
+                        IRegister::from_string(operands[0])?,
+                        IRegister::from_string(operands[1])?,
+                        false,
+                        false,
+                    ))
+                } else if mnemonics[1] == "d" {
+                    Ok(Instruction::LRD(
+                        IRegister::from_string(operands[0])?,
+                        IRegister::from_string(operands[1])?,
+                        false,
+                        false,
+                    ))
+                } else {
+                    Err("size of lr isntruction must be word (w) or doubleword (d)".to_owned())
+                }
+            } else if mnemonics.len() == 3 {
+                let (aq, rl) = match mnemonics[2] {
+                    "" => (false, false),
+                    "aq" => (true, false),
+                    "rl" => (false, true),
+                    "aqrl" => (true, true),
+                    _ => return Err("ordering should be (aq)(rl)".to_owned()),
+                };
+                if mnemonics[1] == "w" {
+                    Ok(Instruction::LRW(
+                        IRegister::from_string(operands[0])?,
+                        IRegister::from_string(operands[1])?,
+                        aq,
+                        rl,
+                    ))
+                } else if mnemonics[1] == "d" {
+                    Ok(Instruction::LRD(
+                        IRegister::from_string(operands[0])?,
+                        IRegister::from_string(operands[1])?,
+                        aq,
+                        rl,
+                    ))
+                } else {
+                    Err("size of lr isntruction must be word (w) or doubleword (d)".to_owned())
+                }
+            } else {
+                Err("lr instruction has too many suffixes, expected lr.size.ordering".to_owned())
             }
         }
         _ => Err(format!("unknown mnemonic: {}", mnemonic)),
@@ -557,8 +624,9 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
 
     let shamtw: ShamtW = ShamtW::from_u32(instruction);
 
-    let aq: bool = ((instruction >> 25) & 0b1) == 0b1;
-    let rl: bool = ((instruction >> 26) & 0b1) == 0b1;
+    // aq is bit 26, rl is bit 25
+    let aq: bool = ((instruction >> 26) & 0b1) == 0b1;
+    let rl: bool = ((instruction >> 25) & 0b1) == 0b1;
 
     match opcode {
         Opcode::Load => match func3 {

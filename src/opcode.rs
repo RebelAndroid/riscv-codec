@@ -38,6 +38,7 @@ impl Opcode {
             0b11_011_11 => Self::Jal,
             0b11_000_11 => Self::Branch,
             0b00_011_11 => Self::MiscMem,
+            0b01_011_11 => Self::AMO,
             _ => Self::Reserved,
         }
     }
