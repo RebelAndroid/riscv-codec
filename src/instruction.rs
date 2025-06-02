@@ -4,7 +4,7 @@ use crate::{immediates::IImmediate, opcode::Opcode};
 use std::fmt::{Display, Formatter};
 
 use proc_macros::{
-    b_assemble, i_assemble, l_assemble, r_assemble, s_assemble, sh_assemble, shw_assemble,
+    amo_assemble, b_assemble, i_assemble, l_assemble, r_assemble, s_assemble, sh_assemble, shw_assemble
 };
 
 #[derive(Debug, PartialEq)]
@@ -569,6 +569,8 @@ pub fn assemble_line(line: &str) -> Result<Instruction, String> {
                 Err("lr instruction has too many suffixes, expected lr.size.ordering".to_owned())
             }
         }
+        "sc" => amo_assemble!(SC),
+        "amoswap" => amo_assemble!(AMOSWAP),
         _ => Err(format!("unknown mnemonic: {}", mnemonic)),
     }
 }
