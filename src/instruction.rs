@@ -267,34 +267,34 @@ impl Display for Instruction {
             Instruction::AMOMAXUW(rd, rs1, rs2, aq, rl) => {
                 write!(f, "amomaxu.w{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
             }
-            Instruction::LRD(rd, rs1, aq, rl) => write!(f, "lr.d.{aq}{rl} {rd},{rs1}"),
-            Instruction::SCD(rd, rs1, rs2, aq, rl) => write!(f, "sc.d.{aq}{rl} {rd},{rs1},{rs2}"),
+            Instruction::LRD(rd, rs1, aq, rl) => write!(f, "lr.d{} {rd},{rs1}", aq_rl_suffix(aq, rl)),
+            Instruction::SCD(rd, rs1, rs2, aq, rl) => write!(f, "sc.d{} {rd},{rs1},{rs2}",aq_rl_suffix(aq, rl)),
             Instruction::AMOSWAPD(rd, rs1, rs2, aq, rl) => {
-                write!(f, "amoswap.d.{aq}{rl} {rd},{rs1},{rs2}")
+                write!(f, "amoswap.d{} {rd},{rs1},{rs2}",aq_rl_suffix(aq, rl))
             }
             Instruction::AMOADDD(rd, rs1, rs2, aq, rl) => {
-                write!(f, "amoswap.w.{aq}{rl} {rd},{rs1},{rs2}")
+                write!(f, "amoswap.w{} {rd},{rs1},{rs2}",aq_rl_suffix(aq, rl))
             }
             Instruction::AMOXORD(rd, rs1, rs2, aq, rl) => {
-                write!(f, "amoxor.d.{aq}{rl} {rd},{rs1},{rs2}")
+                write!(f, "amoxor.d{} {rd},{rs1},{rs2}",aq_rl_suffix(aq, rl))
             }
             Instruction::AMOANDD(rd, rs1, rs2, aq, rl) => {
-                write!(f, "amoand.d.{aq}{rl} {rd},{rs1},{rs2}")
+                write!(f, "amoand.d{} {rd},{rs1},{rs2}",aq_rl_suffix(aq, rl))
             }
             Instruction::AMOORD(rd, rs1, rs2, aq, rl) => {
-                write!(f, "amoor.d.{aq}{rl} {rd},{rs1},{rs2}")
+                write!(f, "amoor.d{} {rd},{rs1},{rs2}",aq_rl_suffix(aq, rl))
             }
             Instruction::AMOMIND(rd, rs1, rs2, aq, rl) => {
-                write!(f, "amomin.d.{aq}{rl} {rd},{rs1},{rs2}")
+                write!(f, "amomin.d{} {rd},{rs1},{rs2}",aq_rl_suffix(aq, rl))
             }
             Instruction::AMOMAXD(rd, rs1, rs2, aq, rl) => {
-                write!(f, "amomax.d.{aq}{rl} {rd},{rs1},{rs2}")
+                write!(f, "amomax.d{} {rd},{rs1},{rs2}",aq_rl_suffix(aq, rl))
             }
             Instruction::AMOMINUD(rd, rs1, rs2, aq, rl) => {
-                write!(f, "amominu.d.{aq}{rl} {rd},{rs1},{rs2}")
+                write!(f, "amominu.d{} {rd},{rs1},{rs2}",aq_rl_suffix(aq, rl))
             }
             Instruction::AMOMAXUD(rd, rs1, rs2, aq, rl) => {
-                write!(f, "amomaxu.d.{aq}{rl} {rd},{rs1},{rs2}")
+                write!(f, "amomaxu.d{} {rd},{rs1},{rs2}",aq_rl_suffix(aq, rl))
             }
         }
     }
@@ -519,6 +519,7 @@ pub fn assemble_line(line: &str) -> Result<Instruction, String> {
                 Err("invalid fence".to_owned())
             }
         }
+        // LR can't use `amo_assemble!` because it only has two operands
         "lr" => {
             if mnemonics.len() == 1 {
                 Err("lr must have size (w/d)".to_owned())
@@ -571,6 +572,14 @@ pub fn assemble_line(line: &str) -> Result<Instruction, String> {
         }
         "sc" => amo_assemble!(SC),
         "amoswap" => amo_assemble!(AMOSWAP),
+        "amoadd" => amo_assemble!(AMOADD),
+        "amoxor" => amo_assemble!(AMOXOR),
+        "amoand" => amo_assemble!(AMOAND),
+        "amoor" => amo_assemble!(AMOOR),
+        "amomin" => amo_assemble!(AMOMIN),
+        "amomax" => amo_assemble!(AMOMAX),
+        "amominu" => amo_assemble!(AMOMINU),
+        "amomaxu" => amo_assemble!(AMOMAXU),
         _ => Err(format!("unknown mnemonic: {}", mnemonic)),
     }
 }
@@ -793,3 +802,4 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
         Opcode::Reserved => Err("instruction uses reserved opcode".to_owned()),
     }
 }
+
