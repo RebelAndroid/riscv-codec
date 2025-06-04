@@ -265,7 +265,7 @@ pub fn amo_assemble(input: TokenStream) -> TokenStream {
         );
         match p.parse() {
             Ok(t) => t,
-            Err(e) => "".parse().unwrap(),
+            Err(_) => "".parse().unwrap(),
         }
     } else {
         panic!("expected identifier");

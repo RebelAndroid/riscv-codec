@@ -273,7 +273,7 @@ impl Display for Instruction {
                 write!(f, "amoswap.d{} {rd},{rs1},{rs2}",aq_rl_suffix(aq, rl))
             }
             Instruction::AMOADDD(rd, rs1, rs2, aq, rl) => {
-                write!(f, "amoswap.w{} {rd},{rs1},{rs2}",aq_rl_suffix(aq, rl))
+                write!(f, "amoadd.d{} {rd},{rs1},{rs2}",aq_rl_suffix(aq, rl))
             }
             Instruction::AMOXORD(rd, rs1, rs2, aq, rl) => {
                 write!(f, "amoxor.d{} {rd},{rs1},{rs2}",aq_rl_suffix(aq, rl))
