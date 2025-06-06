@@ -1,11 +1,55 @@
 use crate::immediates::{SImmediate, Shamt, ShamtW};
-use crate::register::IRegister;
+use crate::register::{FRegister, IRegister};
 use crate::{immediates::IImmediate, opcode::Opcode};
 use std::fmt::{Display, Formatter};
 
 use proc_macros::{
-    amo_assemble, b_assemble, i_assemble, l_assemble, r_assemble, s_assemble, sh_assemble, shw_assemble
+    amo_assemble, b_assemble, i_assemble, l_assemble, r_assemble, s_assemble, sh_assemble,
+    shw_assemble,
 };
+
+#[derive(Debug, PartialEq)]
+enum RoundingMode {
+    /// round to nearest, ties to even
+    RNE = 0b000,
+    /// round towards zero
+    RTZ = 0b001,
+    /// round down
+    RDN = 0b010,
+    /// round up
+    RUP = 0b011,
+    /// round to nearest, ties to max magnitude
+    RMM = 0b100,
+    /// use rounding mode in fcsr
+    DYN = 0b111,
+}
+
+impl Display for RoundingMode {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+        match self {
+            RoundingMode::RNE => write!(f, "rne"),
+            RoundingMode::RTZ => write!(f, "rtz"),
+            RoundingMode::RDN => write!(f, "rdn"),
+            RoundingMode::RUP => write!(f, "rup"),
+            RoundingMode::RMM => write!(f, "rmm"),
+            RoundingMode::DYN => write!(f, "dyn"),
+        }
+    }
+}
+
+impl RoundingMode {
+    pub fn from_int(x: u32) -> Result<RoundingMode, String>{
+        match x {
+            0b000 => Ok(RoundingMode::RNE),
+            0b001 => Ok(RoundingMode::RTZ),
+            0b010 => Ok(RoundingMode::RDN),
+            0b011 => Ok(RoundingMode::RUP),
+            0b100 => Ok(RoundingMode::RMM),
+            0b111 => Ok(RoundingMode::DYN),
+            _ => Err("attempted to create invalid rounding mode".to_owned()),
+        }
+    }
+}
 
 #[derive(Debug, PartialEq)]
 pub enum Instruction {
@@ -155,6 +199,42 @@ pub enum Instruction {
     AMOMAXD(IRegister, IRegister, IRegister, bool, bool),
     AMOMINUD(IRegister, IRegister, IRegister, bool, bool),
     AMOMAXUD(IRegister, IRegister, IRegister, bool, bool),
+    //
+    // Instructions in F Extension
+    //
+    FLW(FRegister, FRegister, IImmediate),
+    FSW(FRegister, FRegister, SImmediate),
+    FMADDS(FRegister, FRegister, FRegister, FRegister, RoundingMode),
+    FMSUBS(FRegister, FRegister, FRegister, FRegister, RoundingMode),
+    FNMSUBS(FRegister, FRegister, FRegister, FRegister, RoundingMode),
+    FNMADDS(FRegister, FRegister, FRegister, FRegister, RoundingMode),
+    FADDS(FRegister, FRegister, FRegister, RoundingMode),
+    FSUBS(FRegister, FRegister, FRegister, RoundingMode),
+    FMULS(FRegister, FRegister, FRegister, RoundingMode),
+    FDIVS(FRegister, FRegister, FRegister, RoundingMode),
+    FSQRTS(FRegister, FRegister, RoundingMode),
+    FSGNJS(FRegister, FRegister),
+    FSGNJNS(FRegister, FRegister),
+    FSGNJXS(FRegister, FRegister),
+    FMINS(FRegister, FRegister, FRegister),
+    FMAXS(FRegister, FRegister, FRegister),
+    FCVTWS(FRegister, FRegister, RoundingMode),
+    FCVTWUS(FRegister, FRegister, RoundingMode),
+    FMVXW(FRegister, FRegister),
+    FEQS(FRegister, FRegister, FRegister),
+    FLTS(FRegister, FRegister, FRegister),
+    FLES(FRegister, FRegister, FRegister),
+    FCLASSS(FRegister, FRegister),
+    FCVTSW(FRegister, FRegister, RoundingMode),
+    FCVTSWU(FRegister, FRegister, RoundingMode),
+    FMVWX(FRegister, FRegister),
+    //
+    // Instructions in F Extension (RV64)
+    //
+    FCVTLS(FRegister, FRegister, RoundingMode),
+    FCVTLUS(FRegister, FRegister, RoundingMode),
+    FCVTSL(FRegister, FRegister, RoundingMode),
+    FCVTSLU(FRegister, FRegister, RoundingMode),
 }
 
 fn aq_rl_suffix(aq: &bool, rl: &bool) -> &'static str {
@@ -267,35 +347,77 @@ impl Display for Instruction {
             Instruction::AMOMAXUW(rd, rs1, rs2, aq, rl) => {
                 write!(f, "amomaxu.w{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
             }
-            Instruction::LRD(rd, rs1, aq, rl) => write!(f, "lr.d{} {rd},{rs1}", aq_rl_suffix(aq, rl)),
-            Instruction::SCD(rd, rs1, rs2, aq, rl) => write!(f, "sc.d{} {rd},{rs1},{rs2}",aq_rl_suffix(aq, rl)),
+            Instruction::LRD(rd, rs1, aq, rl) => {
+                write!(f, "lr.d{} {rd},{rs1}", aq_rl_suffix(aq, rl))
+            }
+            Instruction::SCD(rd, rs1, rs2, aq, rl) => {
+                write!(f, "sc.d{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
+            }
             Instruction::AMOSWAPD(rd, rs1, rs2, aq, rl) => {
-                write!(f, "amoswap.d{} {rd},{rs1},{rs2}",aq_rl_suffix(aq, rl))
+                write!(f, "amoswap.d{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
             }
             Instruction::AMOADDD(rd, rs1, rs2, aq, rl) => {
-                write!(f, "amoadd.d{} {rd},{rs1},{rs2}",aq_rl_suffix(aq, rl))
+                write!(f, "amoadd.d{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
             }
             Instruction::AMOXORD(rd, rs1, rs2, aq, rl) => {
-                write!(f, "amoxor.d{} {rd},{rs1},{rs2}",aq_rl_suffix(aq, rl))
+                write!(f, "amoxor.d{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
             }
             Instruction::AMOANDD(rd, rs1, rs2, aq, rl) => {
-                write!(f, "amoand.d{} {rd},{rs1},{rs2}",aq_rl_suffix(aq, rl))
+                write!(f, "amoand.d{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
             }
             Instruction::AMOORD(rd, rs1, rs2, aq, rl) => {
-                write!(f, "amoor.d{} {rd},{rs1},{rs2}",aq_rl_suffix(aq, rl))
+                write!(f, "amoor.d{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
             }
             Instruction::AMOMIND(rd, rs1, rs2, aq, rl) => {
-                write!(f, "amomin.d{} {rd},{rs1},{rs2}",aq_rl_suffix(aq, rl))
+                write!(f, "amomin.d{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
             }
             Instruction::AMOMAXD(rd, rs1, rs2, aq, rl) => {
-                write!(f, "amomax.d{} {rd},{rs1},{rs2}",aq_rl_suffix(aq, rl))
+                write!(f, "amomax.d{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
             }
             Instruction::AMOMINUD(rd, rs1, rs2, aq, rl) => {
-                write!(f, "amominu.d{} {rd},{rs1},{rs2}",aq_rl_suffix(aq, rl))
+                write!(f, "amominu.d{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
             }
             Instruction::AMOMAXUD(rd, rs1, rs2, aq, rl) => {
-                write!(f, "amomaxu.d{} {rd},{rs1},{rs2}",aq_rl_suffix(aq, rl))
+                write!(f, "amomaxu.d{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
             }
+            Instruction::FLW(rd, rs1, imm) => write!(f, "flw {rd},{rs1},{imm}"),
+            Instruction::FSW(rs1, rs2, imm) => write!(f, "fsw {rs1},{rs2},{imm}"),
+            Instruction::FMADDS(rd, rs1, rs2, rs3, rm) => {
+                write!(f, "fmadd.s.{rm} {rd},{rs1},{rs2},{rs3}")
+            }
+            Instruction::FMSUBS(rd, rs1, rs2, rs3, rm) => {
+                write!(f, "fmsub.s.{rm} {rd},{rs1},{rs2},{rs3}")
+            }
+            Instruction::FNMSUBS(rd, rs1, rs2, rs3, rm) => {
+                write!(f, "fnmsub.s.{rm} {rd},{rs1},{rs2},{rs3}")
+            }
+            Instruction::FNMADDS(rd, rs1, rs2, rs3, rm) => {
+                write!(f, "fnmadd.s.{rm} {rd},{rs1},{rs2},{rs3}")
+            }
+            Instruction::FADDS(rd, rs1, rs2, rm) => write!(f, "fadd.s.{rm} {rd},{rs1},{rs2}"),
+            Instruction::FSUBS(rd, rs1, rs2, rm) => write!(f, "fsub.s.{rm} {rd},{rs1},{rs2}"),
+            Instruction::FMULS(rd, rs1, rs2, rm) => write!(f, "fmul.s.{rm} {rd},{rs1},{rs2}"),
+            Instruction::FDIVS(rd, rs1, rs2, rm) => write!(f, "fdiv.s.{rm} {rd},{rs1},{rs2}"),
+            Instruction::FSQRTS(rd, rs1, rm) => write!(f, "fsqrt.s.{rm} {rd},{rs1}"),
+            Instruction::FSGNJS(rd, rs1) => write!(f, "fsgnj.s {rd},{rs1}"),
+            Instruction::FSGNJNS(rd, rs1) => write!(f, "fsgnjn.s {rd},{rs1}"),
+            Instruction::FSGNJXS(rd, rs1) => write!(f, "fsgnjx.s {rd},{rs1}"),
+            Instruction::FMINS(rd, rs1, rs2) => write!(f, "smin.s {rd},{rs1},{rs2}"),
+            Instruction::FMAXS(rd, rs1, rs2) => write!(f, "smax.s {rd},{rs1},{rs2}"),
+            Instruction::FCVTWS(rd, rs1, rm) => write!(f, "fcvt.w.s.{rm} {rd},{rs1}"),
+            Instruction::FCVTWUS(rd, rs1, rm) => write!(f, "fcvt.wu.s.{rm} {rd},{rs1}"),
+            Instruction::FMVXW(rd, rs1) => write!(f, "fmv.x.w {rd},{rs1}"),
+            Instruction::FEQS(rd, rs1, rs2) => write!(f, "feq.s {rd},{rs1},{rs2}"),
+            Instruction::FLTS(rd, rs1, rs2) => write!(f, "flt.s {rd},{rs1},{rs2}"),
+            Instruction::FLES(rd, rs1, rs2) => write!(f, "fle.s {rd},{rs1},{rs2}"),
+            Instruction::FCLASSS(rd, rs1) => write!(f, "fclass.s {rd},{rs1}"),
+            Instruction::FCVTSW(rd, rs1, rm) => write!(f, "fcvtw.s.w.{rm} {rd},{rs1}"),
+            Instruction::FCVTSWU(rd, rs1, rm) => write!(f, "fcvtw.s.wu.{rm} {rd},{rs1}"),
+            Instruction::FMVWX(rd, rs1) => write!(f, "fmv.w.x {rd},{rs1}"),
+            Instruction::FCVTLS(rd, rs1, rm) => write!(f, "fcvt.l.s.{rm} {rd},{rs1}"),
+            Instruction::FCVTLUS(rd, rs1, rm) => write!(f, "fcvt.lu.s.{rm} {rd},{rs1}"),
+            Instruction::FCVTSL(rd, rs1, rm) => write!(f, "fcvt.s.l.{rm} {rd},{rs1}"),
+            Instruction::FCVTSLU(rd, rs1, rm) => write!(f, "fcvtl.s.lu.{rm} {rd},{rs1}"),
         }
     }
 }
@@ -618,6 +740,11 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
     let rs1 = IRegister::from_int((instruction >> 15) & 0b1_1111);
     let rs2 = IRegister::from_int((instruction >> 20) & 0b1_1111);
 
+    let frd = FRegister::from_int((instruction >> 7) & 0b1_1111);
+    let frs1 = FRegister::from_int((instruction >> 15) & 0b1_1111);
+    let frs2 = FRegister::from_int((instruction >> 20) & 0b1_1111);
+    let frs3 = FRegister::from_int((instruction >> 27) & 0b1_1111);
+
     let i_immediate: IImmediate = IImmediate::from_u32(instruction);
 
     let s_immediate: SImmediate = SImmediate::from_u32(instruction);
@@ -761,7 +888,6 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
             }
             x => Err(format!("unknown fence func3: {x}")),
         },
-        // shift func7 left 2 to clear aq,rl
         Opcode::AMO => match (func3, func7 >> 2) {
             (0b010, 0b00010) => {
                 if rs2 != IRegister::Zero {
@@ -799,7 +925,28 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
             (0b011, 0b11100) => Ok(Instruction::AMOMAXUD(rd, rs1, rs2, aq, rl)),
             _ => Err(format!("unknown AMO. func3: {func3}, func7: {func7}")),
         },
+        Opcode::LoadFp => {
+            if func3 == 0b010 {
+                Ok(Instruction::FLW(frd, frs1, i_immediate))
+            }else{
+                Err(format!("unknown func3: {func3} in opcode LoadFp"))
+            }
+        },
+        Opcode::StoreFp => {
+            if func3 == 0b010 {
+                Ok(Instruction::FSW(frs1, frs2, s_immediate))
+            }else{
+                Err(format!("unknown func3: {func3} in opcode LoadFp"))
+            }
+        },
+        Opcode::OpFp => {
+            match func7 {
+                0b000_0000 => Ok(Instruction::FADDS(frd, frs1, frs2, RoundingMode::from_int(func3)?)),
+                0b000_0100 => Ok(Instruction::FSUBS(frd, frs1, frs2, RoundingMode::from_int(func3)?)),
+                0b000_1000 => Ok(Instruction::FMULS(frd, frs1, frs2, RoundingMode::from_int(func3)?)),
+                0b000_1100 => Ok(Instruction::FDIVS(frd, frs1, frs2, RoundingMode::from_int(func3)?)),
+            }
+        },
         Opcode::Reserved => Err("instruction uses reserved opcode".to_owned()),
     }
 }
-

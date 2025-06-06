@@ -16,6 +16,9 @@ pub enum Opcode {
     Branch = 0b11_000_11,
     MiscMem = 0b00_011_11,
     AMO = 0b01_011_11,
+    OpFp = 0b10_100_11,
+    LoadFp = 0b00_001_11,
+    StoreFp = 0b01_001_11,
     Reserved = 0,
 }
 
@@ -26,6 +29,7 @@ impl Opcode {
             panic!("attempted to convert too large int to opcode")
         }
         match int {
+            
             0b00_000_11 => Self::Load,
             0b00_101_11 => Self::Auipc,
             0b01_000_11 => Self::Store,
@@ -39,6 +43,7 @@ impl Opcode {
             0b11_000_11 => Self::Branch,
             0b00_011_11 => Self::MiscMem,
             0b01_011_11 => Self::AMO,
+            0b10_100_11 => Self::OpFp,
             _ => Self::Reserved,
         }
     }
