@@ -38,7 +38,7 @@ impl Display for RoundingMode {
 }
 
 impl RoundingMode {
-    pub fn from_int(x: u32) -> Result<RoundingMode, String>{
+    pub fn from_int(x: u32) -> Result<RoundingMode, String> {
         match x {
             0b000 => Ok(RoundingMode::RNE),
             0b001 => Ok(RoundingMode::RTZ),
@@ -213,9 +213,9 @@ pub enum Instruction {
     FMULS(FRegister, FRegister, FRegister, RoundingMode),
     FDIVS(FRegister, FRegister, FRegister, RoundingMode),
     FSQRTS(FRegister, FRegister, RoundingMode),
-    FSGNJS(FRegister, FRegister),
-    FSGNJNS(FRegister, FRegister),
-    FSGNJXS(FRegister, FRegister),
+    FSGNJS(FRegister, FRegister, FRegister),
+    FSGNJNS(FRegister, FRegister, FRegister),
+    FSGNJXS(FRegister, FRegister, FRegister),
     FMINS(FRegister, FRegister, FRegister),
     FMAXS(FRegister, FRegister, FRegister),
     FCVTWS(FRegister, FRegister, RoundingMode),
@@ -399,9 +399,9 @@ impl Display for Instruction {
             Instruction::FMULS(rd, rs1, rs2, rm) => write!(f, "fmul.s.{rm} {rd},{rs1},{rs2}"),
             Instruction::FDIVS(rd, rs1, rs2, rm) => write!(f, "fdiv.s.{rm} {rd},{rs1},{rs2}"),
             Instruction::FSQRTS(rd, rs1, rm) => write!(f, "fsqrt.s.{rm} {rd},{rs1}"),
-            Instruction::FSGNJS(rd, rs1) => write!(f, "fsgnj.s {rd},{rs1}"),
-            Instruction::FSGNJNS(rd, rs1) => write!(f, "fsgnjn.s {rd},{rs1}"),
-            Instruction::FSGNJXS(rd, rs1) => write!(f, "fsgnjx.s {rd},{rs1}"),
+            Instruction::FSGNJS(rd, rs1, rs2) => write!(f, "fsgnj.s {rd},{rs1},{rs2}"),
+            Instruction::FSGNJNS(rd, rs1, rs2) => write!(f, "fsgnjn.s {rd},{rs1},{rs2}"),
+            Instruction::FSGNJXS(rd, rs1, rs2) => write!(f, "fsgnjx.s {rd},{rs1},{rs2}"),
             Instruction::FMINS(rd, rs1, rs2) => write!(f, "smin.s {rd},{rs1},{rs2}"),
             Instruction::FMAXS(rd, rs1, rs2) => write!(f, "smax.s {rd},{rs1},{rs2}"),
             Instruction::FCVTWS(rd, rs1, rm) => write!(f, "fcvt.w.s.{rm} {rd},{rs1}"),
@@ -928,23 +928,64 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
         Opcode::LoadFp => {
             if func3 == 0b010 {
                 Ok(Instruction::FLW(frd, frs1, i_immediate))
-            }else{
+            } else {
                 Err(format!("unknown func3: {func3} in opcode LoadFp"))
             }
-        },
+        }
         Opcode::StoreFp => {
             if func3 == 0b010 {
                 Ok(Instruction::FSW(frs1, frs2, s_immediate))
-            }else{
+            } else {
                 Err(format!("unknown func3: {func3} in opcode LoadFp"))
             }
-        },
-        Opcode::OpFp => {
-            match func7 {
-                0b000_0000 => Ok(Instruction::FADDS(frd, frs1, frs2, RoundingMode::from_int(func3)?)),
-                0b000_0100 => Ok(Instruction::FSUBS(frd, frs1, frs2, RoundingMode::from_int(func3)?)),
-                0b000_1000 => Ok(Instruction::FMULS(frd, frs1, frs2, RoundingMode::from_int(func3)?)),
-                0b000_1100 => Ok(Instruction::FDIVS(frd, frs1, frs2, RoundingMode::from_int(func3)?)),
+        }
+        Opcode::OpFp => match func7 {
+            0b000_0000 => Ok(Instruction::FADDS(
+                frd,
+                frs1,
+                frs2,
+                RoundingMode::from_int(func3)?,
+            )),
+            0b000_0100 => Ok(Instruction::FSUBS(
+                frd,
+                frs1,
+                frs2,
+                RoundingMode::from_int(func3)?,
+            )),
+            0b000_1000 => Ok(Instruction::FMULS(
+                frd,
+                frs1,
+                frs2,
+                RoundingMode::from_int(func3)?,
+            )),
+            0b000_1100 => Ok(Instruction::FDIVS(
+                frd,
+                frs1,
+                frs2,
+                RoundingMode::from_int(func3)?,
+            )),
+            0b010_1100 => Ok(Instruction::FSQRTS(
+                frd,
+                frs1,
+                RoundingMode::from_int(func3)?,
+            )),
+            0b001_0000 => {
+                match func3 {
+                    0b000 => Ok(Instruction::FSGNJS(frd, frs1, frs2)),
+                    0b001 => Ok(Instruction::FSGNJNS(frd, frs1, frs2)),
+                    0b010 => Ok(Instruction::FSGNJXS(frd, frs1, frs2)),
+                    x => Err(format!("unknown OpFp func7=0b001_0000 func3: {}", x))
+                }
+            }
+            0b001_0100 => {
+                match func3 {
+                    0b000 => Ok(Instruction::FMINS(frd, frs1, frs2)),
+                    0b001 => Ok(Instruction::FMAXS(frd, frs1, frs2)),
+                    x => Err(format!("unknown OpFp func7=0b001_0100 func3: {}", x))
+                }
+            }
+            x => {
+                Err(format!("Unknown OpFp func7: {x}"))
             }
         },
         Opcode::Reserved => Err("instruction uses reserved opcode".to_owned()),

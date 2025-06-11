@@ -29,7 +29,6 @@ impl Opcode {
             panic!("attempted to convert too large int to opcode")
         }
         match int {
-            
             0b00_000_11 => Self::Load,
             0b00_101_11 => Self::Auipc,
             0b01_000_11 => Self::Store,

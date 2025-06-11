@@ -31,14 +31,26 @@ fn store_conditional_word() {
     let i = assemble_line("sc.w.rl ra,t4,a1").unwrap();
     assert_eq!(
         i,
-        Instruction::SCW(IRegister::ReturnAddress, IRegister::T4, IRegister::A1, false, true)
+        Instruction::SCW(
+            IRegister::ReturnAddress,
+            IRegister::T4,
+            IRegister::A1,
+            false,
+            true
+        )
     );
 
     // check decoder
     let i2 = decode_instruction(0x1abea0af).unwrap();
     assert_eq!(
         i2,
-        Instruction::SCW(IRegister::ReturnAddress, IRegister::T4, IRegister::A1, false, true)
+        Instruction::SCW(
+            IRegister::ReturnAddress,
+            IRegister::T4,
+            IRegister::A1,
+            false,
+            true
+        )
     );
 
     // check disassembler
@@ -53,14 +65,26 @@ fn amo_swap_word() {
     let i = assemble_line("amoswap.w t2,ra,t5").unwrap();
     assert_eq!(
         i,
-        Instruction::AMOSWAPW(IRegister::T2, IRegister::ReturnAddress, IRegister::T5, false, false)
+        Instruction::AMOSWAPW(
+            IRegister::T2,
+            IRegister::ReturnAddress,
+            IRegister::T5,
+            false,
+            false
+        )
     );
 
     // check decoder
     let i2 = decode_instruction(0x09e0a3af).unwrap();
     assert_eq!(
         i2,
-        Instruction::AMOSWAPW(IRegister::T2, IRegister::ReturnAddress, IRegister::T5, false, false)
+        Instruction::AMOSWAPW(
+            IRegister::T2,
+            IRegister::ReturnAddress,
+            IRegister::T5,
+            false,
+            false
+        )
     );
 
     // check disassembler
@@ -75,14 +99,26 @@ fn amo_add_word() {
     let i = assemble_line("amoadd.w.aqrl a4,gp,s4").unwrap();
     assert_eq!(
         i,
-        Instruction::AMOADDW(IRegister::A4, IRegister::GlobalPointer, IRegister::S4, true, true)
+        Instruction::AMOADDW(
+            IRegister::A4,
+            IRegister::GlobalPointer,
+            IRegister::S4,
+            true,
+            true
+        )
     );
 
     // check decoder
     let i2 = decode_instruction(0x0741a72f).unwrap();
     assert_eq!(
         i2,
-        Instruction::AMOADDW(IRegister::A4, IRegister::GlobalPointer, IRegister::S4, true, true)
+        Instruction::AMOADDW(
+            IRegister::A4,
+            IRegister::GlobalPointer,
+            IRegister::S4,
+            true,
+            true
+        )
     );
 
     // check disassembler
@@ -97,14 +133,26 @@ fn amo_xor_word() {
     let i = assemble_line("amoxor.w a4,gp,s4").unwrap();
     assert_eq!(
         i,
-        Instruction::AMOXORW(IRegister::A4, IRegister::GlobalPointer, IRegister::S4, false, false)
+        Instruction::AMOXORW(
+            IRegister::A4,
+            IRegister::GlobalPointer,
+            IRegister::S4,
+            false,
+            false
+        )
     );
 
     // check decoder
     let i2 = decode_instruction(0x2141a72f).unwrap();
     assert_eq!(
         i2,
-        Instruction::AMOXORW(IRegister::A4, IRegister::GlobalPointer, IRegister::S4, false, false)
+        Instruction::AMOXORW(
+            IRegister::A4,
+            IRegister::GlobalPointer,
+            IRegister::S4,
+            false,
+            false
+        )
     );
 
     // check disassembler
@@ -119,14 +167,26 @@ fn amo_and_word() {
     let i = assemble_line("amoand.w a4,gp,s4").unwrap();
     assert_eq!(
         i,
-        Instruction::AMOANDW(IRegister::A4, IRegister::GlobalPointer, IRegister::S4, false, false)
+        Instruction::AMOANDW(
+            IRegister::A4,
+            IRegister::GlobalPointer,
+            IRegister::S4,
+            false,
+            false
+        )
     );
 
     // check decoder
     let i2 = decode_instruction(0x6141a72f).unwrap();
     assert_eq!(
         i2,
-        Instruction::AMOANDW(IRegister::A4, IRegister::GlobalPointer, IRegister::S4, false, false)
+        Instruction::AMOANDW(
+            IRegister::A4,
+            IRegister::GlobalPointer,
+            IRegister::S4,
+            false,
+            false
+        )
     );
 
     // check disassembler
@@ -141,14 +201,26 @@ fn amo_or_word() {
     let i = assemble_line("amoor.w a4,gp,s4").unwrap();
     assert_eq!(
         i,
-        Instruction::AMOORW(IRegister::A4, IRegister::GlobalPointer, IRegister::S4, false, false)
+        Instruction::AMOORW(
+            IRegister::A4,
+            IRegister::GlobalPointer,
+            IRegister::S4,
+            false,
+            false
+        )
     );
 
     // check decoder
     let i2 = decode_instruction(0x4141a72f).unwrap();
     assert_eq!(
         i2,
-        Instruction::AMOORW(IRegister::A4, IRegister::GlobalPointer, IRegister::S4, false, false)
+        Instruction::AMOORW(
+            IRegister::A4,
+            IRegister::GlobalPointer,
+            IRegister::S4,
+            false,
+            false
+        )
     );
 
     // check disassembler
@@ -163,14 +235,26 @@ fn amo_min_word() {
     let i = assemble_line("amomin.w a4,gp,s4").unwrap();
     assert_eq!(
         i,
-        Instruction::AMOMINW(IRegister::A4, IRegister::GlobalPointer, IRegister::S4, false, false)
+        Instruction::AMOMINW(
+            IRegister::A4,
+            IRegister::GlobalPointer,
+            IRegister::S4,
+            false,
+            false
+        )
     );
 
     // check decoder
     let i2 = decode_instruction(0x8141a72f).unwrap();
     assert_eq!(
         i2,
-        Instruction::AMOMINW(IRegister::A4, IRegister::GlobalPointer, IRegister::S4, false, false)
+        Instruction::AMOMINW(
+            IRegister::A4,
+            IRegister::GlobalPointer,
+            IRegister::S4,
+            false,
+            false
+        )
     );
 
     // check disassembler
@@ -185,14 +269,26 @@ fn amo_max_word() {
     let i = assemble_line("amomax.w a4,gp,s4").unwrap();
     assert_eq!(
         i,
-        Instruction::AMOMAXW(IRegister::A4, IRegister::GlobalPointer, IRegister::S4, false, false)
+        Instruction::AMOMAXW(
+            IRegister::A4,
+            IRegister::GlobalPointer,
+            IRegister::S4,
+            false,
+            false
+        )
     );
 
     // check decoder
     let i2 = decode_instruction(0xa141a72f).unwrap();
     assert_eq!(
         i2,
-        Instruction::AMOMAXW(IRegister::A4, IRegister::GlobalPointer, IRegister::S4, false, false)
+        Instruction::AMOMAXW(
+            IRegister::A4,
+            IRegister::GlobalPointer,
+            IRegister::S4,
+            false,
+            false
+        )
     );
 
     // check disassembler
@@ -207,14 +303,26 @@ fn amo_min_unsigned_word() {
     let i = assemble_line("amominu.w a4,gp,s4").unwrap();
     assert_eq!(
         i,
-        Instruction::AMOMINUW(IRegister::A4, IRegister::GlobalPointer, IRegister::S4, false, false)
+        Instruction::AMOMINUW(
+            IRegister::A4,
+            IRegister::GlobalPointer,
+            IRegister::S4,
+            false,
+            false
+        )
     );
 
     // check decoder
     let i2 = decode_instruction(0xc141a72f).unwrap();
     assert_eq!(
         i2,
-        Instruction::AMOMINUW(IRegister::A4, IRegister::GlobalPointer, IRegister::S4, false, false)
+        Instruction::AMOMINUW(
+            IRegister::A4,
+            IRegister::GlobalPointer,
+            IRegister::S4,
+            false,
+            false
+        )
     );
 
     // check disassembler
@@ -229,14 +337,26 @@ fn amo_max_unsigned_word() {
     let i = assemble_line("amomaxu.w a4,gp,s4").unwrap();
     assert_eq!(
         i,
-        Instruction::AMOMAXUW(IRegister::A4, IRegister::GlobalPointer, IRegister::S4, false, false)
+        Instruction::AMOMAXUW(
+            IRegister::A4,
+            IRegister::GlobalPointer,
+            IRegister::S4,
+            false,
+            false
+        )
     );
 
     // check decoder
     let i2 = decode_instruction(0xe141a72f).unwrap();
     assert_eq!(
         i2,
-        Instruction::AMOMAXUW(IRegister::A4, IRegister::GlobalPointer, IRegister::S4, false, false)
+        Instruction::AMOMAXUW(
+            IRegister::A4,
+            IRegister::GlobalPointer,
+            IRegister::S4,
+            false,
+            false
+        )
     );
 
     // check disassembler
@@ -273,14 +393,26 @@ fn store_conditional_doubleword() {
     let i = assemble_line("sc.d.aqrl tp,s10,a2").unwrap();
     assert_eq!(
         i,
-        Instruction::SCD(IRegister::ThreadPointer, IRegister::S10, IRegister::A2, true, true)
+        Instruction::SCD(
+            IRegister::ThreadPointer,
+            IRegister::S10,
+            IRegister::A2,
+            true,
+            true
+        )
     );
 
     // check decoder
     let i2 = decode_instruction(0x1ecd322f).unwrap();
     assert_eq!(
         i2,
-        Instruction::SCD(IRegister::ThreadPointer, IRegister::S10, IRegister::A2, true, true)
+        Instruction::SCD(
+            IRegister::ThreadPointer,
+            IRegister::S10,
+            IRegister::A2,
+            true,
+            true
+        )
     );
 
     // check disassembler
@@ -295,14 +427,26 @@ fn amo_swap_doubleword() {
     let i = assemble_line("amoswap.d t2,ra,t5").unwrap();
     assert_eq!(
         i,
-        Instruction::AMOSWAPD(IRegister::T2, IRegister::ReturnAddress, IRegister::T5, false, false)
+        Instruction::AMOSWAPD(
+            IRegister::T2,
+            IRegister::ReturnAddress,
+            IRegister::T5,
+            false,
+            false
+        )
     );
 
     // check decoder
     let i2 = decode_instruction(0x09e0b3af).unwrap();
     assert_eq!(
         i2,
-        Instruction::AMOSWAPD(IRegister::T2, IRegister::ReturnAddress, IRegister::T5, false, false)
+        Instruction::AMOSWAPD(
+            IRegister::T2,
+            IRegister::ReturnAddress,
+            IRegister::T5,
+            false,
+            false
+        )
     );
 
     // check disassembler
@@ -317,14 +461,26 @@ fn amo_add_doubleword() {
     let i = assemble_line("amoadd.d a4,gp,s4").unwrap();
     assert_eq!(
         i,
-        Instruction::AMOADDD(IRegister::A4, IRegister::GlobalPointer, IRegister::S4, false, false)
+        Instruction::AMOADDD(
+            IRegister::A4,
+            IRegister::GlobalPointer,
+            IRegister::S4,
+            false,
+            false
+        )
     );
 
     // check decoder
     let i2 = decode_instruction(0x0141b72f).unwrap();
     assert_eq!(
         i2,
-        Instruction::AMOADDD(IRegister::A4, IRegister::GlobalPointer, IRegister::S4, false, false)
+        Instruction::AMOADDD(
+            IRegister::A4,
+            IRegister::GlobalPointer,
+            IRegister::S4,
+            false,
+            false
+        )
     );
 
     // check disassembler
@@ -339,14 +495,26 @@ fn amo_xor_doubleword() {
     let i = assemble_line("amoxor.d a4,gp,s4").unwrap();
     assert_eq!(
         i,
-        Instruction::AMOXORD(IRegister::A4, IRegister::GlobalPointer, IRegister::S4, false, false)
+        Instruction::AMOXORD(
+            IRegister::A4,
+            IRegister::GlobalPointer,
+            IRegister::S4,
+            false,
+            false
+        )
     );
 
     // check decoder
     let i2 = decode_instruction(0x2141b72f).unwrap();
     assert_eq!(
         i2,
-        Instruction::AMOXORD(IRegister::A4, IRegister::GlobalPointer, IRegister::S4, false, false)
+        Instruction::AMOXORD(
+            IRegister::A4,
+            IRegister::GlobalPointer,
+            IRegister::S4,
+            false,
+            false
+        )
     );
 
     // check disassembler
@@ -361,14 +529,26 @@ fn amo_and_doubleword() {
     let i = assemble_line("amoand.d a4,gp,s4").unwrap();
     assert_eq!(
         i,
-        Instruction::AMOANDD(IRegister::A4, IRegister::GlobalPointer, IRegister::S4, false, false)
+        Instruction::AMOANDD(
+            IRegister::A4,
+            IRegister::GlobalPointer,
+            IRegister::S4,
+            false,
+            false
+        )
     );
 
     // check decoder
     let i2 = decode_instruction(0x6141b72f).unwrap();
     assert_eq!(
         i2,
-        Instruction::AMOANDD(IRegister::A4, IRegister::GlobalPointer, IRegister::S4, false, false)
+        Instruction::AMOANDD(
+            IRegister::A4,
+            IRegister::GlobalPointer,
+            IRegister::S4,
+            false,
+            false
+        )
     );
 
     // check disassembler
@@ -383,14 +563,26 @@ fn amo_or_doubleword() {
     let i = assemble_line("amoor.d a4,gp,s4").unwrap();
     assert_eq!(
         i,
-        Instruction::AMOORD(IRegister::A4, IRegister::GlobalPointer, IRegister::S4, false, false)
+        Instruction::AMOORD(
+            IRegister::A4,
+            IRegister::GlobalPointer,
+            IRegister::S4,
+            false,
+            false
+        )
     );
 
     // check decoder
     let i2 = decode_instruction(0x4141b72f).unwrap();
     assert_eq!(
         i2,
-        Instruction::AMOORD(IRegister::A4, IRegister::GlobalPointer, IRegister::S4, false, false)
+        Instruction::AMOORD(
+            IRegister::A4,
+            IRegister::GlobalPointer,
+            IRegister::S4,
+            false,
+            false
+        )
     );
 
     // check disassembler
@@ -405,14 +597,26 @@ fn amo_min_doubleword() {
     let i = assemble_line("amomin.d a4,gp,s4").unwrap();
     assert_eq!(
         i,
-        Instruction::AMOMIND(IRegister::A4, IRegister::GlobalPointer, IRegister::S4, false, false)
+        Instruction::AMOMIND(
+            IRegister::A4,
+            IRegister::GlobalPointer,
+            IRegister::S4,
+            false,
+            false
+        )
     );
 
     // check decoder
     let i2 = decode_instruction(0x8141b72f).unwrap();
     assert_eq!(
         i2,
-        Instruction::AMOMIND(IRegister::A4, IRegister::GlobalPointer, IRegister::S4, false, false)
+        Instruction::AMOMIND(
+            IRegister::A4,
+            IRegister::GlobalPointer,
+            IRegister::S4,
+            false,
+            false
+        )
     );
 
     // check disassembler
@@ -427,14 +631,26 @@ fn amo_max_doubleword() {
     let i = assemble_line("amomax.d a4,gp,s4").unwrap();
     assert_eq!(
         i,
-        Instruction::AMOMAXD(IRegister::A4, IRegister::GlobalPointer, IRegister::S4, false, false)
+        Instruction::AMOMAXD(
+            IRegister::A4,
+            IRegister::GlobalPointer,
+            IRegister::S4,
+            false,
+            false
+        )
     );
 
     // check decoder
     let i2 = decode_instruction(0xa141b72f).unwrap();
     assert_eq!(
         i2,
-        Instruction::AMOMAXD(IRegister::A4, IRegister::GlobalPointer, IRegister::S4, false, false)
+        Instruction::AMOMAXD(
+            IRegister::A4,
+            IRegister::GlobalPointer,
+            IRegister::S4,
+            false,
+            false
+        )
     );
 
     // check disassembler
@@ -449,14 +665,26 @@ fn amo_min_unsigned_doubleword() {
     let i = assemble_line("amominu.d a4,gp,s4").unwrap();
     assert_eq!(
         i,
-        Instruction::AMOMINUD(IRegister::A4, IRegister::GlobalPointer, IRegister::S4, false, false)
+        Instruction::AMOMINUD(
+            IRegister::A4,
+            IRegister::GlobalPointer,
+            IRegister::S4,
+            false,
+            false
+        )
     );
 
     // check decoder
     let i2 = decode_instruction(0xc141b72f).unwrap();
     assert_eq!(
         i2,
-        Instruction::AMOMINUD(IRegister::A4, IRegister::GlobalPointer, IRegister::S4, false, false)
+        Instruction::AMOMINUD(
+            IRegister::A4,
+            IRegister::GlobalPointer,
+            IRegister::S4,
+            false,
+            false
+        )
     );
 
     // check disassembler
@@ -471,14 +699,26 @@ fn amo_max_unsigned_doubleword() {
     let i = assemble_line("amomaxu.d a4,gp,s4").unwrap();
     assert_eq!(
         i,
-        Instruction::AMOMAXUD(IRegister::A4, IRegister::GlobalPointer, IRegister::S4, false, false)
+        Instruction::AMOMAXUD(
+            IRegister::A4,
+            IRegister::GlobalPointer,
+            IRegister::S4,
+            false,
+            false
+        )
     );
 
     // check decoder
     let i2 = decode_instruction(0xe141b72f).unwrap();
     assert_eq!(
         i2,
-        Instruction::AMOMAXUD(IRegister::A4, IRegister::GlobalPointer, IRegister::S4, false, false)
+        Instruction::AMOMAXUD(
+            IRegister::A4,
+            IRegister::GlobalPointer,
+            IRegister::S4,
+            false,
+            false
+        )
     );
 
     // check disassembler
