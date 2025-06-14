@@ -9,10 +9,13 @@ pub struct IImmediate {
 impl IImmediate {
     /// Extracts the IImmediate from the appropriate position in a 32-bit instruction
     pub fn from_u32(x: u32) -> Self {
-        let unsigned: u16 = ((x >> 20) & 0b1111_1111_1111).try_into().unwrap();
+        let unsigned: u32 = ((x >> 20) & 0b1111_1111_1111).try_into().unwrap();
+        println!("u {:b}", unsigned);
         // sign extend 12 bit value
         let y = unsigned.overflowing_shl(20).0 as i32;
+        println!("y {:b}", y);
         let val = y.overflowing_shr(20).0 as i16;
+        println!("v {:b}", val);
         IImmediate { val }
     }
 

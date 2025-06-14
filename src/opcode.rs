@@ -19,6 +19,10 @@ pub enum Opcode {
     OpFp = 0b10_100_11,
     LoadFp = 0b00_001_11,
     StoreFp = 0b01_001_11,
+    Madd = 0b10_000_11,
+    Msub = 0b10_001_11,
+    Nmsub = 0b10_010_11,
+    Nmadd = 0b10_011_11,
     Reserved = 0,
 }
 
@@ -43,6 +47,12 @@ impl Opcode {
             0b00_011_11 => Self::MiscMem,
             0b01_011_11 => Self::AMO,
             0b10_100_11 => Self::OpFp,
+            0b10_000_11 => Self::Madd,
+            0b10_001_11 => Self::Msub,
+            0b10_010_11 => Self::Nmsub,
+            0b10_011_11 => Self::Nmadd,
+            0b00_001_11 => Self::LoadFp,
+            0b01_001_11 => Self::StoreFp,
             _ => Self::Reserved,
         }
     }
