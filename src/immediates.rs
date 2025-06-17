@@ -46,10 +46,8 @@ pub struct SImmediate {
 impl SImmediate {
     /// Extracts the IImmediate from the appropriate position in a 32-bit instruction
     pub fn from_u32(x: u32) -> Self {
-        let unsigned: u16 = <u32 as TryInto<u16>>::try_into(
-            (((x >> 25) & 0b111_1111) << 5) | ((x >> 7) & 0b1_1111),
-        )
-        .unwrap();
+        let unsigned: u32 =
+            (((x >> 25) & 0b111_1111) << 5) | ((x >> 7) & 0b1_1111);
         // sign extend 12 bit value
         let y = unsigned.overflowing_shl(20).0 as i32;
         let val = y.overflowing_shr(20).0 as i16;

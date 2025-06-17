@@ -271,3 +271,43 @@ pub fn amo_assemble(input: TokenStream) -> TokenStream {
         panic!("expected identifier");
     }
 }
+
+// assembles an fr type instruction
+#[proc_macro]
+pub fn fr_assemble(input: TokenStream) -> TokenStream {
+    if let TokenTree::Ident(i) = input.into_iter().next().unwrap() {
+        let name = i.to_string();
+        let sname = name.clone() + "S";
+        let _dname = name.clone() + "D";
+        let lower = name.to_lowercase();
+        format!(
+            "
+        if operands.len() != 3 {{
+                Err(\"{lower} instruction requires 3 operands\".to_owned())
+        }} else {{
+                if mnemonics.len() == 2 {{
+                    Ok(Instruction::{sname}(
+                        FRegister::from_string(operands[0])?,
+                        FRegister::from_string(operands[1])?,
+                        FRegister::from_string(operands[2])?,
+                        RoundingMode::DYN,
+                    ))
+        }}else if mnemonics.len() == 3 {{
+                    Ok(Instruction::{sname}(
+                        FRegister::from_string(operands[0])?,
+                        FRegister::from_string(operands[1])?,
+                        FRegister::from_string(operands[2])?,
+                        RoundingMode::from_str(mnemonics[2])?, 
+                    ))
+        }}else{{
+                    Err(\"fadd instruction requires a suffix {{s,d}}\".to_owned())
+        }}
+        }}
+            "
+        )
+        .parse()
+        .unwrap()
+    } else {
+        panic!("expected identifier");
+    }
+}

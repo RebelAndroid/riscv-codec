@@ -4,12 +4,11 @@ use crate::{immediates::IImmediate, opcode::Opcode};
 use std::fmt::{Display, Formatter};
 
 use proc_macros::{
-    amo_assemble, b_assemble, i_assemble, l_assemble, r_assemble, s_assemble, sh_assemble,
-    shw_assemble,
+    amo_assemble, b_assemble, fr_assemble, i_assemble, l_assemble, r_assemble, s_assemble, sh_assemble, shw_assemble
 };
 
 #[derive(Debug, PartialEq)]
-enum RoundingMode {
+pub enum RoundingMode {
     /// round to nearest, ties to even
     RNE = 0b000,
     /// round towards zero
@@ -46,6 +45,17 @@ impl RoundingMode {
             0b011 => Ok(RoundingMode::RUP),
             0b100 => Ok(RoundingMode::RMM),
             0b111 => Ok(RoundingMode::DYN),
+            _ => Err("attempted to create invalid rounding mode".to_owned()),
+        }
+    }
+    pub fn from_str(x: &str) -> Result<RoundingMode, String> {
+        match x {
+            "rne" => Ok(RoundingMode::RNE),
+            "rtz" => Ok(RoundingMode::RTZ),
+            "rdn" => Ok(RoundingMode::RDN),
+            "rup" => Ok(RoundingMode::RUP),
+            "rmm" => Ok(RoundingMode::RMM),
+            "dyn" => Ok(RoundingMode::DYN),
             _ => Err("attempted to create invalid rounding mode".to_owned()),
         }
     }
@@ -203,7 +213,7 @@ pub enum Instruction {
     // Instructions in F Extension
     //
     FLW(FRegister, IRegister, IImmediate),
-    FSW(FRegister, FRegister, SImmediate),
+    FSW(IRegister, FRegister, SImmediate),
     FMADDS(FRegister, FRegister, FRegister, FRegister, RoundingMode),
     FMSUBS(FRegister, FRegister, FRegister, FRegister, RoundingMode),
     FNMSUBS(FRegister, FRegister, FRegister, FRegister, RoundingMode),
@@ -381,7 +391,7 @@ impl Display for Instruction {
                 write!(f, "amomaxu.d{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
             }
             Instruction::FLW(rd, rs1, imm) => write!(f, "flw {rd},{imm}({rs1})"),
-            Instruction::FSW(rs1, rs2, imm) => write!(f, "fsw {rs1},{rs2},{imm}"),
+            Instruction::FSW(rs1, rs2, imm) => write!(f, "fsw {rs2},{imm}({rs1})"),
             Instruction::FMADDS(rd, rs1, rs2, rs3, rm) => {
                 write!(f, "fmadd.s.{rm} {rd},{rs1},{rs2},{rs3}")
             }
@@ -493,6 +503,7 @@ pub fn assemble_line(line: &str) -> Result<Instruction, String> {
         operands.split(',').collect()
     };
     println!("operands: {:?}", operands);
+    println!("mnemonics: {:?}", mnemonics);
 
     match mnemonics[0] {
         // register-immediate instructions
@@ -716,6 +727,44 @@ pub fn assemble_line(line: &str) -> Result<Instruction, String> {
                 ))
             }
         },
+        "fsw" => {
+            if operands.len() != 2 {
+                println!("{:?}", operands);
+                Err("fsw instruction requires 2 operands".to_owned())
+            } else {
+                let (base, offset) = parse_address_expression(operands[1])?;
+                Ok(Instruction::FSW(
+                    base,
+                    FRegister::from_string(operands[0])?,
+                    SImmediate::from_val(offset),
+                ))
+            }
+        },
+        "fsqrt" => {
+            if operands.len() != 2 {
+                Err("fsqrt instruction requires 2 operands".to_owned())
+            } else {
+                if mnemonics.len() == 2 {
+                    Ok(Instruction::FSQRTS(
+                        FRegister::from_string(operands[0])?,
+                        FRegister::from_string(operands[1])?,
+                        RoundingMode::DYN,
+                    ))
+                }else if mnemonics.len() == 3 {
+                    Ok(Instruction::FSQRTS(
+                        FRegister::from_string(operands[0])?,
+                        FRegister::from_string(operands[1])?,
+                        RoundingMode::from_str(mnemonics[2])?, 
+                    ))
+                }else{
+                    Err("fsqrt instruction requires a suffix {s,d}".to_owned())
+                }
+            }
+        }
+        "fadd" => fr_assemble!(FADD),
+        "fsub" => fr_assemble!(FSUB),
+        "fmul" => fr_assemble!(FMUL),
+        "fdiv" => fr_assemble!(FDIV),
         _ => Err(format!("unknown mnemonic: {}", mnemonic)),
     }
 }
@@ -949,7 +998,7 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
             }
         Opcode::StoreFp => {
                 if func3 == 0b010 {
-                    Ok(Instruction::FSW(frs1, frs2, s_immediate))
+                    Ok(Instruction::FSW(rs1, frs2, s_immediate))
                 } else {
                     Err(format!("unknown func3: {func3} in opcode LoadFp"))
                 }
@@ -1069,3 +1118,4 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
         },
     }
 }
+
