@@ -115,7 +115,7 @@ impl IRegister {
             29 => Self::T4,
             30 => Self::T5,
             31 => Self::T6,
-            x => panic!("converted invalid to register {}", x),
+            x => panic!("converted invalid to integer register {}", x),
         }
     }
 
@@ -154,7 +154,7 @@ impl IRegister {
             "t4" => Ok(Self::T4),
             "t5" => Ok(Self::T5),
             "t6" => Ok(Self::T6),
-            x => Err(format!("converted invalid str to register {}", x)),
+            x => Err(format!("converted invalid str to integer register {}", x)),
         }
     }
 }
@@ -311,7 +311,7 @@ impl FRegister {
             "ft9" => Ok(Self::FT9),
             "ft10" => Ok(Self::FT10),
             "ft11" => Ok(Self::FT11),
-            x => Err(format!("converted invalid str to register {}", x)),
+            x => Err(format!("converted invalid str to float register {}", x)),
         }
     }
 }
