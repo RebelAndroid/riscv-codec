@@ -428,7 +428,7 @@ impl Display for Instruction {
             Instruction::FCVTLS(rd, rs1, rm) => write!(f, "fcvt.l.s.{rm} {rd},{rs1}"),
             Instruction::FCVTLUS(rd, rs1, rm) => write!(f, "fcvt.lu.s.{rm} {rd},{rs1}"),
             Instruction::FCVTSL(rd, rs1, rm) => write!(f, "fcvt.s.l.{rm} {rd},{rs1}"),
-            Instruction::FCVTSLU(rd, rs1, rm) => write!(f, "fcvtl.s.lu.{rm} {rd},{rs1}"),
+            Instruction::FCVTSLU(rd, rs1, rm) => write!(f, "fcvt.s.lu.{rm} {rd},{rs1}"),
         }
     }
 }
@@ -768,7 +768,7 @@ pub fn assemble_line(line: &str) -> Result<Instruction, String> {
         "fdiv" => fr_assemble!(FDIV),
         "fmin" => {
             if operands.len() != 3 {
-                Err("fsqrt instruction requires 3 operands".to_owned())
+                Err("fmin instruction requires 3 operands".to_owned())
             } else {
                 if mnemonics.len() == 2 {
                     Ok(Instruction::FMINS(
@@ -777,13 +777,13 @@ pub fn assemble_line(line: &str) -> Result<Instruction, String> {
                         FRegister::from_string(operands[2])?,
                     ))
                 } else {
-                    Err("fsqrt instruction requires a suffix {s,d}".to_owned())
+                    Err("fmin instruction requires a suffix {s,d}".to_owned())
                 }
             }
         }
         "fmax" => {
             if operands.len() != 3 {
-                Err("fsqrt instruction requires 3 operands".to_owned())
+                Err("fmax instruction requires 3 operands".to_owned())
             } else {
                 if mnemonics.len() == 2 {
                     Ok(Instruction::FMAXS(
@@ -792,7 +792,7 @@ pub fn assemble_line(line: &str) -> Result<Instruction, String> {
                         FRegister::from_string(operands[2])?,
                     ))
                 } else {
-                    Err("fsqrt instruction requires a suffix {s,d}".to_owned())
+                    Err("fmax instruction requires a suffix {s,d}".to_owned())
                 }
             }
         }
@@ -904,14 +904,82 @@ pub fn assemble_line(line: &str) -> Result<Instruction, String> {
                             IRegister::from_string(operands[0])?,
                             FRegister::from_string(operands[1])?,
                         )),
-                        ("w", "x") => Ok(Instruction::FMVXW(
-                            IRegister::from_string(operands[0])?,
-                            FRegister::from_string(operands[1])?,
+                        ("w", "x") => Ok(Instruction::FMVWX(
+                            FRegister::from_string(operands[0])?,
+                            IRegister::from_string(operands[1])?,
                         )),
                         _ => Err("invalid fmv suffixes".to_owned()),
                     }
                 } else {
                     Err("fmv requires 2 suffixes".to_owned())
+                }
+            }
+        }
+        "feq" => {
+            if operands.len() != 3 {
+                Err("feq requires 3 operands".to_owned())
+            }else {
+                if mnemonics.len() == 2 {
+                    match mnemonics[1] {
+                        "s" => Ok(Instruction::FEQS(IRegister::from_string(operands[0])?, FRegister::from_string(operands[1])?, FRegister::from_string(operands[2])?)),
+                        "d" => todo!(),
+                        "q" => todo!(),
+                        "h" => todo!(),
+                        _ => Err("feq requires a suffix {s,d}".to_owned()),
+                    }
+                }else {
+                    Err("feq requires a suffix {s,d}".to_owned())
+                }
+            }
+        }
+        "flt" => {
+            if operands.len() != 3 {
+                Err("flt requires 3 operands".to_owned())
+            }else {
+                if mnemonics.len() == 2 {
+                    match mnemonics[1] {
+                        "s" => Ok(Instruction::FLTS(IRegister::from_string(operands[0])?, FRegister::from_string(operands[1])?, FRegister::from_string(operands[2])?)),
+                        "d" => todo!(),
+                        "q" => todo!(),
+                        "h" => todo!(),
+                        _ => Err("flt requires a suffix {s,d}".to_owned()),
+                    }
+                }else {
+                    Err("flt requires a suffix {s,d}".to_owned())
+                }
+            }
+        }
+        "fle" => {
+            if operands.len() != 3 {
+                Err("fle requires 3 operands".to_owned())
+            }else {
+                if mnemonics.len() == 2 {
+                    match mnemonics[1] {
+                        "s" => Ok(Instruction::FLES(IRegister::from_string(operands[0])?, FRegister::from_string(operands[1])?, FRegister::from_string(operands[2])?)),
+                        "d" => todo!(),
+                        "q" => todo!(),
+                        "h" => todo!(),
+                        _ => Err("fle requires a suffix {s,d}".to_owned()),
+                    }
+                }else {
+                    Err("fle requires a suffix {s,d}".to_owned())
+                }
+            }
+        }
+        "fclass" => {
+            if operands.len() != 2 {
+                Err("fclass requires 2 operands".to_owned())
+            }else {
+                if mnemonics.len() == 2 {
+                    match mnemonics[1] {
+                        "s" => Ok(Instruction::FCLASSS(IRegister::from_string(operands[0])?, FRegister::from_string(operands[1])?)),
+                        "d" => todo!(),
+                        "q" => todo!(),
+                        "h" => todo!(),
+                        _ => Err("fle requires a suffix {s,d}".to_owned()),
+                    }
+                }else {
+                    Err("fle requires a suffix {s,d}".to_owned())
                 }
             }
         }
@@ -1211,6 +1279,16 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
                     frs1,
                     RoundingMode::from_int(func3)?,
                 )),
+                0b0_0010 => Ok(Instruction::FCVTLS(
+                    rd,
+                    frs1,
+                    RoundingMode::from_int(func3)?,
+                )),
+                0b0_0011 => Ok(Instruction::FCVTLUS(
+                    rd,
+                    frs1,
+                    RoundingMode::from_int(func3)?,
+                )),
                 x => Err(format!("unknown OpFp func7=0b001_0100 rs2: {}", x)),
             },
             0b110_1000 => match (instruction >> 20) & 0b1_1111 {
@@ -1220,6 +1298,16 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
                     RoundingMode::from_int(func3)?,
                 )),
                 0b0_0001 => Ok(Instruction::FCVTSWU(
+                    frd,
+                    rs1,
+                    RoundingMode::from_int(func3)?,
+                )),
+                0b0_0010 => Ok(Instruction::FCVTSL(
+                    frd,
+                    rs1,
+                    RoundingMode::from_int(func3)?,
+                )),
+                0b0_0011 => Ok(Instruction::FCVTSLU(
                     frd,
                     rs1,
                     RoundingMode::from_int(func3)?,
@@ -1235,6 +1323,24 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
                     } else {
                         Err(format!(
                             "unknown OpFp func7=0b111_0000 rs2=0 func3: {}",
+                            func3
+                        ))
+                    }
+                } else {
+                    Err(format!(
+                        "unknown OpFp func7=0b111_0000 unknown rs2: {} and func3: {}",
+                        (instruction >> 20) & 0b1_1111,
+                        func3
+                    ))
+                }
+            }
+            0b111_1000 => {
+                if (instruction >> 20) & 0b1_1111 == 0 {
+                    if func3 == 0 {
+                        Ok(Instruction::FMVWX(frd, rs1))
+                    }else {
+                        Err(format!(
+                            "unknown OpFp func7=0b111_1000 rs2=0 func3: {}",
                             func3
                         ))
                     }
