@@ -246,6 +246,16 @@ pub enum Instruction {
     FCVTLUS(IRegister, FRegister, RoundingMode),
     FCVTSL(FRegister, IRegister, RoundingMode),
     FCVTSLU(FRegister, IRegister, RoundingMode),
+    //
+    // Instructions in C extension
+    //
+    CADDI4SPN(IRegister, u16),
+    CFLD(IRegister, IRegister, u8),
+    CLW(IRegister, IRegister, u8),
+    CLD(IRegister, IRegister, u8),
+    CFSD(IRegister, IRegister, u8),
+    CSW(IRegister, IRegister, u8),
+    CSD(IRegister, IRegister, u8),
 }
 
 fn aq_rl_suffix(aq: &bool, rl: &bool) -> &'static str {
@@ -326,85 +336,85 @@ impl Display for Instruction {
             Instruction::REMW(rd, rs1, rs2) => write!(f, "remw {rd},{rs1},{rs2}"),
             Instruction::REMUW(rd, rs1, rs2) => write!(f, "remuw {rd},{rs1},{rs2}"),
             Instruction::LRW(rd, rs1, aq, rl) => {
-                write!(f, "lr.w{} {rd},{rs1}", aq_rl_suffix(aq, rl))
-            }
+                        write!(f, "lr.w{} {rd},{rs1}", aq_rl_suffix(aq, rl))
+                    }
             Instruction::SCW(rd, rs1, rs2, aq, rl) => {
-                write!(f, "sc.w{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
-            }
+                        write!(f, "sc.w{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
+                    }
             Instruction::AMOSWAPW(rd, rs1, rs2, aq, rl) => {
-                write!(f, "amoswap.w{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
-            }
+                        write!(f, "amoswap.w{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
+                    }
             Instruction::AMOADDW(rd, rs1, rs2, aq, rl) => {
-                write!(f, "amoadd.w{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
-            }
+                        write!(f, "amoadd.w{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
+                    }
             Instruction::AMOXORW(rd, rs1, rs2, aq, rl) => {
-                write!(f, "amoxor.w{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
-            }
+                        write!(f, "amoxor.w{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
+                    }
             Instruction::AMOANDW(rd, rs1, rs2, aq, rl) => {
-                write!(f, "amoand.w{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
-            }
+                        write!(f, "amoand.w{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
+                    }
             Instruction::AMOORW(rd, rs1, rs2, aq, rl) => {
-                write!(f, "amoor.w{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
-            }
+                        write!(f, "amoor.w{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
+                    }
             Instruction::AMOMINW(rd, rs1, rs2, aq, rl) => {
-                write!(f, "amomin.w{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
-            }
+                        write!(f, "amomin.w{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
+                    }
             Instruction::AMOMAXW(rd, rs1, rs2, aq, rl) => {
-                write!(f, "amomax.w{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
-            }
+                        write!(f, "amomax.w{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
+                    }
             Instruction::AMOMINUW(rd, rs1, rs2, aq, rl) => {
-                write!(f, "amominu.w{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
-            }
+                        write!(f, "amominu.w{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
+                    }
             Instruction::AMOMAXUW(rd, rs1, rs2, aq, rl) => {
-                write!(f, "amomaxu.w{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
-            }
+                        write!(f, "amomaxu.w{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
+                    }
             Instruction::LRD(rd, rs1, aq, rl) => {
-                write!(f, "lr.d{} {rd},{rs1}", aq_rl_suffix(aq, rl))
-            }
+                        write!(f, "lr.d{} {rd},{rs1}", aq_rl_suffix(aq, rl))
+                    }
             Instruction::SCD(rd, rs1, rs2, aq, rl) => {
-                write!(f, "sc.d{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
-            }
+                        write!(f, "sc.d{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
+                    }
             Instruction::AMOSWAPD(rd, rs1, rs2, aq, rl) => {
-                write!(f, "amoswap.d{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
-            }
+                        write!(f, "amoswap.d{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
+                    }
             Instruction::AMOADDD(rd, rs1, rs2, aq, rl) => {
-                write!(f, "amoadd.d{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
-            }
+                        write!(f, "amoadd.d{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
+                    }
             Instruction::AMOXORD(rd, rs1, rs2, aq, rl) => {
-                write!(f, "amoxor.d{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
-            }
+                        write!(f, "amoxor.d{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
+                    }
             Instruction::AMOANDD(rd, rs1, rs2, aq, rl) => {
-                write!(f, "amoand.d{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
-            }
+                        write!(f, "amoand.d{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
+                    }
             Instruction::AMOORD(rd, rs1, rs2, aq, rl) => {
-                write!(f, "amoor.d{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
-            }
+                        write!(f, "amoor.d{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
+                    }
             Instruction::AMOMIND(rd, rs1, rs2, aq, rl) => {
-                write!(f, "amomin.d{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
-            }
+                        write!(f, "amomin.d{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
+                    }
             Instruction::AMOMAXD(rd, rs1, rs2, aq, rl) => {
-                write!(f, "amomax.d{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
-            }
+                        write!(f, "amomax.d{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
+                    }
             Instruction::AMOMINUD(rd, rs1, rs2, aq, rl) => {
-                write!(f, "amominu.d{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
-            }
+                        write!(f, "amominu.d{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
+                    }
             Instruction::AMOMAXUD(rd, rs1, rs2, aq, rl) => {
-                write!(f, "amomaxu.d{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
-            }
+                        write!(f, "amomaxu.d{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
+                    }
             Instruction::FLW(rd, rs1, imm) => write!(f, "flw {rd},{imm}({rs1})"),
             Instruction::FSW(rs1, rs2, imm) => write!(f, "fsw {rs2},{imm}({rs1})"),
             Instruction::FMADDS(rd, rs1, rs2, rs3, rm) => {
-                write!(f, "fmadd.s.{rm} {rd},{rs1},{rs2},{rs3}")
-            }
+                        write!(f, "fmadd.s.{rm} {rd},{rs1},{rs2},{rs3}")
+                    }
             Instruction::FMSUBS(rd, rs1, rs2, rs3, rm) => {
-                write!(f, "fmsub.s.{rm} {rd},{rs1},{rs2},{rs3}")
-            }
+                        write!(f, "fmsub.s.{rm} {rd},{rs1},{rs2},{rs3}")
+                    }
             Instruction::FNMSUBS(rd, rs1, rs2, rs3, rm) => {
-                write!(f, "fnmsub.s.{rm} {rd},{rs1},{rs2},{rs3}")
-            }
+                        write!(f, "fnmsub.s.{rm} {rd},{rs1},{rs2},{rs3}")
+                    }
             Instruction::FNMADDS(rd, rs1, rs2, rs3, rm) => {
-                write!(f, "fnmadd.s.{rm} {rd},{rs1},{rs2},{rs3}")
-            }
+                        write!(f, "fnmadd.s.{rm} {rd},{rs1},{rs2},{rs3}")
+                    }
             Instruction::FADDS(rd, rs1, rs2, rm) => write!(f, "fadd.s.{rm} {rd},{rs1},{rs2}"),
             Instruction::FSUBS(rd, rs1, rs2, rm) => write!(f, "fsub.s.{rm} {rd},{rs1},{rs2}"),
             Instruction::FMULS(rd, rs1, rs2, rm) => write!(f, "fmul.s.{rm} {rd},{rs1},{rs2}"),
@@ -429,7 +439,14 @@ impl Display for Instruction {
             Instruction::FCVTLUS(rd, rs1, rm) => write!(f, "fcvt.lu.s.{rm} {rd},{rs1}"),
             Instruction::FCVTSL(rd, rs1, rm) => write!(f, "fcvt.s.l.{rm} {rd},{rs1}"),
             Instruction::FCVTSLU(rd, rs1, rm) => write!(f, "fcvt.s.lu.{rm} {rd},{rs1}"),
-        }
+            Instruction::CADDI4SPN(rd, imm) => write!(f, "c.addi4spn {rd},{imm}"),
+            Instruction::CFLD(rd, rs1, imm) => write!(f, "c.fld {rd},{imm}({rs1})"),
+            Instruction::CLW(rd, rs1, imm) => write!(f, "c.lw {rd},{imm}({rs1})"),
+            Instruction::CLD(rd, rs1, imm) => write!(f, "c.ld {rd},{imm}({rs1})"),
+            Instruction::CFSD(rs2, rs1, imm) => write!(f, "c.ld {rs1},{imm}({rs2})"),
+            Instruction::CSW(rs2, rs1, imm) => write!(f, "c.ld {rs1},{imm}({rs2})"),
+            Instruction::CSD(rs2, rs1, imm) => write!(f, "c.ld {rs1},{imm}({rs2})"),
+                    }
     }
 }
 
@@ -1419,5 +1436,25 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
                 ))
             }
         }
+    }
+}
+
+pub fn decode_compressed_instruction(instruction: u16) -> Result<Instruction, String> {
+    match instruction & 0b11 {
+        0b00 => match instruction >> 13 {
+            0b000 => todo!(),
+            0b001 => todo!(),
+            0b010 => todo!(),
+            0b011 => todo!(),
+            0b100 => todo!(),
+            0b101 => todo!(),
+            0b110 => todo!(),
+            0b111 => todo!(),
+            _ => unreachable!(),
+        },
+        0b01 => todo!(),
+        0b10 => todo!(),
+        0b11 => Err("attempting to decode larger instruction as though it were 16 bits".to_owned()),
+        _ => unreachable!()
     }
 }
