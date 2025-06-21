@@ -133,3 +133,35 @@ impl Display for ShamtW {
         write!(f, "{}", self.val)
     }
 }
+
+/// The immediate values in LUI and AUIPC
+#[derive(Debug, PartialEq)]
+pub struct UImmediate {
+    val: i32,
+}
+
+
+impl UImmediate {
+    /// Extracts the UImmediate from the appropriate position in a 32-bit instruction
+    pub fn from_u32(x: u32) -> Self {
+        let val = (x as i32) >> 12;
+        UImmediate { val }
+    }
+
+    pub fn from_val(val: i64) -> Self {
+        if val > 2i64.pow(19) - 1 || val < -1 * 2i64.pow(19) {
+            panic!("attempted to construct out of range UImediate")
+        }
+        UImmediate { val: val as i32 }
+    }
+
+    pub fn val(&self) -> i64 {
+        return self.val.into();
+    }
+}
+
+impl Display for UImmediate {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(f, "{}", self.val)
+    }
+}

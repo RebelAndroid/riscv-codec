@@ -1,4 +1,4 @@
-use crate::immediates::{SImmediate, Shamt, ShamtW};
+use crate::immediates::{SImmediate, Shamt, ShamtW, UImmediate};
 use crate::register::{FRegister, IRegister};
 use crate::{immediates::IImmediate, opcode::Opcode};
 use std::fmt::{Display, Formatter};
@@ -68,9 +68,9 @@ pub enum Instruction {
     // Instructions from RV32I
     //
     /// Load upper immediate
-    LUI(IRegister, u32),
+    LUI(IRegister, UImmediate),
     /// Add upper immediate to PC
-    AUIPC(IRegister, u32),
+    AUIPC(IRegister, UImmediate),
     /// Jump and Link
     JAL(IRegister, i32),
     /// Jump and Link Register
@@ -613,11 +613,11 @@ pub fn assemble_line(line: &str) -> Result<Instruction, String> {
             if operands.len() != 2 {
                 Err("lui instruction requires 2 operands".to_owned())
             } else {
-                let int: u32 = parse_int(operands[1])? as u32;
-                if int & 0xFFF != 0 {
-                    Err("auipc immediate must be divisible by 0x1000".to_owned())
+                let int: i64 = parse_int(operands[1])?;
+                if int > 2i64.pow(19) - 1 || int < -1 * 2i64.pow(19) {
+                    Err("UImmediate out of range".to_owned())
                 } else {
-                    Ok(Instruction::LUI(IRegister::from_string(operands[0])?, int))
+                    Ok(Instruction::LUI(IRegister::from_string(operands[0])?, UImmediate::from_val(int)))
                 }
             }
         }
@@ -625,14 +625,11 @@ pub fn assemble_line(line: &str) -> Result<Instruction, String> {
             if operands.len() != 2 {
                 Err("auipc instruction requires 2 operands".to_owned())
             } else {
-                let int: u32 = parse_int(operands[1])? as u32;
-                if int & 0xFFF != 0 {
-                    Err("auipc immediate must be divisible by 0x1000".to_owned())
+                let int: i64 = parse_int(operands[1])?;
+                if int > 2i64.pow(19) - 1 || int < -1 * 2i64.pow(19) {
+                    Err("UImmediate out of range".to_owned())
                 } else {
-                    Ok(Instruction::AUIPC(
-                        IRegister::from_string(operands[0])?,
-                        int,
-                    ))
+                    Ok(Instruction::AUIPC(IRegister::from_string(operands[0])?, UImmediate::from_val(int)))
                 }
             }
         }
@@ -1047,7 +1044,7 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
 
     let s_immediate: SImmediate = SImmediate::from_u32(instruction);
 
-    let u_immediate = instruction & (!0b1111_1111_1111);
+    let u_immediate = UImmediate::from_u32(instruction);
 
     let b = (((instruction >> 7) & 0b1) << 11)
         | (((instruction >> 8) & 0b1111) << 1)
@@ -1152,7 +1149,7 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
         Opcode::Jalr => Ok(Instruction::JALR(rd, rs1, i_immediate)),
         Opcode::Jal => Ok(Instruction::JAL(
             rd,
-            j_immediate_from_u_immediate(u_immediate),
+            j_immediate_from_u_immediate(u_immediate.val().try_into().unwrap()), // TODO: fix this garbage
         )),
         Opcode::Branch => match func3 {
             0b000 => Ok(Instruction::BEQ(rs1, rs2, b_immediate)),
