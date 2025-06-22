@@ -1,4 +1,4 @@
-use crate::immediates::{SImmediate, Shamt, ShamtW, UImmediate};
+use crate::immediates::{JImmediate, SImmediate, Shamt, ShamtW, UImmediate};
 use crate::register::{FRegister, IRegister};
 use crate::{immediates::IImmediate, opcode::Opcode};
 use std::fmt::{Display, Formatter};
@@ -72,7 +72,7 @@ pub enum Instruction {
     /// Add upper immediate to PC
     AUIPC(IRegister, UImmediate),
     /// Jump and Link
-    JAL(IRegister, i32),
+    JAL(IRegister, JImmediate),
     /// Jump and Link Register
     JALR(IRegister, IRegister, IImmediate),
     BEQ(IRegister, IRegister, i16),
@@ -472,16 +472,6 @@ impl Instruction {
     }
 }
 
-fn j_immediate_from_u_immediate(u: u32) -> i32 {
-    let a = (u >> 12) & 0b1111_1111;
-    let b = (u >> 20) & 0b1;
-    let c = (u >> 21) & 0b11_1111_1111;
-    let d = u >> 31;
-
-    let i = (c << 1) | (b << 11) | (a << 12) | (d << 20);
-    ((i << 12) as i32) >> 12
-}
-
 fn parse_int(str: &str) -> Result<i64, String> {
     match str.parse::<i64>() {
         Ok(e) => Ok(e),
@@ -605,7 +595,7 @@ pub fn assemble_line(line: &str) -> Result<Instruction, String> {
             } else {
                 Ok(Instruction::JAL(
                     IRegister::from_string(operands[0])?,
-                    parse_int(operands[1])? as i32,
+                    JImmediate::from_val(parse_int(operands[1])?),
                 ))
             }
         }
@@ -1149,7 +1139,7 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
         Opcode::Jalr => Ok(Instruction::JALR(rd, rs1, i_immediate)),
         Opcode::Jal => Ok(Instruction::JAL(
             rd,
-            j_immediate_from_u_immediate(u_immediate.val().try_into().unwrap()), // TODO: fix this garbage
+            JImmediate::from_u32(instruction),
         )),
         Opcode::Branch => match func3 {
             0b000 => Ok(Instruction::BEQ(rs1, rs2, b_immediate)),
