@@ -139,7 +139,7 @@ pub fn b_assemble(input: TokenStream) -> TokenStream {
             Ok(Instruction::{name}(
                 IRegister::from_string(operands[0])?,
                 IRegister::from_string(operands[1])?,
-                parse_int(operands[2])? as i16,
+                BImmediate::from_val(parse_int(operands[2])?),
             ))
         }}"
         )

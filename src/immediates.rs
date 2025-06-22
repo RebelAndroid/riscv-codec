@@ -203,3 +203,44 @@ impl Display for JImmediate {
         write!(f, "{}", self.val)
     }
 }
+
+/// The immediate value in JAL
+#[derive(Debug, PartialEq)]
+pub struct BImmediate {
+    val: i32,
+}
+
+
+impl BImmediate {
+    /// Extracts the JImmediate from the appropriate position in a 32-bit instruction
+    pub fn from_u32(x: u32) -> Self {
+        let a = (x >> 7) & 0b1;
+        let b = (x >> 8) & 0b1111;
+        let c = (x >> 25) & 0b11_1111;
+        let d = x >> 31;
+        
+        let i: i32 = ((b << 1) | (c << 5) | (a << 11) | (d << 12)) as i32;
+        let i2 = (i << 19) >> 19;
+        BImmediate { val: i2 }
+    }
+
+    pub fn from_val(val: i64) -> Self {
+        if val > 2i64.pow(12) - 1 || val < -1 * 2i64.pow(12) {
+            panic!("attempted to construct out of range JImediate")
+        }
+        if val % 2 == 1 {
+            panic!("attempted to construct odd JImmediate")
+        }
+        BImmediate { val: val as i32 }
+    }
+
+    pub fn val(&self) -> i64 {
+        return self.val.into();
+    }
+}
+
+impl Display for BImmediate {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(f, "{}", self.val)
+    }
+}

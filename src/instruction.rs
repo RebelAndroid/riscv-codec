@@ -1,4 +1,4 @@
-use crate::immediates::{JImmediate, SImmediate, Shamt, ShamtW, UImmediate};
+use crate::immediates::{BImmediate, JImmediate, SImmediate, Shamt, ShamtW, UImmediate};
 use crate::register::{FRegister, IRegister};
 use crate::{immediates::IImmediate, opcode::Opcode};
 use std::fmt::{Display, Formatter};
@@ -75,12 +75,12 @@ pub enum Instruction {
     JAL(IRegister, JImmediate),
     /// Jump and Link Register
     JALR(IRegister, IRegister, IImmediate),
-    BEQ(IRegister, IRegister, i16),
-    BNE(IRegister, IRegister, i16),
-    BLT(IRegister, IRegister, i16),
-    BGE(IRegister, IRegister, i16),
-    BLTU(IRegister, IRegister, i16),
-    BGEU(IRegister, IRegister, i16),
+    BEQ(IRegister, IRegister, BImmediate),
+    BNE(IRegister, IRegister, BImmediate),
+    BLT(IRegister, IRegister, BImmediate),
+    BGE(IRegister, IRegister, BImmediate),
+    BLTU(IRegister, IRegister, BImmediate),
+    BGEU(IRegister, IRegister, BImmediate),
     /// Load Byte
     LB(IRegister, IRegister, IImmediate),
     /// Load Halfword
@@ -1036,12 +1036,7 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
 
     let u_immediate = UImmediate::from_u32(instruction);
 
-    let b = (((instruction >> 7) & 0b1) << 11)
-        | (((instruction >> 8) & 0b1111) << 1)
-        | (((instruction >> 25) & 0b11_1111) << 5)
-        | ((instruction >> 31) << 12);
-
-    let b_immediate = ((b << 20_i32) >> 20) as i16;
+    let b_immediate = BImmediate::from_u32(instruction);
 
     let shamt: Shamt = Shamt::from_u32(instruction);
 
