@@ -119,6 +119,20 @@ impl IRegister {
         }
     }
 
+     pub fn from_int_compressed(int: u16) -> Self {
+        match int {
+            0 => Self::FramePointer,
+            1 => Self::S1,
+            2 => Self::A0,
+            3 => Self::A1,
+            4 => Self::A2,
+            5 => Self::A3,
+            6 => Self::A4,
+            7 => Self::A5,
+            x => panic!("converted invalid integer to register in compressed instruction: {}", x),
+        }
+    }
+
     pub fn from_string(str: &str) -> Result<Self, String> {
         match str {
             "zero" => Ok(Self::Zero),
@@ -273,7 +287,21 @@ impl FRegister {
             29 => Self::FT9,
             30 => Self::FT10,
             31 => Self::FT11,
-            x => panic!("converted invalid to register {}", x),
+            x => panic!("converted invalid integer to float register {}", x),
+        }
+    }
+
+    pub fn from_int_compressed(int: u16) -> Self {
+        match int {
+            0 => Self::FS0,
+            1 => Self::FS1,
+            2 => Self::FA0,
+            3 => Self::FA1,
+            4 => Self::FA2,
+            5 => Self::FA3,
+            6 => Self::FA4,
+            7 => Self::FA5,
+            x => panic!("converted invalid integer to float register in compressed instruction: {}", x),
         }
     }
 

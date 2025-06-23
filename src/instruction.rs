@@ -1,4 +1,6 @@
-use crate::immediates::{BImmediate, JImmediate, SImmediate, Shamt, ShamtW, UImmediate};
+use crate::immediates::{
+    BImmediate, CLDImmediate, CWImmediate, JImmediate, SImmediate, Shamt, ShamtW, UImmediate,
+};
 use crate::register::{FRegister, IRegister};
 use crate::{immediates::IImmediate, opcode::Opcode};
 use std::fmt::{Display, Formatter};
@@ -249,11 +251,11 @@ pub enum Instruction {
     //
     // Instructions in C extension
     //
-    CADDI4SPN(IRegister, u16),
-    CFLD(IRegister, IRegister, u8),
+    CADDI4SPN(IRegister, CWImmediate),
+    CFLD(FRegister, IRegister, CLDImmediate),
     CLW(IRegister, IRegister, u8),
-    CLD(IRegister, IRegister, u8),
-    CFSD(IRegister, IRegister, u8),
+    CLD(IRegister, IRegister, CLDImmediate),
+    CFSD(FRegister, IRegister, u8),
     CSW(IRegister, IRegister, u8),
     CSD(IRegister, IRegister, u8),
 }
@@ -336,85 +338,85 @@ impl Display for Instruction {
             Instruction::REMW(rd, rs1, rs2) => write!(f, "remw {rd},{rs1},{rs2}"),
             Instruction::REMUW(rd, rs1, rs2) => write!(f, "remuw {rd},{rs1},{rs2}"),
             Instruction::LRW(rd, rs1, aq, rl) => {
-                        write!(f, "lr.w{} {rd},{rs1}", aq_rl_suffix(aq, rl))
-                    }
+                write!(f, "lr.w{} {rd},{rs1}", aq_rl_suffix(aq, rl))
+            }
             Instruction::SCW(rd, rs1, rs2, aq, rl) => {
-                        write!(f, "sc.w{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
-                    }
+                write!(f, "sc.w{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
+            }
             Instruction::AMOSWAPW(rd, rs1, rs2, aq, rl) => {
-                        write!(f, "amoswap.w{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
-                    }
+                write!(f, "amoswap.w{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
+            }
             Instruction::AMOADDW(rd, rs1, rs2, aq, rl) => {
-                        write!(f, "amoadd.w{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
-                    }
+                write!(f, "amoadd.w{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
+            }
             Instruction::AMOXORW(rd, rs1, rs2, aq, rl) => {
-                        write!(f, "amoxor.w{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
-                    }
+                write!(f, "amoxor.w{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
+            }
             Instruction::AMOANDW(rd, rs1, rs2, aq, rl) => {
-                        write!(f, "amoand.w{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
-                    }
+                write!(f, "amoand.w{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
+            }
             Instruction::AMOORW(rd, rs1, rs2, aq, rl) => {
-                        write!(f, "amoor.w{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
-                    }
+                write!(f, "amoor.w{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
+            }
             Instruction::AMOMINW(rd, rs1, rs2, aq, rl) => {
-                        write!(f, "amomin.w{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
-                    }
+                write!(f, "amomin.w{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
+            }
             Instruction::AMOMAXW(rd, rs1, rs2, aq, rl) => {
-                        write!(f, "amomax.w{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
-                    }
+                write!(f, "amomax.w{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
+            }
             Instruction::AMOMINUW(rd, rs1, rs2, aq, rl) => {
-                        write!(f, "amominu.w{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
-                    }
+                write!(f, "amominu.w{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
+            }
             Instruction::AMOMAXUW(rd, rs1, rs2, aq, rl) => {
-                        write!(f, "amomaxu.w{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
-                    }
+                write!(f, "amomaxu.w{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
+            }
             Instruction::LRD(rd, rs1, aq, rl) => {
-                        write!(f, "lr.d{} {rd},{rs1}", aq_rl_suffix(aq, rl))
-                    }
+                write!(f, "lr.d{} {rd},{rs1}", aq_rl_suffix(aq, rl))
+            }
             Instruction::SCD(rd, rs1, rs2, aq, rl) => {
-                        write!(f, "sc.d{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
-                    }
+                write!(f, "sc.d{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
+            }
             Instruction::AMOSWAPD(rd, rs1, rs2, aq, rl) => {
-                        write!(f, "amoswap.d{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
-                    }
+                write!(f, "amoswap.d{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
+            }
             Instruction::AMOADDD(rd, rs1, rs2, aq, rl) => {
-                        write!(f, "amoadd.d{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
-                    }
+                write!(f, "amoadd.d{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
+            }
             Instruction::AMOXORD(rd, rs1, rs2, aq, rl) => {
-                        write!(f, "amoxor.d{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
-                    }
+                write!(f, "amoxor.d{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
+            }
             Instruction::AMOANDD(rd, rs1, rs2, aq, rl) => {
-                        write!(f, "amoand.d{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
-                    }
+                write!(f, "amoand.d{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
+            }
             Instruction::AMOORD(rd, rs1, rs2, aq, rl) => {
-                        write!(f, "amoor.d{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
-                    }
+                write!(f, "amoor.d{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
+            }
             Instruction::AMOMIND(rd, rs1, rs2, aq, rl) => {
-                        write!(f, "amomin.d{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
-                    }
+                write!(f, "amomin.d{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
+            }
             Instruction::AMOMAXD(rd, rs1, rs2, aq, rl) => {
-                        write!(f, "amomax.d{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
-                    }
+                write!(f, "amomax.d{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
+            }
             Instruction::AMOMINUD(rd, rs1, rs2, aq, rl) => {
-                        write!(f, "amominu.d{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
-                    }
+                write!(f, "amominu.d{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
+            }
             Instruction::AMOMAXUD(rd, rs1, rs2, aq, rl) => {
-                        write!(f, "amomaxu.d{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
-                    }
+                write!(f, "amomaxu.d{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
+            }
             Instruction::FLW(rd, rs1, imm) => write!(f, "flw {rd},{imm}({rs1})"),
             Instruction::FSW(rs1, rs2, imm) => write!(f, "fsw {rs2},{imm}({rs1})"),
             Instruction::FMADDS(rd, rs1, rs2, rs3, rm) => {
-                        write!(f, "fmadd.s.{rm} {rd},{rs1},{rs2},{rs3}")
-                    }
+                write!(f, "fmadd.s.{rm} {rd},{rs1},{rs2},{rs3}")
+            }
             Instruction::FMSUBS(rd, rs1, rs2, rs3, rm) => {
-                        write!(f, "fmsub.s.{rm} {rd},{rs1},{rs2},{rs3}")
-                    }
+                write!(f, "fmsub.s.{rm} {rd},{rs1},{rs2},{rs3}")
+            }
             Instruction::FNMSUBS(rd, rs1, rs2, rs3, rm) => {
-                        write!(f, "fnmsub.s.{rm} {rd},{rs1},{rs2},{rs3}")
-                    }
+                write!(f, "fnmsub.s.{rm} {rd},{rs1},{rs2},{rs3}")
+            }
             Instruction::FNMADDS(rd, rs1, rs2, rs3, rm) => {
-                        write!(f, "fnmadd.s.{rm} {rd},{rs1},{rs2},{rs3}")
-                    }
+                write!(f, "fnmadd.s.{rm} {rd},{rs1},{rs2},{rs3}")
+            }
             Instruction::FADDS(rd, rs1, rs2, rm) => write!(f, "fadd.s.{rm} {rd},{rs1},{rs2}"),
             Instruction::FSUBS(rd, rs1, rs2, rm) => write!(f, "fsub.s.{rm} {rd},{rs1},{rs2}"),
             Instruction::FMULS(rd, rs1, rs2, rm) => write!(f, "fmul.s.{rm} {rd},{rs1},{rs2}"),
@@ -446,7 +448,7 @@ impl Display for Instruction {
             Instruction::CFSD(rs2, rs1, imm) => write!(f, "c.ld {rs1},{imm}({rs2})"),
             Instruction::CSW(rs2, rs1, imm) => write!(f, "c.ld {rs1},{imm}({rs2})"),
             Instruction::CSD(rs2, rs1, imm) => write!(f, "c.ld {rs1},{imm}({rs2})"),
-                    }
+        }
     }
 }
 
@@ -607,7 +609,10 @@ pub fn assemble_line(line: &str) -> Result<Instruction, String> {
                 if int > 2i64.pow(19) - 1 || int < -1 * 2i64.pow(19) {
                     Err("UImmediate out of range".to_owned())
                 } else {
-                    Ok(Instruction::LUI(IRegister::from_string(operands[0])?, UImmediate::from_val(int)))
+                    Ok(Instruction::LUI(
+                        IRegister::from_string(operands[0])?,
+                        UImmediate::from_val(int),
+                    ))
                 }
             }
         }
@@ -619,7 +624,10 @@ pub fn assemble_line(line: &str) -> Result<Instruction, String> {
                 if int > 2i64.pow(19) - 1 || int < -1 * 2i64.pow(19) {
                     Err("UImmediate out of range".to_owned())
                 } else {
-                    Ok(Instruction::AUIPC(IRegister::from_string(operands[0])?, UImmediate::from_val(int)))
+                    Ok(Instruction::AUIPC(
+                        IRegister::from_string(operands[0])?,
+                        UImmediate::from_val(int),
+                    ))
                 }
             }
         }
@@ -922,16 +930,20 @@ pub fn assemble_line(line: &str) -> Result<Instruction, String> {
         "feq" => {
             if operands.len() != 3 {
                 Err("feq requires 3 operands".to_owned())
-            }else {
+            } else {
                 if mnemonics.len() == 2 {
                     match mnemonics[1] {
-                        "s" => Ok(Instruction::FEQS(IRegister::from_string(operands[0])?, FRegister::from_string(operands[1])?, FRegister::from_string(operands[2])?)),
+                        "s" => Ok(Instruction::FEQS(
+                            IRegister::from_string(operands[0])?,
+                            FRegister::from_string(operands[1])?,
+                            FRegister::from_string(operands[2])?,
+                        )),
                         "d" => todo!(),
                         "q" => todo!(),
                         "h" => todo!(),
                         _ => Err("feq requires a suffix {s,d}".to_owned()),
                     }
-                }else {
+                } else {
                     Err("feq requires a suffix {s,d}".to_owned())
                 }
             }
@@ -939,16 +951,20 @@ pub fn assemble_line(line: &str) -> Result<Instruction, String> {
         "flt" => {
             if operands.len() != 3 {
                 Err("flt requires 3 operands".to_owned())
-            }else {
+            } else {
                 if mnemonics.len() == 2 {
                     match mnemonics[1] {
-                        "s" => Ok(Instruction::FLTS(IRegister::from_string(operands[0])?, FRegister::from_string(operands[1])?, FRegister::from_string(operands[2])?)),
+                        "s" => Ok(Instruction::FLTS(
+                            IRegister::from_string(operands[0])?,
+                            FRegister::from_string(operands[1])?,
+                            FRegister::from_string(operands[2])?,
+                        )),
                         "d" => todo!(),
                         "q" => todo!(),
                         "h" => todo!(),
                         _ => Err("flt requires a suffix {s,d}".to_owned()),
                     }
-                }else {
+                } else {
                     Err("flt requires a suffix {s,d}".to_owned())
                 }
             }
@@ -956,16 +972,20 @@ pub fn assemble_line(line: &str) -> Result<Instruction, String> {
         "fle" => {
             if operands.len() != 3 {
                 Err("fle requires 3 operands".to_owned())
-            }else {
+            } else {
                 if mnemonics.len() == 2 {
                     match mnemonics[1] {
-                        "s" => Ok(Instruction::FLES(IRegister::from_string(operands[0])?, FRegister::from_string(operands[1])?, FRegister::from_string(operands[2])?)),
+                        "s" => Ok(Instruction::FLES(
+                            IRegister::from_string(operands[0])?,
+                            FRegister::from_string(operands[1])?,
+                            FRegister::from_string(operands[2])?,
+                        )),
                         "d" => todo!(),
                         "q" => todo!(),
                         "h" => todo!(),
                         _ => Err("fle requires a suffix {s,d}".to_owned()),
                     }
-                }else {
+                } else {
                     Err("fle requires a suffix {s,d}".to_owned())
                 }
             }
@@ -973,16 +993,19 @@ pub fn assemble_line(line: &str) -> Result<Instruction, String> {
         "fclass" => {
             if operands.len() != 2 {
                 Err("fclass requires 2 operands".to_owned())
-            }else {
+            } else {
                 if mnemonics.len() == 2 {
                     match mnemonics[1] {
-                        "s" => Ok(Instruction::FCLASSS(IRegister::from_string(operands[0])?, FRegister::from_string(operands[1])?)),
+                        "s" => Ok(Instruction::FCLASSS(
+                            IRegister::from_string(operands[0])?,
+                            FRegister::from_string(operands[1])?,
+                        )),
                         "d" => todo!(),
                         "q" => todo!(),
                         "h" => todo!(),
                         _ => Err("fle requires a suffix {s,d}".to_owned()),
                     }
-                }else {
+                } else {
                     Err("fle requires a suffix {s,d}".to_owned())
                 }
             }
@@ -1132,10 +1155,7 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
             x => Err(format!("unkown OpImm32 func3: {}", x).to_owned()),
         },
         Opcode::Jalr => Ok(Instruction::JALR(rd, rs1, i_immediate)),
-        Opcode::Jal => Ok(Instruction::JAL(
-            rd,
-            JImmediate::from_u32(instruction),
-        )),
+        Opcode::Jal => Ok(Instruction::JAL(rd, JImmediate::from_u32(instruction))),
         Opcode::Branch => match func3 {
             0b000 => Ok(Instruction::BEQ(rs1, rs2, b_immediate)),
             0b001 => Ok(Instruction::BNE(rs1, rs2, b_immediate)),
@@ -1337,7 +1357,7 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
                 if (instruction >> 20) & 0b1_1111 == 0 {
                     if func3 == 0 {
                         Ok(Instruction::FMVWX(frd, rs1))
-                    }else {
+                    } else {
                         Err(format!(
                             "unknown OpFp func7=0b111_1000 rs2=0 func3: {}",
                             func3
@@ -1424,11 +1444,29 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
 pub fn decode_compressed_instruction(instruction: u16) -> Result<Instruction, String> {
     match instruction & 0b11 {
         0b00 => match instruction >> 13 {
-            0b000 => todo!(),
-            0b001 => todo!(),
+            0b000 => {
+                let imm = CWImmediate::from_u16(instruction);
+                if imm.val() == 0 {
+                    Err("compressed illegal instruction".to_owned())
+                } else {
+                    Ok(Instruction::CADDI4SPN(
+                        IRegister::from_int_compressed((instruction >> 2) & 0b111),
+                        imm,
+                    ))
+                }
+            }
+            0b001 => Ok(Instruction::CFLD(
+                FRegister::from_int_compressed((instruction >> 2) & 0b111),
+                IRegister::from_int_compressed((instruction >> 7) & 0b111),
+                CLDImmediate::from_u16(instruction),
+            )),
             0b010 => todo!(),
-            0b011 => todo!(),
-            0b100 => todo!(),
+            0b011 => Ok(Instruction::CLD(
+                IRegister::from_int_compressed((instruction >> 2) & 0b111),
+                IRegister::from_int_compressed((instruction >> 7) & 0b111),
+                CLDImmediate::from_u16(instruction),
+            )),
+            0b100 => Err("reserved opcode in C instruction".to_owned()),
             0b101 => todo!(),
             0b110 => todo!(),
             0b111 => todo!(),
@@ -1437,6 +1475,6 @@ pub fn decode_compressed_instruction(instruction: u16) -> Result<Instruction, St
         0b01 => todo!(),
         0b10 => todo!(),
         0b11 => Err("attempting to decode larger instruction as though it were 16 bits".to_owned()),
-        _ => unreachable!()
+        _ => unreachable!(),
     }
 }

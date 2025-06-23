@@ -210,7 +210,6 @@ pub struct BImmediate {
     val: i32,
 }
 
-
 impl BImmediate {
     /// Extracts the JImmediate from the appropriate position in a 32-bit instruction
     pub fn from_u32(x: u32) -> Self {
@@ -240,6 +239,86 @@ impl BImmediate {
 }
 
 impl Display for BImmediate {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(f, "{}", self.val)
+    }
+}
+
+/// The immediate value in wide immediate compressed instructions
+#[derive(Debug, PartialEq)]
+pub struct CWImmediate {
+    val: i32,
+}
+
+
+impl CWImmediate {
+    /// Extracts the CWImmediate from the appropriate position in a 16-bit instruction
+    pub fn from_u16(x: u16) -> Self {
+        let a = (x >> 5) & 0b1;
+        let b = (x >> 6) & 0b1;
+        let c = (x >> 7) & 0b1111;
+        let d = (x >> 11) & 0b11;
+        
+        let i: i32 = ((b << 2) | (a << 3) | (d << 4) | (c << 6)) as i32;
+        // CWImmediate is zero-extended
+        CWImmediate { val: i }
+    }
+
+    pub fn from_val(val: i64) -> Self {
+        if val > 2i64.pow(10) - 1 || val < 0 {
+            panic!("attempted to construct out of range CWImediate")
+        }
+        if val % 4 != 0 {
+            panic!("attempted to construct non multiple of 4 CWImmediate")
+        }
+        CWImmediate { val: val as i32 }
+    }
+
+    pub fn val(&self) -> i64 {
+        return self.val.into();
+    }
+}
+
+impl Display for CWImmediate {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(f, "{}", self.val)
+    }
+}
+
+/// The immediate value in compressed, load double instructions
+#[derive(Debug, PartialEq)]
+pub struct CLDImmediate {
+    val: i32,
+}
+
+
+impl CLDImmediate {
+    /// Extracts the CLDImmediate from the appropriate position in a 16-bit instruction
+    pub fn from_u16(x: u16) -> Self {
+        let a = (x >> 5) & 0b11;
+        let b = (x >> 10) & 0b111;
+
+        let i: i32 = ((b << 3) | (a << 6)) as i32;
+        // CLDImmediate is zero-extended
+        CLDImmediate { val: i }
+    }
+
+    pub fn from_val(val: i64) -> Self {
+        if val > 2i64.pow(8) - 1 || val < 0 {
+            panic!("attempted to construct out of range CLDImediate")
+        }
+        if val % 8 != 0 {
+            panic!("attempted to construct non multiple of 8 CLDImmediate")
+        }
+        CLDImmediate { val: val as i32 }
+    }
+
+    pub fn val(&self) -> i64 {
+        return self.val.into();
+    }
+}
+
+impl Display for CLDImmediate {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
         write!(f, "{}", self.val)
     }
