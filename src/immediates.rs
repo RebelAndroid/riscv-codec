@@ -187,7 +187,7 @@ impl JImmediate {
         if val > 2i64.pow(20) - 1 || val < -1 * 2i64.pow(20) {
             panic!("attempted to construct out of range JImediate")
         }
-        if val % 2 == 1 {
+        if val % 2 != 0 {
             panic!("attempted to construct odd JImmediate")
         }
         JImmediate { val: val as i32 }
@@ -228,8 +228,8 @@ impl BImmediate {
         if val > 2i64.pow(12) - 1 || val < -1 * 2i64.pow(12) {
             panic!("attempted to construct out of range JImediate")
         }
-        if val % 2 == 1 {
-            panic!("attempted to construct odd JImmediate")
+        if val % 2 != 0 {
+            panic!("attempted to construct odd BImmediate")
         }
         BImmediate { val: val as i32 }
     }
