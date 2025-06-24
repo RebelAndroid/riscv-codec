@@ -1,5 +1,6 @@
 use crate::immediates::{
-    BImmediate, CLDImmediate, CWImmediate, JImmediate, SImmediate, Shamt, ShamtW, UImmediate,
+    BImmediate, CDImmediate, CWImmediate, CWideImmediate, JImmediate, SImmediate, Shamt, ShamtW,
+    UImmediate,
 };
 use crate::register::{FRegister, IRegister};
 use crate::{immediates::IImmediate, opcode::Opcode};
@@ -251,13 +252,14 @@ pub enum Instruction {
     //
     // Instructions in C extension
     //
-    CADDI4SPN(IRegister, CWImmediate),
-    CFLD(FRegister, IRegister, CLDImmediate),
-    CLW(IRegister, IRegister, u8),
-    CLD(IRegister, IRegister, CLDImmediate),
-    CFSD(FRegister, IRegister, u8),
-    CSW(IRegister, IRegister, u8),
-    CSD(IRegister, IRegister, u8),
+    CADDI4SPN(IRegister, CWideImmediate),
+    CFLD(FRegister, IRegister, CDImmediate),
+    CLW(IRegister, IRegister, CWImmediate),
+    CLD(IRegister, IRegister, CDImmediate),
+    CFSD(FRegister, IRegister, CDImmediate),
+    CSW(IRegister, IRegister, CWImmediate),
+    CSD(IRegister, IRegister, CDImmediate),
+    CFLW(FRegister, IRegister, CWImmediate),
 }
 
 fn aq_rl_suffix(aq: &bool, rl: &bool) -> &'static str {
@@ -445,9 +447,10 @@ impl Display for Instruction {
             Instruction::CFLD(rd, rs1, imm) => write!(f, "c.fld {rd},{imm}({rs1})"),
             Instruction::CLW(rd, rs1, imm) => write!(f, "c.lw {rd},{imm}({rs1})"),
             Instruction::CLD(rd, rs1, imm) => write!(f, "c.ld {rd},{imm}({rs1})"),
-            Instruction::CFSD(rs2, rs1, imm) => write!(f, "c.ld {rs1},{imm}({rs2})"),
-            Instruction::CSW(rs2, rs1, imm) => write!(f, "c.ld {rs1},{imm}({rs2})"),
-            Instruction::CSD(rs2, rs1, imm) => write!(f, "c.ld {rs1},{imm}({rs2})"),
+            Instruction::CFSD(rs2, rs1, imm) => write!(f, "c.fsd {rs2},{imm}({rs1})"),
+            Instruction::CSW(rs2, rs1, imm) => write!(f, "c.sw {rs2},{imm}({rs1})"),
+            Instruction::CSD(rs2, rs1, imm) => write!(f, "c.sd {rs2},{imm}({rs1})"),
+            Instruction::CFLW(frd, frs1, imm) => write!(f, "c.flw {frd},{imm}({frs1})"),
         }
     }
 }
@@ -1010,6 +1013,70 @@ pub fn assemble_line(line: &str) -> Result<Instruction, String> {
                 }
             }
         }
+        "c" => {
+            if mnemonics.len() == 1 {
+                Err("compressed instruction must be specified".to_owned())
+            }else {
+                match mnemonics[1] {
+                    "addi4spn" => {
+                        if operands.len() != 2 {
+                            Err("c.addi4spn requires 2 operands".to_owned())
+                        }else {
+                            Ok(Instruction::CADDI4SPN(IRegister::from_string_compressed(operands[0])?, CWideImmediate::from_val(parse_int(operands[1])?)))
+                        }
+                    }
+                    "fld" => {
+                        if operands.len() != 2 {
+                            Err("c.fld requires 2 operands".to_owned())
+                        }else{
+                            let (base, imm) = parse_address_expression(operands[1])?;
+                            Ok(Instruction::CFLD(FRegister::from_string_compressed(operands[0])?, base, CDImmediate::from_val(imm)))
+                        }
+                    }
+                    "lw" => {
+                        if operands.len() != 2 {
+                            Err("c.lw requires 2 operands".to_owned())
+                        }else{
+                            let (base, imm) = parse_address_expression(operands[1])?;
+                            Ok(Instruction::CLW(IRegister::from_string_compressed(operands[0])?, base, CWImmediate::from_val(imm)))
+                        }
+                    }
+                    "ld" => {
+                        if operands.len() != 2 {
+                            Err("c.ld requires 2 operands".to_owned())
+                        }else{
+                            let (base, imm) = parse_address_expression(operands[1])?;
+                            Ok(Instruction::CLD(IRegister::from_string_compressed(operands[0])?, base, CDImmediate::from_val(imm)))
+                        }
+                    }
+                    "fsd" => {
+                        if operands.len() != 2 {
+                            Err("c.fsd requires 2 operands".to_owned())
+                        }else{
+                            let (base, imm) = parse_address_expression(operands[1])?;
+                            Ok(Instruction::CFSD(FRegister::from_string_compressed(operands[0])?, base, CDImmediate::from_val(imm)))
+                        }
+                    }
+                    "sw" => {
+                        if operands.len() != 2 {
+                            Err("c.sw requires 2 operands".to_owned())
+                        }else{
+                            let (base, imm) = parse_address_expression(operands[1])?;
+                            Ok(Instruction::CSW(IRegister::from_string_compressed(operands[0])?, base, CWImmediate::from_val(imm)))
+                        }
+                    }
+                    "sd" => {
+                        if operands.len() != 2 {
+                            Err("c.sd requires 2 operands".to_owned())
+                        }else{
+                            let (base, imm) = parse_address_expression(operands[1])?;
+                            Ok(Instruction::CSD(IRegister::from_string_compressed(operands[0])?, base, CDImmediate::from_val(imm)))
+                        }
+                    }
+                    _ => Err(format!("unknown compressed instruction mnemonic: {}", mnemonic))
+                }
+            }
+        }
         _ => Err(format!("unknown mnemonic: {}", mnemonic)),
     }
 }
@@ -1442,10 +1509,16 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
 }
 
 pub fn decode_compressed_instruction(instruction: u16) -> Result<Instruction, String> {
+    let rd = IRegister::from_int_compressed((instruction >> 2) & 0b111);
+    let frd = FRegister::from_int_compressed((instruction >> 2) & 0b111);
+
+    let rs1 = IRegister::from_int_compressed((instruction >> 7) & 0b111);
+    // let frs1 = FRegister::from_int_compressed((instruction >> 7) & 0b111);
+
     match instruction & 0b11 {
         0b00 => match instruction >> 13 {
             0b000 => {
-                let imm = CWImmediate::from_u16(instruction);
+                let imm = CWideImmediate::from_u16(instruction);
                 if imm.val() == 0 {
                     Err("compressed illegal instruction".to_owned())
                 } else {
@@ -1456,20 +1529,36 @@ pub fn decode_compressed_instruction(instruction: u16) -> Result<Instruction, St
                 }
             }
             0b001 => Ok(Instruction::CFLD(
-                FRegister::from_int_compressed((instruction >> 2) & 0b111),
-                IRegister::from_int_compressed((instruction >> 7) & 0b111),
-                CLDImmediate::from_u16(instruction),
+                frd,
+                rs1,
+                CDImmediate::from_u16(instruction),
             )),
-            0b010 => todo!(),
+            0b010 => Ok(Instruction::CLW(
+                rd,
+                rs1,
+                CWImmediate::from_u16(instruction),
+            )),
             0b011 => Ok(Instruction::CLD(
-                IRegister::from_int_compressed((instruction >> 2) & 0b111),
-                IRegister::from_int_compressed((instruction >> 7) & 0b111),
-                CLDImmediate::from_u16(instruction),
+                rd,
+                rs1,
+                CDImmediate::from_u16(instruction),
             )),
             0b100 => Err("reserved opcode in C instruction".to_owned()),
-            0b101 => todo!(),
-            0b110 => todo!(),
-            0b111 => todo!(),
+            0b101 => Ok(Instruction::CFSD(
+                frd,
+                rs1,
+                CDImmediate::from_u16(instruction),
+            )),
+            0b110 => Ok(Instruction::CSW(
+                rd,
+                rs1,
+                CWImmediate::from_u16(instruction),
+            )),
+            0b111 => Ok(Instruction::CSD(
+                rd,
+                rs1,
+                CDImmediate::from_u16(instruction),
+            )),
             _ => unreachable!(),
         },
         0b01 => todo!(),

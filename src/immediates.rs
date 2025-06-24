@@ -246,12 +246,12 @@ impl Display for BImmediate {
 
 /// The immediate value in wide immediate compressed instructions
 #[derive(Debug, PartialEq)]
-pub struct CWImmediate {
+pub struct CWideImmediate {
     val: i32,
 }
 
 
-impl CWImmediate {
+impl CWideImmediate {
     /// Extracts the CWImmediate from the appropriate position in a 16-bit instruction
     pub fn from_u16(x: u16) -> Self {
         let a = (x >> 5) & 0b1;
@@ -261,12 +261,91 @@ impl CWImmediate {
         
         let i: i32 = ((b << 2) | (a << 3) | (d << 4) | (c << 6)) as i32;
         // CWImmediate is zero-extended
-        CWImmediate { val: i }
+        CWideImmediate { val: i }
     }
 
     pub fn from_val(val: i64) -> Self {
         if val > 2i64.pow(10) - 1 || val < 0 {
-            panic!("attempted to construct out of range CWImediate")
+            panic!("attempted to construct out of range CWideImmediate")
+        }
+        if val % 4 != 0 {
+            panic!("attempted to construct non multiple of 4 CWideImmediate")
+        }
+        CWideImmediate { val: val as i32 }
+    }
+
+    pub fn val(&self) -> i64 {
+        return self.val.into();
+    }
+}
+
+impl Display for CWideImmediate {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(f, "{}", self.val)
+    }
+}
+
+/// The immediate value in compressed, load/store doubleword instructions
+#[derive(Debug, PartialEq)]
+pub struct CDImmediate {
+    val: i32,
+}
+
+
+impl CDImmediate {
+    /// Extracts the CLDImmediate from the appropriate position in a 16-bit instruction
+    pub fn from_u16(x: u16) -> Self {
+        let a = (x >> 5) & 0b11;
+        let b = (x >> 10) & 0b111;
+
+        let i: i32 = ((b << 3) | (a << 6)) as i32;
+        // CLDImmediate is zero-extended
+        CDImmediate { val: i }
+    }
+
+    pub fn from_val(val: i64) -> Self {
+        if val > 2i64.pow(8) - 1 || val < 0 {
+            panic!("attempted to construct out of range CDImmediate")
+        }
+        if val % 8 != 0 {
+            panic!("attempted to construct non multiple of 8 CDImmediate")
+        }
+        CDImmediate { val: val as i32 }
+    }
+
+    pub fn val(&self) -> i64 {
+        return self.val.into();
+    }
+}
+
+impl Display for CDImmediate {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(f, "{}", self.val)
+    }
+}
+
+/// The immediate value in compressed, load/store word instructions
+#[derive(Debug, PartialEq)]
+pub struct CWImmediate {
+    val: i32,
+}
+
+
+impl CWImmediate {
+    /// Extracts the CLWImmediate from the appropriate position in a 16-bit instruction
+    pub fn from_u16(x: u16) -> Self {
+        let a = (x >> 5) & 0b1;
+        let b = (x >> 6) & 0b1;
+        let c = (x >> 10) & 0b111;
+
+        let i: i32 = ((b << 2) | (c << 3) | (a << 6)) as i32;
+        // CLWImmediate is zero-extended
+        CWImmediate { val: i }
+    }
+
+    pub fn from_val(val: i64) -> Self {
+        if val > 2i64.pow(7) - 1 || val < 0 {
+            panic!("attempted to construct out of range CWImmediate")
         }
         if val % 4 != 0 {
             panic!("attempted to construct non multiple of 4 CWImmediate")
@@ -280,45 +359,6 @@ impl CWImmediate {
 }
 
 impl Display for CWImmediate {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(f, "{}", self.val)
-    }
-}
-
-/// The immediate value in compressed, load double instructions
-#[derive(Debug, PartialEq)]
-pub struct CLDImmediate {
-    val: i32,
-}
-
-
-impl CLDImmediate {
-    /// Extracts the CLDImmediate from the appropriate position in a 16-bit instruction
-    pub fn from_u16(x: u16) -> Self {
-        let a = (x >> 5) & 0b11;
-        let b = (x >> 10) & 0b111;
-
-        let i: i32 = ((b << 3) | (a << 6)) as i32;
-        // CLDImmediate is zero-extended
-        CLDImmediate { val: i }
-    }
-
-    pub fn from_val(val: i64) -> Self {
-        if val > 2i64.pow(8) - 1 || val < 0 {
-            panic!("attempted to construct out of range CLDImediate")
-        }
-        if val % 8 != 0 {
-            panic!("attempted to construct non multiple of 8 CLDImmediate")
-        }
-        CLDImmediate { val: val as i32 }
-    }
-
-    pub fn val(&self) -> i64 {
-        return self.val.into();
-    }
-}
-
-impl Display for CLDImmediate {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
         write!(f, "{}", self.val)
     }
