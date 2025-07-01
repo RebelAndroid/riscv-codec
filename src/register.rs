@@ -157,36 +157,6 @@ impl IRegister {
             x => Err(format!("converted invalid str to integer register {}", x)),
         }
     }
-
-     pub fn from_int_compressed(int: u16) -> Self {
-        match int {
-            0 => Self::FramePointer,
-            1 => Self::S1,
-            2 => Self::A0,
-            3 => Self::A1,
-            4 => Self::A2,
-            5 => Self::A3,
-            6 => Self::A4,
-            7 => Self::A5,
-            x => panic!("converted invalid integer to register in compressed instruction: {}", x),
-        }
-    }
-
-     pub fn from_string_compressed(str: &str) -> Result<Self, String> {
-        match str {
-            "fp" => Ok(Self::FramePointer),
-            "s0" => Ok(Self::FramePointer),
-            "s1" => Ok(Self::S1),
-            "a0" => Ok(Self::A0),
-            "a1" => Ok(Self::A1),
-            "a2" => Ok(Self::A2),
-            "a3" => Ok(Self::A3),
-            "a4" => Ok(Self::A4),
-            "a5" => Ok(Self::A5),
-            x => Err(format!("converted invalid str to integer register in compressed instruction: {}", x)),
-        }
-    }
-
 }
 
 #[derive(Debug, PartialEq)]
@@ -344,8 +314,91 @@ impl FRegister {
             x => Err(format!("converted invalid str to float register {}", x)),
         }
     }
+}
 
-    pub fn from_int_compressed(int: u16) -> Self {
+/// One of the limited set of registers available in compressed instructions
+#[derive(Debug, PartialEq)]
+pub enum CIRegister {
+    FramePointer,
+    S1,
+    A0,
+    A1,
+    A2,
+    A3,
+    A4,
+    A5,
+}
+
+impl CIRegister {
+    pub fn from_int(int: u16) -> Self {
+        match int {
+            0 => Self::FramePointer,
+            1 => Self::S1,
+            2 => Self::A0,
+            3 => Self::A1,
+            4 => Self::A2,
+            5 => Self::A3,
+            6 => Self::A4,
+            7 => Self::A5,
+            x => panic!(
+                "converted invalid integer to register in compressed instruction: {}",
+                x
+            ),
+        }
+    }
+
+    pub fn from_string(str: &str) -> Result<Self, String> {
+        match str {
+            "fp" => Ok(Self::FramePointer),
+            "s0" => Ok(Self::FramePointer),
+            "s1" => Ok(Self::S1),
+            "a0" => Ok(Self::A0),
+            "a1" => Ok(Self::A1),
+            "a2" => Ok(Self::A2),
+            "a3" => Ok(Self::A3),
+            "a4" => Ok(Self::A4),
+            "a5" => Ok(Self::A5),
+            x => Err(format!(
+                "converted invalid str to integer register in compressed instruction: {}",
+                x
+            )),
+        }
+    }
+}
+
+impl Display for CIRegister {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            match self {
+                CIRegister::FramePointer => "s0",
+                CIRegister::S1 => "s1",
+                CIRegister::A0 => "a0",
+                CIRegister::A1 => "a1",
+                CIRegister::A2 => "a2",
+                CIRegister::A3 => "a3",
+                CIRegister::A4 => "a4",
+                CIRegister::A5 => "a5",
+            }
+        )
+    }
+}
+
+#[derive(Debug, PartialEq)]
+pub enum CFRegister {
+    FS0,
+    FS1,
+    FA0,
+    FA1,
+    FA2,
+    FA3,
+    FA4,
+    FA5,
+}
+
+impl CFRegister {
+    pub fn from_int(int: u16) -> Self {
         match int {
             0 => Self::FS0,
             1 => Self::FS1,
@@ -355,11 +408,14 @@ impl FRegister {
             5 => Self::FA3,
             6 => Self::FA4,
             7 => Self::FA5,
-            x => panic!("converted invalid integer to float register in compressed instruction: {}", x),
+            x => panic!(
+                "converted invalid integer to float register in compressed instruction: {}",
+                x
+            ),
         }
     }
 
-    pub fn from_string_compressed(str: &str) -> Result<Self, String> {
+    pub fn from_string(str: &str) -> Result<Self, String> {
         match str {
             "fs0" => Ok(Self::FS0),
             "fs1" => Ok(Self::FS1),
@@ -369,7 +425,29 @@ impl FRegister {
             "fa3" => Ok(Self::FA3),
             "fa4" => Ok(Self::FA4),
             "fa5" => Ok(Self::FA5),
-            x => Err(format!("converted invalid str to float register in compressed instruction {}", x)),
+            x => Err(format!(
+                "converted invalid str to float register in compressed instruction {}",
+                x
+            )),
         }
+    }
+}
+
+impl Display for CFRegister {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "{}",
+            match self {
+                CFRegister::FS0 => "fs0",
+                CFRegister::FS1 => "fs1",
+                CFRegister::FA0 => "fa0",
+                CFRegister::FA1 => "fa1",
+                CFRegister::FA2 => "fa2",
+                CFRegister::FA3 => "fa3",
+                CFRegister::FA4 => "fa4",
+                CFRegister::FA5 => "fa5",
+            }
+        )
     }
 }

@@ -6,7 +6,7 @@ use riscv_disassembler::register::IRegister;
 #[test]
 fn load_reserved_word() {
     // check assembler
-    let i = assemble_line("lr.w.aq a0,a1").unwrap();
+    let i = assemble_line("lr.w.aq a0,a1").unwrap().i();
     assert_eq!(
         i,
         Instruction::LRW(IRegister::A0, IRegister::A1, true, false)
@@ -21,14 +21,14 @@ fn load_reserved_word() {
 
     // check disassembler
     println!("{}", disassemble_instruction(&i));
-    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap();
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
     assert_eq!(i, i3);
 }
 
 #[test]
 fn store_conditional_word() {
     // check assembler
-    let i = assemble_line("sc.w.rl ra,t4,a1").unwrap();
+    let i = assemble_line("sc.w.rl ra,t4,a1").unwrap().i();
     assert_eq!(
         i,
         Instruction::SCW(
@@ -55,14 +55,14 @@ fn store_conditional_word() {
 
     // check disassembler
     println!("{}", disassemble_instruction(&i));
-    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap();
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
     assert_eq!(i, i3);
 }
 
 #[test]
 fn amo_swap_word() {
     // check assembler
-    let i = assemble_line("amoswap.w t2,ra,t5").unwrap();
+    let i = assemble_line("amoswap.w t2,ra,t5").unwrap().i();
     assert_eq!(
         i,
         Instruction::AMOSWAPW(
@@ -89,14 +89,14 @@ fn amo_swap_word() {
 
     // check disassembler
     println!("{}", disassemble_instruction(&i));
-    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap();
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
     assert_eq!(i, i3);
 }
 
 #[test]
 fn amo_add_word() {
     // check assembler
-    let i = assemble_line("amoadd.w.aqrl a4,gp,s4").unwrap();
+    let i = assemble_line("amoadd.w.aqrl a4,gp,s4").unwrap().i();
     assert_eq!(
         i,
         Instruction::AMOADDW(
@@ -123,14 +123,14 @@ fn amo_add_word() {
 
     // check disassembler
     println!("{}", disassemble_instruction(&i));
-    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap();
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
     assert_eq!(i, i3);
 }
 
 #[test]
 fn amo_xor_word() {
     // check assembler
-    let i = assemble_line("amoxor.w a4,gp,s4").unwrap();
+    let i = assemble_line("amoxor.w a4,gp,s4").unwrap().i();
     assert_eq!(
         i,
         Instruction::AMOXORW(
@@ -157,14 +157,14 @@ fn amo_xor_word() {
 
     // check disassembler
     println!("{}", disassemble_instruction(&i));
-    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap();
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
     assert_eq!(i, i3);
 }
 
 #[test]
 fn amo_and_word() {
     // check assembler
-    let i = assemble_line("amoand.w a4,gp,s4").unwrap();
+    let i = assemble_line("amoand.w a4,gp,s4").unwrap().i();
     assert_eq!(
         i,
         Instruction::AMOANDW(
@@ -191,14 +191,14 @@ fn amo_and_word() {
 
     // check disassembler
     println!("{}", disassemble_instruction(&i));
-    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap();
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
     assert_eq!(i, i3);
 }
 
 #[test]
 fn amo_or_word() {
     // check assembler
-    let i = assemble_line("amoor.w a4,gp,s4").unwrap();
+    let i = assemble_line("amoor.w a4,gp,s4").unwrap().i();
     assert_eq!(
         i,
         Instruction::AMOORW(
@@ -225,14 +225,14 @@ fn amo_or_word() {
 
     // check disassembler
     println!("{}", disassemble_instruction(&i));
-    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap();
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
     assert_eq!(i, i3);
 }
 
 #[test]
 fn amo_min_word() {
     // check assembler
-    let i = assemble_line("amomin.w a4,gp,s4").unwrap();
+    let i = assemble_line("amomin.w a4,gp,s4").unwrap().i();
     assert_eq!(
         i,
         Instruction::AMOMINW(
@@ -259,14 +259,14 @@ fn amo_min_word() {
 
     // check disassembler
     println!("{}", disassemble_instruction(&i));
-    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap();
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
     assert_eq!(i, i3);
 }
 
 #[test]
 fn amo_max_word() {
     // check assembler
-    let i = assemble_line("amomax.w a4,gp,s4").unwrap();
+    let i = assemble_line("amomax.w a4,gp,s4").unwrap().i();
     assert_eq!(
         i,
         Instruction::AMOMAXW(
@@ -293,14 +293,14 @@ fn amo_max_word() {
 
     // check disassembler
     println!("{}", disassemble_instruction(&i));
-    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap();
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
     assert_eq!(i, i3);
 }
 
 #[test]
 fn amo_min_unsigned_word() {
     // check assembler
-    let i = assemble_line("amominu.w a4,gp,s4").unwrap();
+    let i = assemble_line("amominu.w a4,gp,s4").unwrap().i();
     assert_eq!(
         i,
         Instruction::AMOMINUW(
@@ -327,14 +327,14 @@ fn amo_min_unsigned_word() {
 
     // check disassembler
     println!("{}", disassemble_instruction(&i));
-    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap();
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
     assert_eq!(i, i3);
 }
 
 #[test]
 fn amo_max_unsigned_word() {
     // check assembler
-    let i = assemble_line("amomaxu.w a4,gp,s4").unwrap();
+    let i = assemble_line("amomaxu.w a4,gp,s4").unwrap().i();
     assert_eq!(
         i,
         Instruction::AMOMAXUW(
@@ -361,14 +361,14 @@ fn amo_max_unsigned_word() {
 
     // check disassembler
     println!("{}", disassemble_instruction(&i));
-    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap();
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
     assert_eq!(i, i3);
 }
 
 #[test]
 fn load_reserved_doubleword() {
     // check assembler
-    let i = assemble_line("lr.d.rl s6,s7").unwrap();
+    let i = assemble_line("lr.d.rl s6,s7").unwrap().i();
     assert_eq!(
         i,
         Instruction::LRD(IRegister::S6, IRegister::S7, false, true)
@@ -383,14 +383,14 @@ fn load_reserved_doubleword() {
 
     // check disassembler
     println!("{}", disassemble_instruction(&i));
-    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap();
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
     assert_eq!(i, i3);
 }
 
 #[test]
 fn store_conditional_doubleword() {
     // check assembler
-    let i = assemble_line("sc.d.aqrl tp,s10,a2").unwrap();
+    let i = assemble_line("sc.d.aqrl tp,s10,a2").unwrap().i();
     assert_eq!(
         i,
         Instruction::SCD(
@@ -417,14 +417,14 @@ fn store_conditional_doubleword() {
 
     // check disassembler
     println!("{}", disassemble_instruction(&i));
-    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap();
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
     assert_eq!(i, i3);
 }
 
 #[test]
 fn amo_swap_doubleword() {
     // check assembler
-    let i = assemble_line("amoswap.d t2,ra,t5").unwrap();
+    let i = assemble_line("amoswap.d t2,ra,t5").unwrap().i();
     assert_eq!(
         i,
         Instruction::AMOSWAPD(
@@ -451,14 +451,14 @@ fn amo_swap_doubleword() {
 
     // check disassembler
     println!("{}", disassemble_instruction(&i));
-    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap();
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
     assert_eq!(i, i3);
 }
 
 #[test]
 fn amo_add_doubleword() {
     // check assembler
-    let i = assemble_line("amoadd.d a4,gp,s4").unwrap();
+    let i = assemble_line("amoadd.d a4,gp,s4").unwrap().i();
     assert_eq!(
         i,
         Instruction::AMOADDD(
@@ -485,14 +485,14 @@ fn amo_add_doubleword() {
 
     // check disassembler
     println!("{}", disassemble_instruction(&i));
-    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap();
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
     assert_eq!(i, i3);
 }
 
 #[test]
 fn amo_xor_doubleword() {
     // check assembler
-    let i = assemble_line("amoxor.d a4,gp,s4").unwrap();
+    let i = assemble_line("amoxor.d a4,gp,s4").unwrap().i();
     assert_eq!(
         i,
         Instruction::AMOXORD(
@@ -519,14 +519,14 @@ fn amo_xor_doubleword() {
 
     // check disassembler
     println!("{}", disassemble_instruction(&i));
-    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap();
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
     assert_eq!(i, i3);
 }
 
 #[test]
 fn amo_and_doubleword() {
     // check assembler
-    let i = assemble_line("amoand.d a4,gp,s4").unwrap();
+    let i = assemble_line("amoand.d a4,gp,s4").unwrap().i();
     assert_eq!(
         i,
         Instruction::AMOANDD(
@@ -553,14 +553,14 @@ fn amo_and_doubleword() {
 
     // check disassembler
     println!("{}", disassemble_instruction(&i));
-    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap();
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
     assert_eq!(i, i3);
 }
 
 #[test]
 fn amo_or_doubleword() {
     // check assembler
-    let i = assemble_line("amoor.d a4,gp,s4").unwrap();
+    let i = assemble_line("amoor.d a4,gp,s4").unwrap().i();
     assert_eq!(
         i,
         Instruction::AMOORD(
@@ -587,14 +587,14 @@ fn amo_or_doubleword() {
 
     // check disassembler
     println!("{}", disassemble_instruction(&i));
-    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap();
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
     assert_eq!(i, i3);
 }
 
 #[test]
 fn amo_min_doubleword() {
     // check assembler
-    let i = assemble_line("amomin.d a4,gp,s4").unwrap();
+    let i = assemble_line("amomin.d a4,gp,s4").unwrap().i();
     assert_eq!(
         i,
         Instruction::AMOMIND(
@@ -621,14 +621,14 @@ fn amo_min_doubleword() {
 
     // check disassembler
     println!("{}", disassemble_instruction(&i));
-    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap();
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
     assert_eq!(i, i3);
 }
 
 #[test]
 fn amo_max_doubleword() {
     // check assembler
-    let i = assemble_line("amomax.d a4,gp,s4").unwrap();
+    let i = assemble_line("amomax.d a4,gp,s4").unwrap().i();
     assert_eq!(
         i,
         Instruction::AMOMAXD(
@@ -655,14 +655,14 @@ fn amo_max_doubleword() {
 
     // check disassembler
     println!("{}", disassemble_instruction(&i));
-    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap();
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
     assert_eq!(i, i3);
 }
 
 #[test]
 fn amo_min_unsigned_doubleword() {
     // check assembler
-    let i = assemble_line("amominu.d a4,gp,s4").unwrap();
+    let i = assemble_line("amominu.d a4,gp,s4").unwrap().i();
     assert_eq!(
         i,
         Instruction::AMOMINUD(
@@ -689,14 +689,14 @@ fn amo_min_unsigned_doubleword() {
 
     // check disassembler
     println!("{}", disassemble_instruction(&i));
-    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap();
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
     assert_eq!(i, i3);
 }
 
 #[test]
 fn amo_max_unsigned_doubleword() {
     // check assembler
-    let i = assemble_line("amomaxu.d a4,gp,s4").unwrap();
+    let i = assemble_line("amomaxu.d a4,gp,s4").unwrap().i();
     assert_eq!(
         i,
         Instruction::AMOMAXUD(
@@ -723,6 +723,6 @@ fn amo_max_unsigned_doubleword() {
 
     // check disassembler
     println!("{}", disassemble_instruction(&i));
-    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap();
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
     assert_eq!(i, i3);
 }

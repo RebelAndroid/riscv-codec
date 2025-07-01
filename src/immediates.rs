@@ -7,7 +7,7 @@ pub struct IImmediate {
 }
 
 impl IImmediate {
-    /// Extracts the IImmediate from the appropriate position in a 32-bit instruction
+    /// Extracts the `IImmediate` from the appropriate position in a 32-bit instruction
     pub fn from_u32(x: u32) -> Self {
         let unsigned: u32 = ((x >> 20) & 0b1111_1111_1111).try_into().unwrap();
         // sign extend 12 bit value
@@ -41,7 +41,7 @@ pub struct SImmediate {
 }
 
 impl SImmediate {
-    /// Extracts the IImmediate from the appropriate position in a 32-bit instruction
+    /// Extracts the `SImmediate` from the appropriate position in a 32-bit instruction
     pub fn from_u32(x: u32) -> Self {
         let unsigned: u32 =
             (((x >> 25) & 0b111_1111) << 5) | ((x >> 7) & 0b1_1111);
@@ -76,7 +76,7 @@ pub struct Shamt {
 }
 
 impl Shamt {
-    /// Extracts the IImmediate from the appropriate position in a 32-bit instruction
+    /// Extracts the `Shamt` from the appropriate position in a 32-bit instruction
     pub fn from_u32(x: u32) -> Self {
         let val: u8 = ((x >> 20) & 0b11_1111) as u8;
         Shamt { val }
@@ -107,7 +107,7 @@ pub struct ShamtW {
 }
 
 impl ShamtW {
-    /// Extracts the IImmediate from the appropriate position in a 32-bit instruction
+    /// Extracts the `IImmediate` from the appropriate position in a 32-bit instruction
     pub fn from_u32(x: u32) -> Self {
         let val: u8 = ((x >> 20) & 0b1_1111) as u8;
         ShamtW { val }
@@ -139,7 +139,7 @@ pub struct UImmediate {
 
 
 impl UImmediate {
-    /// Extracts the UImmediate from the appropriate position in a 32-bit instruction
+    /// Extracts the `UImmediate` from the appropriate position in a 32-bit instruction
     pub fn from_u32(x: u32) -> Self {
         let val = (x as i32) >> 12;
         UImmediate { val }
@@ -171,7 +171,7 @@ pub struct JImmediate {
 
 
 impl JImmediate {
-    /// Extracts the JImmediate from the appropriate position in a 32-bit instruction
+    /// Extracts the `JImmediate` from the appropriate position in a 32-bit instruction
     pub fn from_u32(x: u32) -> Self {
         let a = (x >> 12) & 0b1111_1111;
         let b = (x >> 20) & 0b1;
@@ -211,7 +211,7 @@ pub struct BImmediate {
 }
 
 impl BImmediate {
-    /// Extracts the JImmediate from the appropriate position in a 32-bit instruction
+    /// Extracts the `BImmediate` from the appropriate position in a 32-bit instruction
     pub fn from_u32(x: u32) -> Self {
         let a = (x >> 7) & 0b1;
         let b = (x >> 8) & 0b1111;
@@ -252,7 +252,7 @@ pub struct CWideImmediate {
 
 
 impl CWideImmediate {
-    /// Extracts the CWImmediate from the appropriate position in a 16-bit instruction
+    /// Extracts the `CWImmediate` from the appropriate position in a 16-bit instruction
     pub fn from_u16(x: u16) -> Self {
         let a = (x >> 5) & 0b1;
         let b = (x >> 6) & 0b1;
@@ -293,7 +293,7 @@ pub struct CDImmediate {
 
 
 impl CDImmediate {
-    /// Extracts the CLDImmediate from the appropriate position in a 16-bit instruction
+    /// Extracts the `CLDImmediate` from the appropriate position in a 16-bit instruction
     pub fn from_u16(x: u16) -> Self {
         let a = (x >> 5) & 0b11;
         let b = (x >> 10) & 0b111;
@@ -332,7 +332,7 @@ pub struct CWImmediate {
 
 
 impl CWImmediate {
-    /// Extracts the CLWImmediate from the appropriate position in a 16-bit instruction
+    /// Extracts the `CLWImmediate` from the appropriate position in a 16-bit instruction
     pub fn from_u16(x: u16) -> Self {
         let a = (x >> 5) & 0b1;
         let b = (x >> 6) & 0b1;
@@ -359,6 +359,111 @@ impl CWImmediate {
 }
 
 impl Display for CWImmediate {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(f, "{}", self.val)
+    }
+}
+
+/// The immediate value in compressed immediate operation instructions
+#[derive(Debug, PartialEq)]
+pub struct CIImmediate {
+    val: i32,
+}
+
+impl CIImmediate {
+    /// Extracts the `CIImmediate` from the appropriate position in a 16-bit instruction
+    pub fn from_u16(x: u16) -> Self {
+        let a = (x >> 2) & 0b1111;
+        let b = (x >> 12) & 0b1;
+        let i: i32 = (a | (b << 5)) as i32;
+        let i2 = (i << 26) >> 26;
+        CIImmediate { val: i2 }
+    }
+
+    pub fn from_val(val: i64) -> Self {
+        if val > 2i64.pow(5) - 1 || val < -1 * 2i64.pow(5) {
+            panic!("attempted to construct out of range CIImmediate")
+        }
+        CIImmediate { val: val as i32 }
+    }
+
+    pub fn val(&self) -> i64 {
+        return self.val.into();
+    }
+}
+
+impl Display for CIImmediate {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(f, "{}", self.val)
+    }
+}
+
+/// The immediate value in compressed branch instructions
+#[derive(Debug, PartialEq)]
+pub struct CBImmediate {
+    val: i32,
+}
+
+impl CBImmediate {
+    /// Extracts the `CBImmediate` from the appropriate position in a 16-bit instruction
+    pub fn from_u16(x: u16) -> Self {
+        let a = (x >> 2) & 0b1;
+        let b = (x >> 3) & 0b11;
+        let c = (x >> 5) & 0b11;
+        let d = (x >> 10) & 0b11;
+        let e = (x >> 12) & 0b1;
+
+        let i: i32 = ((b << 1) | (d << 3) | (a << 5) | (c << 6) | (e << 8)) as i32;
+        let i2 = (i << 26) >> 26;
+        CBImmediate { val: i2 }
+    }
+
+    pub fn from_val(val: i64) -> Self {
+        if val > 2i64.pow(5) - 1 || val < -1 * 2i64.pow(5) {
+            panic!("attempted to construct out of range CBImmediate")
+        }
+        CBImmediate { val: val as i32 }
+    }
+
+    pub fn val(&self) -> i64 {
+        return self.val.into();
+    }
+}
+
+impl Display for CBImmediate {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(f, "{}", self.val)
+    }
+}
+
+/// The immediate value in compressed bit shift instructions
+#[derive(Debug, PartialEq)]
+pub struct CShamt {
+    val: u32,
+}
+
+impl CShamt {
+    /// Extracts the `CShamt` from the appropriate position in a 16-bit instruction
+    pub fn from_u16(x: u16) -> Self {
+        let a = (x >> 2) & 0b1111;
+        let b = (x >> 12) & 0b1;
+        let i: u32 = (a | (b << 5)) as u32;
+        CShamt { val: i }
+    }
+
+    pub fn from_val(val: i64) -> Self {
+        if val > 2i64.pow(6) - 1 || val < 0 {
+            panic!("attempted to construct out of range CIImmediate")
+        }
+        CShamt { val: val as u32 }
+    }
+
+    pub fn val(&self) -> i64 {
+        return self.val.into();
+    }
+}
+
+impl Display for CShamt {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
         write!(f, "{}", self.val)
     }

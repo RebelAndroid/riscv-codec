@@ -1,8 +1,10 @@
+use crate::cinstruction::CInstruction;
 use crate::immediates::{
-    BImmediate, CDImmediate, CWImmediate, CWideImmediate, JImmediate, SImmediate, Shamt, ShamtW,
-    UImmediate,
+    BImmediate, CBImmediate, CDImmediate, CIImmediate, CShamt, CWImmediate, CWideImmediate,
+    JImmediate, SImmediate, Shamt, ShamtW, UImmediate,
 };
-use crate::register::{FRegister, IRegister};
+use crate::instruction;
+use crate::register::{CIRegister, FRegister, IRegister};
 use crate::{immediates::IImmediate, opcode::Opcode};
 use std::fmt::{Display, Formatter};
 
@@ -249,17 +251,6 @@ pub enum Instruction {
     FCVTLUS(IRegister, FRegister, RoundingMode),
     FCVTSL(FRegister, IRegister, RoundingMode),
     FCVTSLU(FRegister, IRegister, RoundingMode),
-    //
-    // Instructions in C extension
-    //
-    CADDI4SPN(IRegister, CWideImmediate),
-    CFLD(FRegister, IRegister, CDImmediate),
-    CLW(IRegister, IRegister, CWImmediate),
-    CLD(IRegister, IRegister, CDImmediate),
-    CFSD(FRegister, IRegister, CDImmediate),
-    CSW(IRegister, IRegister, CWImmediate),
-    CSD(IRegister, IRegister, CDImmediate),
-    CFLW(FRegister, IRegister, CWImmediate),
 }
 
 fn aq_rl_suffix(aq: &bool, rl: &bool) -> &'static str {
@@ -443,14 +434,6 @@ impl Display for Instruction {
             Instruction::FCVTLUS(rd, rs1, rm) => write!(f, "fcvt.lu.s.{rm} {rd},{rs1}"),
             Instruction::FCVTSL(rd, rs1, rm) => write!(f, "fcvt.s.l.{rm} {rd},{rs1}"),
             Instruction::FCVTSLU(rd, rs1, rm) => write!(f, "fcvt.s.lu.{rm} {rd},{rs1}"),
-            Instruction::CADDI4SPN(rd, imm) => write!(f, "c.addi4spn {rd},{imm}"),
-            Instruction::CFLD(rd, rs1, imm) => write!(f, "c.fld {rd},{imm}({rs1})"),
-            Instruction::CLW(rd, rs1, imm) => write!(f, "c.lw {rd},{imm}({rs1})"),
-            Instruction::CLD(rd, rs1, imm) => write!(f, "c.ld {rd},{imm}({rs1})"),
-            Instruction::CFSD(rs2, rs1, imm) => write!(f, "c.fsd {rs2},{imm}({rs1})"),
-            Instruction::CSW(rs2, rs1, imm) => write!(f, "c.sw {rs2},{imm}({rs1})"),
-            Instruction::CSD(rs2, rs1, imm) => write!(f, "c.sd {rs2},{imm}({rs1})"),
-            Instruction::CFLW(frd, frs1, imm) => write!(f, "c.flw {frd},{imm}({frs1})"),
         }
     }
 }
@@ -477,14 +460,14 @@ impl Instruction {
     }
 }
 
-fn parse_int(str: &str) -> Result<i64, String> {
+pub fn parse_int(str: &str) -> Result<i64, String> {
     match str.parse::<i64>() {
         Ok(e) => Ok(e),
         Err(_) => Err(format!("unable to parse int:{str}").to_owned()),
     }
 }
 
-fn parse_address_expression(str: &str) -> Result<(IRegister, i64), String> {
+pub fn parse_address_expression(str: &str) -> Result<(IRegister, i64), String> {
     let (offset, register): (&str, &str) = if let Some(x) = str.split_once("(") {
         x
     } else {
@@ -500,8 +483,44 @@ fn parse_address_expression(str: &str) -> Result<(IRegister, i64), String> {
     }
 }
 
+pub fn parse_address_expression_compressed(str: &str) -> Result<(CIRegister, i64), String> {
+    let (offset, register): (&str, &str) = if let Some(x) = str.split_once("(") {
+        x
+    } else {
+        panic!("no (");
+    };
+    match register.strip_suffix(")") {
+        Some(y) => {
+            let r = CIRegister::from_string(y)?;
+            let i = parse_int(offset)?;
+            Ok((r, i))
+        }
+        _ => Err("Address expression should end in a )".to_owned()),
+    }
+}
+
+#[derive(Debug, PartialEq)]
+pub enum AssemblyResult {
+    I(Instruction),
+    C(CInstruction),
+}
+impl AssemblyResult {
+    pub fn c(self) -> CInstruction {
+        match self {
+            AssemblyResult::I(_) => panic!("c called on regular instruction"),
+            AssemblyResult::C(cinstruction) => cinstruction,
+        }
+    }
+    pub fn i(self) -> Instruction {
+        match self {
+            AssemblyResult::I(instruction) => instruction,
+            AssemblyResult::C(_) => panic!("i called on compressed instruction"),
+        }
+    }
+}
+
 /// Constructs an `Instruction` from a line of assembly.
-pub fn assemble_line(line: &str) -> Result<Instruction, String> {
+pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
     let (mnemonic, operands): (&str, &str) = if let Some(x) = line.split_once(" ") {
         x
     } else {
@@ -518,566 +537,516 @@ pub fn assemble_line(line: &str) -> Result<Instruction, String> {
     println!("operands: {:?}", operands);
     println!("mnemonics: {:?}", mnemonics);
 
-    match mnemonics[0] {
-        // register-immediate instructions
-        "addi" => i_assemble!(ADDI),
-        "addiw" => i_assemble!(ADDIW),
-        "andi" => i_assemble!(ANDI),
-        "ori" => i_assemble!(ORI),
-        "xori" => i_assemble!(XORI),
-        "slti" => i_assemble!(SLTI),
-        "sltiu" => i_assemble!(SLTIU),
-        "slli" => sh_assemble!(SLLI),
-        "srai" => sh_assemble!(SRAI),
-        "sraiw" => shw_assemble!(SRAIW),
-        "srli" => sh_assemble!(SRLI),
-        "srliw" => shw_assemble!(SRLIW),
-        "slliw" => shw_assemble!(SLLIW),
-        // register-register instructions
-        "add" => r_assemble!(ADD),
-        "addw" => r_assemble!(ADDW),
-        "subw" => r_assemble!(SUBW),
-        "and" => r_assemble!(AND),
-        "sub" => r_assemble!(SUB),
-        "or" => r_assemble!(OR),
-        "xor" => r_assemble!(XOR),
-        "sllw" => r_assemble!(SLLW),
-        "srl" => r_assemble!(SRL),
-        "sra" => r_assemble!(SRA),
-        "srlw" => r_assemble!(SRLW),
-        "sraw" => r_assemble!(SRAW),
-        "sll" => r_assemble!(SLL),
-        "slt" => r_assemble!(SLT),
-        "sltu" => r_assemble!(SLTU),
-        "mul" => r_assemble!(MUL),
-        "mulh" => r_assemble!(MULH),
-        "mulhsu" => r_assemble!(MULHSU),
-        "mulhu" => r_assemble!(MULHU),
-        "div" => r_assemble!(DIV),
-        "divu" => r_assemble!(DIVU),
-        "rem" => r_assemble!(REM),
-        "remu" => r_assemble!(REMU),
-        "mulw" => r_assemble!(MULW),
-        "divw" => r_assemble!(DIVW),
-        "divuw" => r_assemble!(DIVUW),
-        "remw" => r_assemble!(REMW),
-        "remuw" => r_assemble!(REMUW),
-        // load instructions
-        "lb" => l_assemble!(LB),
-        "lbu" => l_assemble!(LBU),
-        "lhu" => l_assemble!(LHU),
-        "lw" => l_assemble!(LW),
-        "lwu" => l_assemble!(LWU),
-        "lh" => l_assemble!(LH),
-        // store instructions
-        "ld" => l_assemble!(LD),
-        "sd" => s_assemble!(SD),
-        "sw" => s_assemble!(SW),
-        "sh" => s_assemble!(SH),
-        "sb" => s_assemble!(SB),
-        // branch instructions
-        "blt" => b_assemble!(BLT),
-        "beq" => b_assemble!(BEQ),
-        "bne" => b_assemble!(BNE),
-        "bge" => b_assemble!(BGE),
-        "bgeu" => b_assemble!(BGEU),
-        "bltu" => b_assemble!(BLTU),
-        "jalr" => {
-            if operands.len() != 2 {
-                Err("jalr instruction requires 2 operands".to_owned())
-            } else {
-                let (base, offset) = parse_address_expression(operands[1])?;
-                Ok(Instruction::JALR(
-                    IRegister::from_string(operands[0])?,
-                    base,
-                    IImmediate::from_val(offset),
-                ))
-            }
+    if mnemonics[0] == "c" {
+        if mnemonics.len() == 1 {
+            Err("compressed instruction must be specified".to_owned())
+        } else {
+            CInstruction::assemble_line(&mnemonics[1..], operands).map(|c| AssemblyResult::C(c))
         }
-        "jal" => {
-            if operands.len() != 2 {
-                Err("jal instruction requires 2 operands".to_owned())
-            } else {
-                Ok(Instruction::JAL(
-                    IRegister::from_string(operands[0])?,
-                    JImmediate::from_val(parse_int(operands[1])?),
-                ))
-            }
-        }
-        "lui" => {
-            if operands.len() != 2 {
-                Err("lui instruction requires 2 operands".to_owned())
-            } else {
-                let int: i64 = parse_int(operands[1])?;
-                if int > 2i64.pow(19) - 1 || int < -1 * 2i64.pow(19) {
-                    Err("UImmediate out of range".to_owned())
-                } else {
-                    Ok(Instruction::LUI(
-                        IRegister::from_string(operands[0])?,
-                        UImmediate::from_val(int),
-                    ))
-                }
-            }
-        }
-        "auipc" => {
-            if operands.len() != 2 {
-                Err("auipc instruction requires 2 operands".to_owned())
-            } else {
-                let int: i64 = parse_int(operands[1])?;
-                if int > 2i64.pow(19) - 1 || int < -1 * 2i64.pow(19) {
-                    Err("UImmediate out of range".to_owned())
-                } else {
-                    Ok(Instruction::AUIPC(
-                        IRegister::from_string(operands[0])?,
-                        UImmediate::from_val(int),
-                    ))
-                }
-            }
-        }
-        "fence" => {
-            if mnemonics.len() == 1 {
+    } else {
+        let x = match mnemonics[0] {
+            // register-immediate instructions
+            "addi" => i_assemble!(ADDI),
+            "addiw" => i_assemble!(ADDIW),
+            "andi" => i_assemble!(ANDI),
+            "ori" => i_assemble!(ORI),
+            "xori" => i_assemble!(XORI),
+            "slti" => i_assemble!(SLTI),
+            "sltiu" => i_assemble!(SLTIU),
+            "slli" => sh_assemble!(SLLI),
+            "srai" => sh_assemble!(SRAI),
+            "sraiw" => shw_assemble!(SRAIW),
+            "srli" => sh_assemble!(SRLI),
+            "srliw" => shw_assemble!(SRLIW),
+            "slliw" => shw_assemble!(SLLIW),
+            // register-register instructions
+            "add" => r_assemble!(ADD),
+            "addw" => r_assemble!(ADDW),
+            "subw" => r_assemble!(SUBW),
+            "and" => r_assemble!(AND),
+            "sub" => r_assemble!(SUB),
+            "or" => r_assemble!(OR),
+            "xor" => r_assemble!(XOR),
+            "sllw" => r_assemble!(SLLW),
+            "srl" => r_assemble!(SRL),
+            "sra" => r_assemble!(SRA),
+            "srlw" => r_assemble!(SRLW),
+            "sraw" => r_assemble!(SRAW),
+            "sll" => r_assemble!(SLL),
+            "slt" => r_assemble!(SLT),
+            "sltu" => r_assemble!(SLTU),
+            "mul" => r_assemble!(MUL),
+            "mulh" => r_assemble!(MULH),
+            "mulhsu" => r_assemble!(MULHSU),
+            "mulhu" => r_assemble!(MULHU),
+            "div" => r_assemble!(DIV),
+            "divu" => r_assemble!(DIVU),
+            "rem" => r_assemble!(REM),
+            "remu" => r_assemble!(REMU),
+            "mulw" => r_assemble!(MULW),
+            "divw" => r_assemble!(DIVW),
+            "divuw" => r_assemble!(DIVUW),
+            "remw" => r_assemble!(REMW),
+            "remuw" => r_assemble!(REMUW),
+            // load instructions
+            "lb" => l_assemble!(LB),
+            "lbu" => l_assemble!(LBU),
+            "lhu" => l_assemble!(LHU),
+            "lw" => l_assemble!(LW),
+            "lwu" => l_assemble!(LWU),
+            "lh" => l_assemble!(LH),
+            // store instructions
+            "ld" => l_assemble!(LD),
+            "sd" => s_assemble!(SD),
+            "sw" => s_assemble!(SW),
+            "sh" => s_assemble!(SH),
+            "sb" => s_assemble!(SB),
+            // branch instructions
+            "blt" => b_assemble!(BLT),
+            "beq" => b_assemble!(BEQ),
+            "bne" => b_assemble!(BNE),
+            "bge" => b_assemble!(BGE),
+            "bgeu" => b_assemble!(BGEU),
+            "bltu" => b_assemble!(BLTU),
+            "jalr" => {
                 if operands.len() != 2 {
-                    Err("fence instruction requires 2 operands".to_owned())
+                    Err("jalr instruction requires 2 operands".to_owned())
                 } else {
-                    let ops = parse_fence_set(operands[1]) | (parse_fence_set(operands[0]) << 4);
-                    Ok(Instruction::FENCE(
-                        // rd and rs1 are currently unused
-                        IRegister::Zero,
-                        IRegister::Zero,
-                        ops,
-                        0, //fm field, always zero for a non-tso fence
+                    let (base, offset) = parse_address_expression(operands[1])?;
+                    Ok(Instruction::JALR(
+                        IRegister::from_string(operands[0])?,
+                        base,
+                        IImmediate::from_val(offset),
                     ))
                 }
-            } else if mnemonics[1] == ".tso" {
+            }
+            "jal" => {
                 if operands.len() != 2 {
-                    Err("fence.tso instruction requires 2 operands".to_owned())
+                    Err("jal instruction requires 2 operands".to_owned())
                 } else {
-                    let ops = parse_fence_set(operands[1]) | (parse_fence_set(operands[0]) << 4);
-                    if ops != (parse_fence_set("rw") | (parse_fence_set("rw") << 4)) {
-                        Err("fence.tso should be rw,rw".to_owned())
+                    Ok(Instruction::JAL(
+                        IRegister::from_string(operands[0])?,
+                        JImmediate::from_val(parse_int(operands[1])?),
+                    ))
+                }
+            }
+            "lui" => {
+                if operands.len() != 2 {
+                    Err("lui instruction requires 2 operands".to_owned())
+                } else {
+                    let int: i64 = parse_int(operands[1])?;
+                    if int > 2i64.pow(19) - 1 || int < -1 * 2i64.pow(19) {
+                        Err("UImmediate out of range".to_owned())
                     } else {
+                        Ok(Instruction::LUI(
+                            IRegister::from_string(operands[0])?,
+                            UImmediate::from_val(int),
+                        ))
+                    }
+                }
+            }
+            "auipc" => {
+                if operands.len() != 2 {
+                    Err("auipc instruction requires 2 operands".to_owned())
+                } else {
+                    let int: i64 = parse_int(operands[1])?;
+                    if int > 2i64.pow(19) - 1 || int < -1 * 2i64.pow(19) {
+                        Err("UImmediate out of range".to_owned())
+                    } else {
+                        Ok(Instruction::AUIPC(
+                            IRegister::from_string(operands[0])?,
+                            UImmediate::from_val(int),
+                        ))
+                    }
+                }
+            }
+            "fence" => {
+                if mnemonics.len() == 1 {
+                    if operands.len() != 2 {
+                        Err("fence instruction requires 2 operands".to_owned())
+                    } else {
+                        let ops =
+                            parse_fence_set(operands[1]) | (parse_fence_set(operands[0]) << 4);
                         Ok(Instruction::FENCE(
                             // rd and rs1 are currently unused
                             IRegister::Zero,
                             IRegister::Zero,
                             ops,
-                            0b1000, // tso fence
+                            0, //fm field, always zero for a non-tso fence
                         ))
                     }
-                }
-            } else {
-                Err("invalid fence".to_owned())
-            }
-        }
-        // LR can't use `amo_assemble!` because it only has two operands
-        "lr" => {
-            if mnemonics.len() == 1 {
-                Err("lr must have size (w/d)".to_owned())
-            } else if mnemonics.len() == 2 {
-                if mnemonics[1] == "w" {
-                    Ok(Instruction::LRW(
-                        IRegister::from_string(operands[0])?,
-                        IRegister::from_string(operands[1])?,
-                        false,
-                        false,
-                    ))
-                } else if mnemonics[1] == "d" {
-                    Ok(Instruction::LRD(
-                        IRegister::from_string(operands[0])?,
-                        IRegister::from_string(operands[1])?,
-                        false,
-                        false,
-                    ))
+                } else if mnemonics[1] == ".tso" {
+                    if operands.len() != 2 {
+                        Err("fence.tso instruction requires 2 operands".to_owned())
+                    } else {
+                        let ops =
+                            parse_fence_set(operands[1]) | (parse_fence_set(operands[0]) << 4);
+                        if ops != (parse_fence_set("rw") | (parse_fence_set("rw") << 4)) {
+                            Err("fence.tso should be rw,rw".to_owned())
+                        } else {
+                            Ok(Instruction::FENCE(
+                                // rd and rs1 are currently unused
+                                IRegister::Zero,
+                                IRegister::Zero,
+                                ops,
+                                0b1000, // tso fence
+                            ))
+                        }
+                    }
                 } else {
-                    Err("size of lr isntruction must be word (w) or doubleword (d)".to_owned())
+                    Err("invalid fence".to_owned())
                 }
-            } else if mnemonics.len() == 3 {
-                let (aq, rl) = match mnemonics[2] {
-                    "" => (false, false),
-                    "aq" => (true, false),
-                    "rl" => (false, true),
-                    "aqrl" => (true, true),
-                    _ => return Err("ordering should be (aq)(rl)".to_owned()),
-                };
-                if mnemonics[1] == "w" {
-                    Ok(Instruction::LRW(
-                        IRegister::from_string(operands[0])?,
-                        IRegister::from_string(operands[1])?,
-                        aq,
-                        rl,
-                    ))
-                } else if mnemonics[1] == "d" {
-                    Ok(Instruction::LRD(
-                        IRegister::from_string(operands[0])?,
-                        IRegister::from_string(operands[1])?,
-                        aq,
-                        rl,
-                    ))
-                } else {
-                    Err("size of lr isntruction must be word (w) or doubleword (d)".to_owned())
-                }
-            } else {
-                Err("lr instruction has too many suffixes, expected lr.size.ordering".to_owned())
             }
-        }
-        "sc" => amo_assemble!(SC),
-        "amoswap" => amo_assemble!(AMOSWAP),
-        "amoadd" => amo_assemble!(AMOADD),
-        "amoxor" => amo_assemble!(AMOXOR),
-        "amoand" => amo_assemble!(AMOAND),
-        "amoor" => amo_assemble!(AMOOR),
-        "amomin" => amo_assemble!(AMOMIN),
-        "amomax" => amo_assemble!(AMOMAX),
-        "amominu" => amo_assemble!(AMOMINU),
-        "amomaxu" => amo_assemble!(AMOMAXU),
-        "flw" => {
-            if operands.len() != 2 {
-                println!("{:?}", operands);
-                Err("flw instruction requires 2 operands".to_owned())
-            } else {
-                let (base, offset) = parse_address_expression(operands[1])?;
-                Ok(Instruction::FLW(
-                    FRegister::from_string(operands[0])?,
-                    base,
-                    IImmediate::from_val(offset),
-                ))
-            }
-        }
-        "fsw" => {
-            if operands.len() != 2 {
-                println!("{:?}", operands);
-                Err("fsw instruction requires 2 operands".to_owned())
-            } else {
-                let (base, offset) = parse_address_expression(operands[1])?;
-                Ok(Instruction::FSW(
-                    base,
-                    FRegister::from_string(operands[0])?,
-                    SImmediate::from_val(offset),
-                ))
-            }
-        }
-        "fsqrt" => {
-            if operands.len() != 2 {
-                Err("fsqrt instruction requires 2 operands".to_owned())
-            } else {
-                if mnemonics.len() == 2 {
-                    Ok(Instruction::FSQRTS(
-                        FRegister::from_string(operands[0])?,
-                        FRegister::from_string(operands[1])?,
-                        RoundingMode::DYN,
-                    ))
+            // LR can't use `amo_assemble!` because it only has two operands
+            "lr" => {
+                if mnemonics.len() == 1 {
+                    Err("lr must have size (w/d)".to_owned())
+                } else if mnemonics.len() == 2 {
+                    if mnemonics[1] == "w" {
+                        Ok(Instruction::LRW(
+                            IRegister::from_string(operands[0])?,
+                            IRegister::from_string(operands[1])?,
+                            false,
+                            false,
+                        ))
+                    } else if mnemonics[1] == "d" {
+                        Ok(Instruction::LRD(
+                            IRegister::from_string(operands[0])?,
+                            IRegister::from_string(operands[1])?,
+                            false,
+                            false,
+                        ))
+                    } else {
+                        Err("size of lr isntruction must be word (w) or doubleword (d)".to_owned())
+                    }
                 } else if mnemonics.len() == 3 {
-                    Ok(Instruction::FSQRTS(
-                        FRegister::from_string(operands[0])?,
-                        FRegister::from_string(operands[1])?,
-                        RoundingMode::from_str(mnemonics[2])?,
-                    ))
-                } else {
-                    Err("fsqrt instruction requires a suffix {s,d}".to_owned())
-                }
-            }
-        }
-        "fadd" => fr_assemble!(FADD),
-        "fsub" => fr_assemble!(FSUB),
-        "fmul" => fr_assemble!(FMUL),
-        "fdiv" => fr_assemble!(FDIV),
-        "fmin" => {
-            if operands.len() != 3 {
-                Err("fmin instruction requires 3 operands".to_owned())
-            } else {
-                if mnemonics.len() == 2 {
-                    Ok(Instruction::FMINS(
-                        FRegister::from_string(operands[0])?,
-                        FRegister::from_string(operands[1])?,
-                        FRegister::from_string(operands[2])?,
-                    ))
-                } else {
-                    Err("fmin instruction requires a suffix {s,d}".to_owned())
-                }
-            }
-        }
-        "fmax" => {
-            if operands.len() != 3 {
-                Err("fmax instruction requires 3 operands".to_owned())
-            } else {
-                if mnemonics.len() == 2 {
-                    Ok(Instruction::FMAXS(
-                        FRegister::from_string(operands[0])?,
-                        FRegister::from_string(operands[1])?,
-                        FRegister::from_string(operands[2])?,
-                    ))
-                } else {
-                    Err("fmax instruction requires a suffix {s,d}".to_owned())
-                }
-            }
-        }
-        "fcvt" => {
-            if operands.len() != 2 {
-                Err("fcvt requires 3 operands".to_owned())
-            } else {
-                if mnemonics.len() == 3 {
-                    // default rounding mode
-                    match (mnemonics[1], mnemonics[2]) {
-                        ("w", "s") => Ok(Instruction::FCVTWS(
+                    let (aq, rl) = match mnemonics[2] {
+                        "" => (false, false),
+                        "aq" => (true, false),
+                        "rl" => (false, true),
+                        "aqrl" => (true, true),
+                        _ => return Err("ordering should be (aq)(rl)".to_owned()),
+                    };
+                    if mnemonics[1] == "w" {
+                        Ok(Instruction::LRW(
                             IRegister::from_string(operands[0])?,
-                            FRegister::from_string(operands[1])?,
-                            RoundingMode::DYN,
-                        )),
-                        ("wu", "s") => Ok(Instruction::FCVTWUS(
+                            IRegister::from_string(operands[1])?,
+                            aq,
+                            rl,
+                        ))
+                    } else if mnemonics[1] == "d" {
+                        Ok(Instruction::LRD(
                             IRegister::from_string(operands[0])?,
-                            FRegister::from_string(operands[1])?,
-                            RoundingMode::DYN,
-                        )),
-                        ("s", "w") => Ok(Instruction::FCVTSW(
-                            FRegister::from_string(operands[0])?,
                             IRegister::from_string(operands[1])?,
-                            RoundingMode::DYN,
-                        )),
-                        ("s", "wu") => Ok(Instruction::FCVTSWU(
-                            FRegister::from_string(operands[0])?,
-                            IRegister::from_string(operands[1])?,
-                            RoundingMode::DYN,
-                        )),
-                        ("l", "s") => Ok(Instruction::FCVTLS(
-                            IRegister::from_string(operands[0])?,
-                            FRegister::from_string(operands[1])?,
-                            RoundingMode::DYN,
-                        )),
-                        ("lu", "s") => Ok(Instruction::FCVTLUS(
-                            IRegister::from_string(operands[0])?,
-                            FRegister::from_string(operands[1])?,
-                            RoundingMode::DYN,
-                        )),
-                        ("s", "l") => Ok(Instruction::FCVTSL(
-                            FRegister::from_string(operands[0])?,
-                            IRegister::from_string(operands[1])?,
-                            RoundingMode::DYN,
-                        )),
-                        ("s", "lu") => Ok(Instruction::FCVTSLU(
-                            FRegister::from_string(operands[0])?,
-                            IRegister::from_string(operands[1])?,
-                            RoundingMode::DYN,
-                        )),
-                        _ => Err("invalid fcvt suffixes".to_owned()),
-                    }
-                } else if mnemonics.len() == 4 {
-                    match (mnemonics[1], mnemonics[2]) {
-                        ("w", "s") => Ok(Instruction::FCVTWS(
-                            IRegister::from_string(operands[0])?,
-                            FRegister::from_string(operands[1])?,
-                            RoundingMode::from_str(mnemonics[3])?,
-                        )),
-                        ("wu", "s") => Ok(Instruction::FCVTWUS(
-                            IRegister::from_string(operands[0])?,
-                            FRegister::from_string(operands[1])?,
-                            RoundingMode::from_str(mnemonics[3])?,
-                        )),
-                        ("s", "w") => Ok(Instruction::FCVTSW(
-                            FRegister::from_string(operands[0])?,
-                            IRegister::from_string(operands[1])?,
-                            RoundingMode::from_str(mnemonics[3])?,
-                        )),
-                        ("s", "wu") => Ok(Instruction::FCVTSWU(
-                            FRegister::from_string(operands[0])?,
-                            IRegister::from_string(operands[1])?,
-                            RoundingMode::from_str(mnemonics[3])?,
-                        )),
-                        ("l", "s") => Ok(Instruction::FCVTLS(
-                            IRegister::from_string(operands[0])?,
-                            FRegister::from_string(operands[1])?,
-                            RoundingMode::from_str(mnemonics[3])?,
-                        )),
-                        ("lu", "s") => Ok(Instruction::FCVTLUS(
-                            IRegister::from_string(operands[0])?,
-                            FRegister::from_string(operands[1])?,
-                            RoundingMode::from_str(mnemonics[3])?,
-                        )),
-                        ("s", "l") => Ok(Instruction::FCVTSL(
-                            FRegister::from_string(operands[0])?,
-                            IRegister::from_string(operands[1])?,
-                            RoundingMode::from_str(mnemonics[3])?,
-                        )),
-                        ("s", "lu") => Ok(Instruction::FCVTSLU(
-                            FRegister::from_string(operands[0])?,
-                            IRegister::from_string(operands[1])?,
-                            RoundingMode::from_str(mnemonics[3])?,
-                        )),
-                        _ => Err("invalid fcvt suffixes".to_owned()),
+                            aq,
+                            rl,
+                        ))
+                    } else {
+                        Err("size of lr isntruction must be word (w) or doubleword (d)".to_owned())
                     }
                 } else {
-                    Err("fcvt should have 2 or 3 suffixes".to_owned())
+                    Err(
+                        "lr instruction has too many suffixes, expected lr.size.ordering"
+                            .to_owned(),
+                    )
                 }
             }
-        }
-        "fmv" => {
-            if operands.len() != 2 {
-                Err("fmv requires 2 operands".to_owned())
-            } else {
-                if mnemonics.len() == 3 {
-                    match (mnemonics[1], mnemonics[2]) {
-                        ("x", "w") => Ok(Instruction::FMVXW(
-                            IRegister::from_string(operands[0])?,
-                            FRegister::from_string(operands[1])?,
-                        )),
-                        ("w", "x") => Ok(Instruction::FMVWX(
-                            FRegister::from_string(operands[0])?,
-                            IRegister::from_string(operands[1])?,
-                        )),
-                        _ => Err("invalid fmv suffixes".to_owned()),
-                    }
+            "sc" => amo_assemble!(SC),
+            "amoswap" => amo_assemble!(AMOSWAP),
+            "amoadd" => amo_assemble!(AMOADD),
+            "amoxor" => amo_assemble!(AMOXOR),
+            "amoand" => amo_assemble!(AMOAND),
+            "amoor" => amo_assemble!(AMOOR),
+            "amomin" => amo_assemble!(AMOMIN),
+            "amomax" => amo_assemble!(AMOMAX),
+            "amominu" => amo_assemble!(AMOMINU),
+            "amomaxu" => amo_assemble!(AMOMAXU),
+            "flw" => {
+                if operands.len() != 2 {
+                    println!("{:?}", operands);
+                    Err("flw instruction requires 2 operands".to_owned())
                 } else {
-                    Err("fmv requires 2 suffixes".to_owned())
+                    let (base, offset) = parse_address_expression(operands[1])?;
+                    Ok(Instruction::FLW(
+                        FRegister::from_string(operands[0])?,
+                        base,
+                        IImmediate::from_val(offset),
+                    ))
                 }
             }
-        }
-        "feq" => {
-            if operands.len() != 3 {
-                Err("feq requires 3 operands".to_owned())
-            } else {
-                if mnemonics.len() == 2 {
-                    match mnemonics[1] {
-                        "s" => Ok(Instruction::FEQS(
-                            IRegister::from_string(operands[0])?,
+            "fsw" => {
+                if operands.len() != 2 {
+                    println!("{:?}", operands);
+                    Err("fsw instruction requires 2 operands".to_owned())
+                } else {
+                    let (base, offset) = parse_address_expression(operands[1])?;
+                    Ok(Instruction::FSW(
+                        base,
+                        FRegister::from_string(operands[0])?,
+                        SImmediate::from_val(offset),
+                    ))
+                }
+            }
+            "fsqrt" => {
+                if operands.len() != 2 {
+                    Err("fsqrt instruction requires 2 operands".to_owned())
+                } else {
+                    if mnemonics.len() == 2 {
+                        Ok(Instruction::FSQRTS(
+                            FRegister::from_string(operands[0])?,
+                            FRegister::from_string(operands[1])?,
+                            RoundingMode::DYN,
+                        ))
+                    } else if mnemonics.len() == 3 {
+                        Ok(Instruction::FSQRTS(
+                            FRegister::from_string(operands[0])?,
+                            FRegister::from_string(operands[1])?,
+                            RoundingMode::from_str(mnemonics[2])?,
+                        ))
+                    } else {
+                        Err("fsqrt instruction requires a suffix {s,d}".to_owned())
+                    }
+                }
+            }
+            "fadd" => fr_assemble!(FADD),
+            "fsub" => fr_assemble!(FSUB),
+            "fmul" => fr_assemble!(FMUL),
+            "fdiv" => fr_assemble!(FDIV),
+            "fmin" => {
+                if operands.len() != 3 {
+                    Err("fmin instruction requires 3 operands".to_owned())
+                } else {
+                    if mnemonics.len() == 2 {
+                        Ok(Instruction::FMINS(
+                            FRegister::from_string(operands[0])?,
                             FRegister::from_string(operands[1])?,
                             FRegister::from_string(operands[2])?,
-                        )),
-                        "d" => todo!(),
-                        "q" => todo!(),
-                        "h" => todo!(),
-                        _ => Err("feq requires a suffix {s,d}".to_owned()),
+                        ))
+                    } else {
+                        Err("fmin instruction requires a suffix {s,d}".to_owned())
                     }
-                } else {
-                    Err("feq requires a suffix {s,d}".to_owned())
                 }
             }
-        }
-        "flt" => {
-            if operands.len() != 3 {
-                Err("flt requires 3 operands".to_owned())
-            } else {
-                if mnemonics.len() == 2 {
-                    match mnemonics[1] {
-                        "s" => Ok(Instruction::FLTS(
-                            IRegister::from_string(operands[0])?,
+            "fmax" => {
+                if operands.len() != 3 {
+                    Err("fmax instruction requires 3 operands".to_owned())
+                } else {
+                    if mnemonics.len() == 2 {
+                        Ok(Instruction::FMAXS(
+                            FRegister::from_string(operands[0])?,
                             FRegister::from_string(operands[1])?,
                             FRegister::from_string(operands[2])?,
-                        )),
-                        "d" => todo!(),
-                        "q" => todo!(),
-                        "h" => todo!(),
-                        _ => Err("flt requires a suffix {s,d}".to_owned()),
+                        ))
+                    } else {
+                        Err("fmax instruction requires a suffix {s,d}".to_owned())
                     }
+                }
+            }
+            "fcvt" => {
+                if operands.len() != 2 {
+                    Err("fcvt requires 3 operands".to_owned())
                 } else {
-                    Err("flt requires a suffix {s,d}".to_owned())
+                    if mnemonics.len() == 3 {
+                        // default rounding mode
+                        match (mnemonics[1], mnemonics[2]) {
+                            ("w", "s") => Ok(Instruction::FCVTWS(
+                                IRegister::from_string(operands[0])?,
+                                FRegister::from_string(operands[1])?,
+                                RoundingMode::DYN,
+                            )),
+                            ("wu", "s") => Ok(Instruction::FCVTWUS(
+                                IRegister::from_string(operands[0])?,
+                                FRegister::from_string(operands[1])?,
+                                RoundingMode::DYN,
+                            )),
+                            ("s", "w") => Ok(Instruction::FCVTSW(
+                                FRegister::from_string(operands[0])?,
+                                IRegister::from_string(operands[1])?,
+                                RoundingMode::DYN,
+                            )),
+                            ("s", "wu") => Ok(Instruction::FCVTSWU(
+                                FRegister::from_string(operands[0])?,
+                                IRegister::from_string(operands[1])?,
+                                RoundingMode::DYN,
+                            )),
+                            ("l", "s") => Ok(Instruction::FCVTLS(
+                                IRegister::from_string(operands[0])?,
+                                FRegister::from_string(operands[1])?,
+                                RoundingMode::DYN,
+                            )),
+                            ("lu", "s") => Ok(Instruction::FCVTLUS(
+                                IRegister::from_string(operands[0])?,
+                                FRegister::from_string(operands[1])?,
+                                RoundingMode::DYN,
+                            )),
+                            ("s", "l") => Ok(Instruction::FCVTSL(
+                                FRegister::from_string(operands[0])?,
+                                IRegister::from_string(operands[1])?,
+                                RoundingMode::DYN,
+                            )),
+                            ("s", "lu") => Ok(Instruction::FCVTSLU(
+                                FRegister::from_string(operands[0])?,
+                                IRegister::from_string(operands[1])?,
+                                RoundingMode::DYN,
+                            )),
+                            _ => Err("invalid fcvt suffixes".to_owned()),
+                        }
+                    } else if mnemonics.len() == 4 {
+                        match (mnemonics[1], mnemonics[2]) {
+                            ("w", "s") => Ok(Instruction::FCVTWS(
+                                IRegister::from_string(operands[0])?,
+                                FRegister::from_string(operands[1])?,
+                                RoundingMode::from_str(mnemonics[3])?,
+                            )),
+                            ("wu", "s") => Ok(Instruction::FCVTWUS(
+                                IRegister::from_string(operands[0])?,
+                                FRegister::from_string(operands[1])?,
+                                RoundingMode::from_str(mnemonics[3])?,
+                            )),
+                            ("s", "w") => Ok(Instruction::FCVTSW(
+                                FRegister::from_string(operands[0])?,
+                                IRegister::from_string(operands[1])?,
+                                RoundingMode::from_str(mnemonics[3])?,
+                            )),
+                            ("s", "wu") => Ok(Instruction::FCVTSWU(
+                                FRegister::from_string(operands[0])?,
+                                IRegister::from_string(operands[1])?,
+                                RoundingMode::from_str(mnemonics[3])?,
+                            )),
+                            ("l", "s") => Ok(Instruction::FCVTLS(
+                                IRegister::from_string(operands[0])?,
+                                FRegister::from_string(operands[1])?,
+                                RoundingMode::from_str(mnemonics[3])?,
+                            )),
+                            ("lu", "s") => Ok(Instruction::FCVTLUS(
+                                IRegister::from_string(operands[0])?,
+                                FRegister::from_string(operands[1])?,
+                                RoundingMode::from_str(mnemonics[3])?,
+                            )),
+                            ("s", "l") => Ok(Instruction::FCVTSL(
+                                FRegister::from_string(operands[0])?,
+                                IRegister::from_string(operands[1])?,
+                                RoundingMode::from_str(mnemonics[3])?,
+                            )),
+                            ("s", "lu") => Ok(Instruction::FCVTSLU(
+                                FRegister::from_string(operands[0])?,
+                                IRegister::from_string(operands[1])?,
+                                RoundingMode::from_str(mnemonics[3])?,
+                            )),
+                            _ => Err("invalid fcvt suffixes".to_owned()),
+                        }
+                    } else {
+                        Err("fcvt should have 2 or 3 suffixes".to_owned())
+                    }
                 }
             }
-        }
-        "fle" => {
-            if operands.len() != 3 {
-                Err("fle requires 3 operands".to_owned())
-            } else {
-                if mnemonics.len() == 2 {
-                    match mnemonics[1] {
-                        "s" => Ok(Instruction::FLES(
-                            IRegister::from_string(operands[0])?,
-                            FRegister::from_string(operands[1])?,
-                            FRegister::from_string(operands[2])?,
-                        )),
-                        "d" => todo!(),
-                        "q" => todo!(),
-                        "h" => todo!(),
-                        _ => Err("fle requires a suffix {s,d}".to_owned()),
-                    }
+            "fmv" => {
+                if operands.len() != 2 {
+                    Err("fmv requires 2 operands".to_owned())
                 } else {
-                    Err("fle requires a suffix {s,d}".to_owned())
+                    if mnemonics.len() == 3 {
+                        match (mnemonics[1], mnemonics[2]) {
+                            ("x", "w") => Ok(Instruction::FMVXW(
+                                IRegister::from_string(operands[0])?,
+                                FRegister::from_string(operands[1])?,
+                            )),
+                            ("w", "x") => Ok(Instruction::FMVWX(
+                                FRegister::from_string(operands[0])?,
+                                IRegister::from_string(operands[1])?,
+                            )),
+                            _ => Err("invalid fmv suffixes".to_owned()),
+                        }
+                    } else {
+                        Err("fmv requires 2 suffixes".to_owned())
+                    }
                 }
             }
-        }
-        "fclass" => {
-            if operands.len() != 2 {
-                Err("fclass requires 2 operands".to_owned())
-            } else {
-                if mnemonics.len() == 2 {
-                    match mnemonics[1] {
-                        "s" => Ok(Instruction::FCLASSS(
-                            IRegister::from_string(operands[0])?,
-                            FRegister::from_string(operands[1])?,
-                        )),
-                        "d" => todo!(),
-                        "q" => todo!(),
-                        "h" => todo!(),
-                        _ => Err("fle requires a suffix {s,d}".to_owned()),
-                    }
+            "feq" => {
+                if operands.len() != 3 {
+                    Err("feq requires 3 operands".to_owned())
                 } else {
-                    Err("fle requires a suffix {s,d}".to_owned())
+                    if mnemonics.len() == 2 {
+                        match mnemonics[1] {
+                            "s" => Ok(Instruction::FEQS(
+                                IRegister::from_string(operands[0])?,
+                                FRegister::from_string(operands[1])?,
+                                FRegister::from_string(operands[2])?,
+                            )),
+                            "d" => todo!(),
+                            "q" => todo!(),
+                            "h" => todo!(),
+                            _ => Err("feq requires a suffix {s,d}".to_owned()),
+                        }
+                    } else {
+                        Err("feq requires a suffix {s,d}".to_owned())
+                    }
                 }
             }
-        }
-        "c" => {
-            if mnemonics.len() == 1 {
-                Err("compressed instruction must be specified".to_owned())
-            }else {
-                match mnemonics[1] {
-                    "addi4spn" => {
-                        if operands.len() != 2 {
-                            Err("c.addi4spn requires 2 operands".to_owned())
-                        }else {
-                            Ok(Instruction::CADDI4SPN(IRegister::from_string_compressed(operands[0])?, CWideImmediate::from_val(parse_int(operands[1])?)))
+            "flt" => {
+                if operands.len() != 3 {
+                    Err("flt requires 3 operands".to_owned())
+                } else {
+                    if mnemonics.len() == 2 {
+                        match mnemonics[1] {
+                            "s" => Ok(Instruction::FLTS(
+                                IRegister::from_string(operands[0])?,
+                                FRegister::from_string(operands[1])?,
+                                FRegister::from_string(operands[2])?,
+                            )),
+                            "d" => todo!(),
+                            "q" => todo!(),
+                            "h" => todo!(),
+                            _ => Err("flt requires a suffix {s,d}".to_owned()),
                         }
+                    } else {
+                        Err("flt requires a suffix {s,d}".to_owned())
                     }
-                    "fld" => {
-                        if operands.len() != 2 {
-                            Err("c.fld requires 2 operands".to_owned())
-                        }else{
-                            let (base, imm) = parse_address_expression(operands[1])?;
-                            Ok(Instruction::CFLD(FRegister::from_string_compressed(operands[0])?, base, CDImmediate::from_val(imm)))
-                        }
-                    }
-                    "lw" => {
-                        if operands.len() != 2 {
-                            Err("c.lw requires 2 operands".to_owned())
-                        }else{
-                            let (base, imm) = parse_address_expression(operands[1])?;
-                            Ok(Instruction::CLW(IRegister::from_string_compressed(operands[0])?, base, CWImmediate::from_val(imm)))
-                        }
-                    }
-                    "ld" => {
-                        if operands.len() != 2 {
-                            Err("c.ld requires 2 operands".to_owned())
-                        }else{
-                            let (base, imm) = parse_address_expression(operands[1])?;
-                            Ok(Instruction::CLD(IRegister::from_string_compressed(operands[0])?, base, CDImmediate::from_val(imm)))
-                        }
-                    }
-                    "fsd" => {
-                        if operands.len() != 2 {
-                            Err("c.fsd requires 2 operands".to_owned())
-                        }else{
-                            let (base, imm) = parse_address_expression(operands[1])?;
-                            Ok(Instruction::CFSD(FRegister::from_string_compressed(operands[0])?, base, CDImmediate::from_val(imm)))
-                        }
-                    }
-                    "sw" => {
-                        if operands.len() != 2 {
-                            Err("c.sw requires 2 operands".to_owned())
-                        }else{
-                            let (base, imm) = parse_address_expression(operands[1])?;
-                            Ok(Instruction::CSW(IRegister::from_string_compressed(operands[0])?, base, CWImmediate::from_val(imm)))
-                        }
-                    }
-                    "sd" => {
-                        if operands.len() != 2 {
-                            Err("c.sd requires 2 operands".to_owned())
-                        }else{
-                            let (base, imm) = parse_address_expression(operands[1])?;
-                            Ok(Instruction::CSD(IRegister::from_string_compressed(operands[0])?, base, CDImmediate::from_val(imm)))
-                        }
-                    }
-                    _ => Err(format!("unknown compressed instruction mnemonic: {}", mnemonic))
                 }
             }
-        }
-        _ => Err(format!("unknown mnemonic: {}", mnemonic)),
+            "fle" => {
+                if operands.len() != 3 {
+                    Err("fle requires 3 operands".to_owned())
+                } else {
+                    if mnemonics.len() == 2 {
+                        match mnemonics[1] {
+                            "s" => Ok(Instruction::FLES(
+                                IRegister::from_string(operands[0])?,
+                                FRegister::from_string(operands[1])?,
+                                FRegister::from_string(operands[2])?,
+                            )),
+                            "d" => todo!(),
+                            "q" => todo!(),
+                            "h" => todo!(),
+                            _ => Err("fle requires a suffix {s,d}".to_owned()),
+                        }
+                    } else {
+                        Err("fle requires a suffix {s,d}".to_owned())
+                    }
+                }
+            }
+            "fclass" => {
+                if operands.len() != 2 {
+                    Err("fclass requires 2 operands".to_owned())
+                } else {
+                    if mnemonics.len() == 2 {
+                        match mnemonics[1] {
+                            "s" => Ok(Instruction::FCLASSS(
+                                IRegister::from_string(operands[0])?,
+                                FRegister::from_string(operands[1])?,
+                            )),
+                            "d" => todo!(),
+                            "q" => todo!(),
+                            "h" => todo!(),
+                            _ => Err("fle requires a suffix {s,d}".to_owned()),
+                        }
+                    } else {
+                        Err("fle requires a suffix {s,d}".to_owned())
+                    }
+                }
+            }
+            _ => Err(format!("unknown mnemonic: {}", mnemonic)),
+        };
+        x.map(|i| AssemblyResult::I(i))
     }
 }
 
@@ -1505,65 +1474,5 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
                 ))
             }
         }
-    }
-}
-
-pub fn decode_compressed_instruction(instruction: u16) -> Result<Instruction, String> {
-    let rd = IRegister::from_int_compressed((instruction >> 2) & 0b111);
-    let frd = FRegister::from_int_compressed((instruction >> 2) & 0b111);
-
-    let rs1 = IRegister::from_int_compressed((instruction >> 7) & 0b111);
-    // let frs1 = FRegister::from_int_compressed((instruction >> 7) & 0b111);
-
-    match instruction & 0b11 {
-        0b00 => match instruction >> 13 {
-            0b000 => {
-                let imm = CWideImmediate::from_u16(instruction);
-                if imm.val() == 0 {
-                    Err("compressed illegal instruction".to_owned())
-                } else {
-                    Ok(Instruction::CADDI4SPN(
-                        IRegister::from_int_compressed((instruction >> 2) & 0b111),
-                        imm,
-                    ))
-                }
-            }
-            0b001 => Ok(Instruction::CFLD(
-                frd,
-                rs1,
-                CDImmediate::from_u16(instruction),
-            )),
-            0b010 => Ok(Instruction::CLW(
-                rd,
-                rs1,
-                CWImmediate::from_u16(instruction),
-            )),
-            0b011 => Ok(Instruction::CLD(
-                rd,
-                rs1,
-                CDImmediate::from_u16(instruction),
-            )),
-            0b100 => Err("reserved opcode in C instruction".to_owned()),
-            0b101 => Ok(Instruction::CFSD(
-                frd,
-                rs1,
-                CDImmediate::from_u16(instruction),
-            )),
-            0b110 => Ok(Instruction::CSW(
-                rd,
-                rs1,
-                CWImmediate::from_u16(instruction),
-            )),
-            0b111 => Ok(Instruction::CSD(
-                rd,
-                rs1,
-                CDImmediate::from_u16(instruction),
-            )),
-            _ => unreachable!(),
-        },
-        0b01 => todo!(),
-        0b10 => todo!(),
-        0b11 => Err("attempting to decode larger instruction as though it were 16 bits".to_owned()),
-        _ => unreachable!(),
     }
 }

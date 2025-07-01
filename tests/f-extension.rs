@@ -7,7 +7,7 @@ use riscv_disassembler::register::{IRegister, FRegister};
 #[test]
 fn float_load_word() {
     // check assembler
-    let i = assemble_line("flw fa0,64(a0)").unwrap();
+    let i = assemble_line("flw fa0,64(a0)").unwrap().i();
     let expected = Instruction::FLW(FRegister::FA0, IRegister::A0, IImmediate::from_val(64));
     assert_eq!(
         i,
@@ -22,14 +22,14 @@ fn float_load_word() {
     );
 
     // check disassembler
-    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap();
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
     assert_eq!(i, i3);
 }
 
 #[test]
 fn float_store_word() {
     // check assembler
-    let i = assemble_line("fsw fs1,-1(a5)").unwrap();
+    let i = assemble_line("fsw fs1,-1(a5)").unwrap().i();
     let expected = Instruction::FSW(IRegister::A5, FRegister::FS1, SImmediate::from_val(-1));
     assert_eq!(
         i,
@@ -44,14 +44,14 @@ fn float_store_word() {
     );
 
     // check disassembler
-    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap();
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
     assert_eq!(i, i3);
 }
 
 #[test]
 fn float_add() {
     // check assembler
-    let i = assemble_line("fadd.s ft7,fa5,fs10").unwrap();
+    let i = assemble_line("fadd.s ft7,fa5,fs10").unwrap().i();
     let expected = Instruction::FADDS(FRegister::FT7, FRegister::FA5, FRegister::FS10, RoundingMode::DYN);
     assert_eq!(
         i,
@@ -66,14 +66,14 @@ fn float_add() {
     );
 
     // check disassembler
-    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap();
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
     assert_eq!(i, i3);
 }
 
 #[test]
 fn float_subtract() {
     // check assembler
-    let i = assemble_line("fsub.s.rtz ft0,ft8,fs0").unwrap();
+    let i = assemble_line("fsub.s.rtz ft0,ft8,fs0").unwrap().i();
     let expected = Instruction::FSUBS(FRegister::FT0, FRegister::FT8, FRegister::FS0, RoundingMode::RTZ);
     assert_eq!(
         i,
@@ -88,14 +88,14 @@ fn float_subtract() {
     );
 
     // check disassembler
-    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap();
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
     assert_eq!(i, i3);
 }
 
 #[test]
 fn float_multiply() {
     // check assembler
-    let i = assemble_line("fmul.s.rmm fs1,fs9,ft11").unwrap();
+    let i = assemble_line("fmul.s.rmm fs1,fs9,ft11").unwrap().i();
     let expected = Instruction::FMULS(FRegister::FS1, FRegister::FS9, FRegister::FT11, RoundingMode::RMM);
     assert_eq!(
         i,
@@ -110,14 +110,14 @@ fn float_multiply() {
     );
 
     // check disassembler
-    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap();
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
     assert_eq!(i, i3);
 }
 
 #[test]
 fn float_divide() {
     // check assembler
-    let i = assemble_line("fdiv.s.rup fs6,fs10,ft2").unwrap();
+    let i = assemble_line("fdiv.s.rup fs6,fs10,ft2").unwrap().i();
     let expected = Instruction::FDIVS(FRegister::FS6, FRegister::FS10, FRegister::FT2, RoundingMode::RUP);
     assert_eq!(
         i,
@@ -132,14 +132,14 @@ fn float_divide() {
     );
 
     // check disassembler
-    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap();
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
     assert_eq!(i, i3);
 }
 
 #[test]
 fn float_sqrt() {
     // check assembler
-    let i = assemble_line("fsqrt.s.rne ft3,fa3").unwrap();
+    let i = assemble_line("fsqrt.s.rne ft3,fa3").unwrap().i();
     let expected = Instruction::FSQRTS(FRegister::FT3, FRegister::FA3, RoundingMode::RNE);
     assert_eq!(
         i,
@@ -154,14 +154,14 @@ fn float_sqrt() {
     );
 
     // check disassembler
-    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap();
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
     assert_eq!(i, i3);
 }
 
 #[test]
 fn float_minimum() {
     // check assembler
-    let i = assemble_line("fmin.s ft1,fs4,fa5").unwrap();
+    let i = assemble_line("fmin.s ft1,fs4,fa5").unwrap().i();
     let expected = Instruction::FMINS(FRegister::FT1, FRegister::FS4, FRegister::FA5);
     assert_eq!(
         i,
@@ -176,14 +176,14 @@ fn float_minimum() {
     );
 
     // check disassembler
-    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap();
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
     assert_eq!(i, i3);
 }
 
 #[test]
 fn float_maximum() {
     // check assembler
-    let i = assemble_line("fmax.s fa3,fs9,fs2").unwrap();
+    let i = assemble_line("fmax.s fa3,fs9,fs2").unwrap().i();
     let expected = Instruction::FMAXS(FRegister::FA3, FRegister::FS9, FRegister::FS2);
     assert_eq!(
         i,
@@ -198,14 +198,14 @@ fn float_maximum() {
     );
 
     // check disassembler
-    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap();
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
     assert_eq!(i, i3);
 }
 
 #[test]
 fn float_convert_word_from_single() {
     // check assembler
-    let i = assemble_line("fcvt.w.s.rup s1,fs2").unwrap();
+    let i = assemble_line("fcvt.w.s.rup s1,fs2").unwrap().i();
     let expected = Instruction::FCVTWS(IRegister::S1, FRegister::FS2, RoundingMode::RUP);
     assert_eq!(
         i,
@@ -220,14 +220,14 @@ fn float_convert_word_from_single() {
     );
 
     // check disassembler
-    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap();
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
     assert_eq!(i, i3);
 }
 
 #[test]
 fn float_convert_unsigned_word_from_single() {
     // check assembler
-    let i = assemble_line("fcvt.wu.s.rmm sp,ft3").unwrap();
+    let i = assemble_line("fcvt.wu.s.rmm sp,ft3").unwrap().i();
     let expected = Instruction::FCVTWUS(IRegister::StackPointer, FRegister::FT3, RoundingMode::RMM);
     assert_eq!(
         i,
@@ -242,14 +242,14 @@ fn float_convert_unsigned_word_from_single() {
     );
 
     // check disassembler
-    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap();
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
     assert_eq!(i, i3);
 }
 
 #[test]
 fn float_move_x_from_word() {
     // check assembler
-    let i = assemble_line("fmv.x.w s2,ft4").unwrap();
+    let i = assemble_line("fmv.x.w s2,ft4").unwrap().i();
     let expected = Instruction::FMVXW(IRegister::S2, FRegister::FT4);
     assert_eq!(
         i,
@@ -264,14 +264,14 @@ fn float_move_x_from_word() {
     );
 
     // check disassembler
-    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap();
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
     assert_eq!(i, i3);
 }
 
 #[test]
 fn float_equal_single() {
     // check assembler
-    let i = assemble_line("feq.s a4,fs7,ft11").unwrap();
+    let i = assemble_line("feq.s a4,fs7,ft11").unwrap().i();
     let expected = Instruction::FEQS(IRegister::A4, FRegister::FS7, FRegister::FT11);
     assert_eq!(
         i,
@@ -286,14 +286,14 @@ fn float_equal_single() {
     );
 
     // check disassembler
-    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap();
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
     assert_eq!(i, i3);
 }
 
 #[test]
 fn float_less_than_single() {
     // check assembler
-    let i = assemble_line("flt.s s6,ft10,fa6").unwrap();
+    let i = assemble_line("flt.s s6,ft10,fa6").unwrap().i();
     let expected = Instruction::FLTS(IRegister::S6, FRegister::FT10, FRegister::FA6);
     assert_eq!(
         i,
@@ -308,14 +308,14 @@ fn float_less_than_single() {
     );
 
     // check disassembler
-    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap();
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
     assert_eq!(i, i3);
 }
 
 #[test]
 fn float_less_equal_single() {
     // check assembler
-    let i = assemble_line("fle.s s2,fs4,ft0").unwrap();
+    let i = assemble_line("fle.s s2,fs4,ft0").unwrap().i();
     let expected = Instruction::FLES(IRegister::S2, FRegister::FS4, FRegister::FT0);
     assert_eq!(
         i,
@@ -330,14 +330,14 @@ fn float_less_equal_single() {
     );
 
     // check disassembler
-    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap();
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
     assert_eq!(i, i3);
 }
 
 #[test]
 fn float_class_single() {
     // check assembler
-    let i = assemble_line("fclass.s tp,fs3").unwrap();
+    let i = assemble_line("fclass.s tp,fs3").unwrap().i();
     let expected = Instruction::FCLASSS(IRegister::ThreadPointer, FRegister::FS3);
     assert_eq!(
         i,
@@ -352,14 +352,14 @@ fn float_class_single() {
     );
 
     // check disassembler
-    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap();
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
     assert_eq!(i, i3);
 }
 
 #[test]
 fn float_convert_single_from_word() {
     // check assembler
-    let i = assemble_line("fcvt.s.w.rdn fa2,t4").unwrap();
+    let i = assemble_line("fcvt.s.w.rdn fa2,t4").unwrap().i();
     let expected = Instruction::FCVTSW(FRegister::FA2, IRegister::T4, RoundingMode::RDN);
     assert_eq!(
         i,
@@ -374,14 +374,14 @@ fn float_convert_single_from_word() {
     );
 
     // check disassembler
-    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap();
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
     assert_eq!(i, i3);
 }
 
 #[test]
 fn float_convert_single_from_unsigned_word() {
     // check assembler
-    let i = assemble_line("fcvt.s.wu.dyn fs4,t6").unwrap();
+    let i = assemble_line("fcvt.s.wu.dyn fs4,t6").unwrap().i();
     let expected = Instruction::FCVTSWU(FRegister::FS4, IRegister::T6, RoundingMode::DYN);
     assert_eq!(
         i,
@@ -396,14 +396,14 @@ fn float_convert_single_from_unsigned_word() {
     );
 
     // check disassembler
-    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap();
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
     assert_eq!(i, i3);
 }
 
 #[test]
 fn float_move_word_from_x() {
     // check assembler
-    let i = assemble_line("fmv.w.x fs3,t1").unwrap();
+    let i = assemble_line("fmv.w.x fs3,t1").unwrap().i();
     let expected = Instruction::FMVWX(FRegister::FS3, IRegister::T1);
     assert_eq!(
         i,
@@ -418,14 +418,14 @@ fn float_move_word_from_x() {
     );
 
     // check disassembler
-    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap();
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
     assert_eq!(i, i3);
 }
 
 #[test]
 fn float_convert_long_from_single() {
     // check assembler
-    let i = assemble_line("fcvt.l.s s4,fa7").unwrap();
+    let i = assemble_line("fcvt.l.s s4,fa7").unwrap().i();
     let expected = Instruction::FCVTLS(IRegister::S4, FRegister::FA7, RoundingMode::DYN);
     assert_eq!(
         i,
@@ -440,14 +440,14 @@ fn float_convert_long_from_single() {
     );
 
     // check disassembler
-    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap();
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
     assert_eq!(i, i3);
 }
 
 #[test]
 fn float_convert_unsigned_long_from_single() {
     // check assembler
-    let i = assemble_line("fcvt.lu.s t2,ft9").unwrap();
+    let i = assemble_line("fcvt.lu.s t2,ft9").unwrap().i();
     let expected = Instruction::FCVTLUS(IRegister::T2, FRegister::FT9, RoundingMode::DYN);
     assert_eq!(
         i,
@@ -462,7 +462,7 @@ fn float_convert_unsigned_long_from_single() {
     );
 
     // check disassembler
-    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap();
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
     assert_eq!(i, i3);
 }
 
@@ -470,7 +470,7 @@ fn float_convert_unsigned_long_from_single() {
 #[test]
 fn float_convert_single_from_long() {
     // check assembler
-    let i = assemble_line("fcvt.s.l fs8,s2").unwrap();
+    let i = assemble_line("fcvt.s.l fs8,s2").unwrap().i();
     let expected = Instruction::FCVTSL(FRegister::FS8, IRegister::S2, RoundingMode::DYN);
     assert_eq!(
         i,
@@ -485,14 +485,14 @@ fn float_convert_single_from_long() {
     );
 
     // check disassembler
-    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap();
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
     assert_eq!(i, i3);
 }
 
 #[test]
 fn float_convert_single_from_unsigned_long() {
     // check assembler
-    let i = assemble_line("fcvt.s.lu ft7,fp").unwrap();
+    let i = assemble_line("fcvt.s.lu ft7,fp").unwrap().i();
     let expected = Instruction::FCVTSLU(FRegister::FT7, IRegister::FramePointer, RoundingMode::DYN);
     assert_eq!(
         i,
@@ -507,6 +507,6 @@ fn float_convert_single_from_unsigned_long() {
     );
 
     // check disassembler
-    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap();
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
     assert_eq!(i, i3);
 }
