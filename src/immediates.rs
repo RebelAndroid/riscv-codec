@@ -9,7 +9,7 @@ pub struct IImmediate {
 impl IImmediate {
     /// Extracts the `IImmediate` from the appropriate position in a 32-bit instruction
     pub fn from_u32(x: u32) -> Self {
-        let unsigned: u32 = ((x >> 20) & 0b1111_1111_1111).try_into().unwrap();
+        let unsigned: u32 = (x >> 20) & 0b1111_1111_1111;
         // sign extend 12 bit value
         let y = unsigned.overflowing_shl(20).0 as i32;
         let val = y.overflowing_shr(20).0 as i16;
@@ -17,14 +17,14 @@ impl IImmediate {
     }
 
     pub fn from_val(val: i64) -> Self {
-        if val > 2047 || val < -2048 {
+        if !(-2048..=2047).contains(&val) {
             panic!("attempted to construct out of range IImediate")
         }
         IImmediate { val: val as i16 }
     }
 
     pub fn val(&self) -> i64 {
-        return self.val.into();
+        self.val.into()
     }
 }
 
@@ -52,14 +52,14 @@ impl SImmediate {
     }
 
     pub fn from_val(val: i64) -> Self {
-        if val > 2047 || val < -2048 {
+        if !(-2048..=2047).contains(&val) {
             panic!("attempted to construct out of range IImediate")
         }
         SImmediate { val: val as i16 }
     }
 
     pub fn val(&self) -> i64 {
-        return self.val.into();
+        self.val.into()
     }
 }
 
@@ -83,14 +83,14 @@ impl Shamt {
     }
 
     pub fn from_val(val: i64) -> Self {
-        if val > 63 || val < 0 {
+        if !(0..=63).contains(&val) {
             panic!("attempted to construct out of range Shamt")
         }
         Shamt { val: val as u8 }
     }
 
     pub fn val(&self) -> i64 {
-        return self.val.into();
+        self.val.into()
     }
 }
 
@@ -114,14 +114,14 @@ impl ShamtW {
     }
 
     pub fn from_val(val: i64) -> Self {
-        if val > 31 || val < 0 {
+        if !(0..=31).contains(&val) {
             panic!("attempted to construct out of range Shamtw")
         }
         ShamtW { val: val as u8 }
     }
 
     pub fn val(&self) -> i64 {
-        return self.val.into();
+        self.val.into()
     }
 }
 
@@ -146,14 +146,14 @@ impl UImmediate {
     }
 
     pub fn from_val(val: i64) -> Self {
-        if val > 2i64.pow(19) - 1 || val < -1 * 2i64.pow(19) {
+        if val > 2i64.pow(19) - 1 || val < -2i64.pow(19) {
             panic!("attempted to construct out of range UImediate")
         }
         UImmediate { val: val as i32 }
     }
 
     pub fn val(&self) -> i64 {
-        return self.val.into();
+        self.val.into()
     }
 }
 
@@ -184,7 +184,7 @@ impl JImmediate {
     }
 
     pub fn from_val(val: i64) -> Self {
-        if val > 2i64.pow(20) - 1 || val < -1 * 2i64.pow(20) {
+        if val > 2i64.pow(20) - 1 || val < -2i64.pow(20) {
             panic!("attempted to construct out of range JImediate")
         }
         if val % 2 != 0 {
@@ -194,7 +194,7 @@ impl JImmediate {
     }
 
     pub fn val(&self) -> i64 {
-        return self.val.into();
+        self.val.into()
     }
 }
 
@@ -224,7 +224,7 @@ impl BImmediate {
     }
 
     pub fn from_val(val: i64) -> Self {
-        if val > 2i64.pow(12) - 1 || val < -1 * 2i64.pow(12) {
+        if val > 2i64.pow(12) - 1 || val < -2i64.pow(12) {
             panic!("attempted to construct out of range JImediate")
         }
         if val % 2 != 0 {
@@ -234,7 +234,7 @@ impl BImmediate {
     }
 
     pub fn val(&self) -> i64 {
-        return self.val.into();
+        self.val.into()
     }
 }
 
@@ -275,7 +275,7 @@ impl CWideImmediate {
     }
 
     pub fn val(&self) -> i64 {
-        return self.val.into();
+        self.val.into()
     }
 }
 
@@ -314,7 +314,7 @@ impl CDImmediate {
     }
 
     pub fn val(&self) -> i64 {
-        return self.val.into();
+        self.val.into()
     }
 }
 
@@ -354,7 +354,7 @@ impl CWImmediate {
     }
 
     pub fn val(&self) -> i64 {
-        return self.val.into();
+        self.val.into()
     }
 }
 
@@ -381,14 +381,14 @@ impl CIImmediate {
     }
 
     pub fn from_val(val: i64) -> Self {
-        if val > 2i64.pow(5) - 1 || val < -1 * 2i64.pow(5) {
+        if val > 2i64.pow(5) - 1 || val < -2i64.pow(5) {
             panic!("attempted to construct out of range CIImmediate")
         }
         CIImmediate { val: val as i32 }
     }
 
     pub fn val(&self) -> i64 {
-        return self.val.into();
+        self.val.into()
     }
 }
 
@@ -419,14 +419,14 @@ impl CBImmediate {
     }
 
     pub fn from_val(val: i64) -> Self {
-        if val > 2i64.pow(5) - 1 || val < -1 * 2i64.pow(5) {
+        if val > 2i64.pow(5) - 1 || val < -2i64.pow(5) {
             panic!("attempted to construct out of range CBImmediate")
         }
         CBImmediate { val: val as i32 }
     }
 
     pub fn val(&self) -> i64 {
-        return self.val.into();
+        self.val.into()
     }
 }
 
@@ -459,7 +459,7 @@ impl CShamt {
     }
 
     pub fn val(&self) -> i64 {
-        return self.val.into();
+        self.val.into()
     }
 }
 

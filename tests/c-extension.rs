@@ -1,7 +1,7 @@
 use riscv_disassembler::cinstruction::{CInstruction, decode_compressed_instruction};
-use riscv_disassembler::immediates::{CDImmediate, CIImmediate, CShamt, CWImmediate, CWideImmediate, Shamt};
+use riscv_disassembler::immediates::{CDImmediate, CIImmediate, CShamt, CWImmediate, CWideImmediate};
 use riscv_disassembler::instruction::assemble_line;
-use riscv_disassembler::register::{CFRegister, CIRegister, FRegister, IRegister};
+use riscv_disassembler::register::{CFRegister, CIRegister, IRegister};
 
 #[test]
 fn add_4_immediate_stack_pointer() {

@@ -4,7 +4,7 @@ use proc_macros::ci_assemble;
 
 use crate::{
     immediates::{CBImmediate, CDImmediate, CIImmediate, CShamt, CWImmediate, CWideImmediate},
-    instruction::{parse_address_expression, parse_address_expression_compressed, parse_int},
+    instruction::{parse_address_expression_compressed, parse_int},
     register::{CFRegister, CIRegister, IRegister},
 };
 
@@ -256,13 +256,13 @@ impl CInstruction {
                     Err("c.addi16sp requires 1 operands".to_owned())
                 } else {
                     let i = parse_int(operands[0])?;
-                    if i > 2i64.pow(9) - 1 || i < -1 * 2i64.pow(9)  {
+                    if i > 2i64.pow(9) - 1 || i < -2i64.pow(9)  {
                         panic!("attempted to construct out of range CWImmediate")
                     }
                     if i % 16 != 0 {
                         panic!("attempted to construct non multiple of 4 CWImmediate")
                     }
-                    return Ok(CInstruction::ADDI16SP(i as i16));
+                    Ok(CInstruction::ADDI16SP(i as i16))
                 }
             }
             "lui" => ci_assemble!(LUI),
