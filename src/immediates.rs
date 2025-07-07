@@ -373,7 +373,7 @@ pub struct CIImmediate {
 impl CIImmediate {
     /// Extracts the `CIImmediate` from the appropriate position in a 16-bit instruction
     pub fn from_u16(x: u16) -> Self {
-        let a = (x >> 2) & 0b1111;
+        let a = (x >> 2) & 0b1_1111;
         let b = (x >> 12) & 0b1;
         let i: i32 = (a | (b << 5)) as i32;
         let i2 = (i << 26) >> 26;

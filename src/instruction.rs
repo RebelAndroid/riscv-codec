@@ -534,6 +534,8 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
     } else {
         operands.split(',').collect()
     };
+    let operands: Vec<&str> = operands.iter().map(|operand| operand.to_owned().trim()).collect();
+
     println!("operands: {:?}", operands);
     println!("mnemonics: {:?}", mnemonics);
 

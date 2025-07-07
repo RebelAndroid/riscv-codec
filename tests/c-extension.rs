@@ -1,5 +1,5 @@
 use riscv_disassembler::cinstruction::{CInstruction, decode_compressed_instruction};
-use riscv_disassembler::immediates::{CDImmediate, CWImmediate, CWideImmediate};
+use riscv_disassembler::immediates::{CDImmediate, CIImmediate, CShamt, CWImmediate, CWideImmediate, Shamt};
 use riscv_disassembler::instruction::assemble_line;
 use riscv_disassembler::register::{CFRegister, CIRegister, FRegister, IRegister};
 
@@ -118,6 +118,108 @@ fn store_double() {
 
     // check decoder
     let i2 = decode_compressed_instruction(0xfef8).unwrap();
+    assert_eq!(i2, expected);
+
+    // check disassembler
+    println!("{}", CInstruction::disassemble(&i));
+    let i3 = assemble_line(&CInstruction::disassemble(&i)).unwrap().c();
+    assert_eq!(i, i3);
+}
+
+#[test]
+fn add_immediate() {
+    // check assembler
+    let i = assemble_line("c.addi t1,12").unwrap().c();
+    let expected = CInstruction::ADDI(IRegister::T1, CIImmediate::from_val(12));
+    assert_eq!(i, expected);
+
+    // check decoder
+    let i2 = decode_compressed_instruction(0x0331).unwrap();
+    assert_eq!(i2, expected);
+
+    // check disassembler
+    println!("{}", CInstruction::disassemble(&i));
+    let i3 = assemble_line(&CInstruction::disassemble(&i)).unwrap().c();
+    assert_eq!(i, i3);
+}
+
+#[test]
+fn add_immediate_word() {
+    // check assembler
+    let i = assemble_line("c.addiw s6,31").unwrap().c();
+    let expected = CInstruction::ADDIW(IRegister::S6, CIImmediate::from_val(31));
+    assert_eq!(i, expected);
+
+    // check decoder
+    let i2 = decode_compressed_instruction(0x2b7d).unwrap();
+    assert_eq!(i2, expected);
+
+    // check disassembler
+    println!("{}", CInstruction::disassemble(&i));
+    let i3 = assemble_line(&CInstruction::disassemble(&i)).unwrap().c();
+    assert_eq!(i, i3);
+}
+
+#[test]
+fn load_immediate() {
+    // check assembler
+    let i = assemble_line("c.li t4,-32").unwrap().c();
+    let expected = CInstruction::LI(IRegister::T4, CIImmediate::from_val(-32));
+    assert_eq!(i, expected);
+
+    // check decoder
+    let i2 = decode_compressed_instruction(0x5e81).unwrap();
+    assert_eq!(i2, expected);
+
+    // check disassembler
+    println!("{}", CInstruction::disassemble(&i));
+    let i3 = assemble_line(&CInstruction::disassemble(&i)).unwrap().c();
+    assert_eq!(i, i3);
+}
+
+#[test]
+fn add_16_immediate_stack_pointer() {
+    // check assembler
+    let i = assemble_line("c.addi16sp 80").unwrap().c();
+    let expected = CInstruction::ADDI16SP(80);
+    assert_eq!(i, expected);
+
+    // check decoder
+    let i2 = decode_compressed_instruction(0x6161).unwrap();
+    assert_eq!(i2, expected);
+
+    // check disassembler
+    println!("{}", CInstruction::disassemble(&i));
+    let i3 = assemble_line(&CInstruction::disassemble(&i)).unwrap().c();
+    assert_eq!(i, i3);
+}
+
+#[test]
+fn load_upper_immediate() {
+    // check assembler
+    let i = assemble_line("c.lui s9,24").unwrap().c();
+    let expected = CInstruction::LUI(IRegister::S9, CIImmediate::from_val(24));
+    assert_eq!(i, expected);
+
+    // check decoder
+    let i2 = decode_compressed_instruction(0x6ce1).unwrap();
+    assert_eq!(i2, expected);
+
+    // check disassembler
+    println!("{}", CInstruction::disassemble(&i));
+    let i3 = assemble_line(&CInstruction::disassemble(&i)).unwrap().c();
+    assert_eq!(i, i3);
+}
+
+#[test]
+fn shift_right_logical_immediate() {
+    // check assembler
+    let i = assemble_line("c.srli a2,35").unwrap().c();
+    let expected = CInstruction::SRLI(CIRegister::A2, CShamt::from_val(35));
+    assert_eq!(i, expected);
+
+    // check decoder
+    let i2 = decode_compressed_instruction(0x920d).unwrap();
     assert_eq!(i2, expected);
 
     // check disassembler
