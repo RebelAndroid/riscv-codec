@@ -4,4 +4,5 @@ fn main() {
         "Instruction size: {} bytes",
         std::mem::size_of::<Instruction>()
     );
+    println!("{}", (-2i64).pow(2));
 }

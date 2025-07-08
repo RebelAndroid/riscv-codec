@@ -412,14 +412,13 @@ impl CBImmediate {
         let c = (x >> 5) & 0b11;
         let d = (x >> 10) & 0b11;
         let e = (x >> 12) & 0b1;
-
         let i: i32 = ((b << 1) | (d << 3) | (a << 5) | (c << 6) | (e << 8)) as i32;
-        let i2 = (i << 26) >> 26;
+        let i2 = (i << 23) >> 23;
         CBImmediate { val: i2 }
     }
 
     pub fn from_val(val: i64) -> Self {
-        if val > 2i64.pow(5) - 1 || val < -2i64.pow(5) {
+        if val > 2i64.pow(8) - 1 || val < -2i64.pow(8) {
             panic!("attempted to construct out of range CBImmediate")
         }
         CBImmediate { val: val as i32 }
@@ -445,7 +444,7 @@ pub struct CShamt {
 impl CShamt {
     /// Extracts the `CShamt` from the appropriate position in a 16-bit instruction
     pub fn from_u16(x: u16) -> Self {
-        let a = (x >> 2) & 0b1111;
+        let a = (x >> 2) & 0b1_1111;
         let b = (x >> 12) & 0b1;
         let i: u32 = (a | (b << 5)) as u32;
         CShamt { val: i }
@@ -464,6 +463,48 @@ impl CShamt {
 }
 
 impl Display for CShamt {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(f, "{}", self.val)
+    }
+}
+
+/// The immediate value in a compressed jump instruction
+#[derive(Debug, PartialEq)]
+pub struct CJImmediate {
+    val: i32,
+}
+
+impl CJImmediate {
+    /// Extracts the `CJImmediate` from the appropriate position in a 16-bit instruction
+    pub fn from_u16(x: u16) -> Self {
+        let a = (x >> 2) & 0b1;
+        let b = (x >> 3) & 0b111;
+        let c = (x >> 6) & 0b1;
+        let d = (x >> 7) & 0b1;
+        let e = (x >> 8) & 0b1;
+        let f = (x >> 9) & 0b11;
+        let g = (x >> 11) & 0b1;
+        let h = (x >> 12) & 0b1;
+
+
+        let i: i32 = ((b << 1) | (g << 4) | (a << 5) | (d << 6) | (c << 7) | (f << 8) | (e << 10) | (h << 11)) as i32;
+        let i2 = (i << 20) >> 20;
+        CJImmediate { val: i2 }
+    }
+
+    pub fn from_val(val: i64) -> Self {
+        if val > 2i64.pow(11) - 1 || val < -2i64.pow(11) {
+            panic!("attempted to construct out of range CJImmediate")
+        }
+        CJImmediate { val: val as i32}
+    }
+
+    pub fn val(&self) -> i64 {
+        self.val.into()
+    }
+}
+
+impl Display for CJImmediate {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
         write!(f, "{}", self.val)
     }

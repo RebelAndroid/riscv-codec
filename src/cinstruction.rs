@@ -1,9 +1,9 @@
 use std::fmt::{Display, Formatter};
 
-use proc_macros::ci_assemble;
+use proc_macros::{ci_assemble, cr_assemble};
 
 use crate::{
-    immediates::{CBImmediate, CDImmediate, CIImmediate, CShamt, CWImmediate, CWideImmediate},
+    immediates::{CBImmediate, CDImmediate, CIImmediate, CJImmediate, CShamt, CWImmediate, CWideImmediate},
     instruction::{parse_address_expression_compressed, parse_int},
     register::{CFRegister, CIRegister, IRegister},
 };
@@ -29,13 +29,13 @@ pub enum CInstruction {
     SRLI(CIRegister, CShamt),
     SRAI(CIRegister, CShamt),
     ANDI(CIRegister, CIImmediate),
-    SUB(CIRegister, CIRegister),
-    XOR(CIRegister, CIRegister),
-    OR(CIRegister, CIRegister),
-    AND(CIRegister, CIRegister),
-    SUBW(CIRegister, CIRegister),
-    ADDW(CIRegister, CIRegister),
-    J(u16),
+    SUB{rd: CIRegister, rs2: CIRegister},
+    XOR{rd: CIRegister, rs2: CIRegister},
+    OR{rd: CIRegister, rs2: CIRegister},
+    AND{rd: CIRegister, rs2: CIRegister},
+    SUBW{rd: CIRegister, rs2: CIRegister},
+    ADDW{rd: CIRegister, rs2: CIRegister},
+    J(CJImmediate),
     BEQZ(CIRegister, CBImmediate),
     BNEZ(CIRegister, CBImmediate),
 }
@@ -59,13 +59,13 @@ impl Display for CInstruction {
             CInstruction::SRLI(rd, imm) => write!(f, "c.srli {rd},{imm}"),
             CInstruction::SRAI(rd, imm) => write!(f, "c.srai {rd},{imm}"),
             CInstruction::ANDI(rd, imm) => write!(f, "c.andi {rd},{imm}"),
-            CInstruction::SUB(rd, rs2) => write!(f, "c.sub {rd},{rs2}"),
-            CInstruction::XOR(rd, rs2) => write!(f, "c.xor {rd},{rs2}"),
-            CInstruction::OR(rd, rs2) => write!(f, "c.or {rd},{rs2}"),
-            CInstruction::AND(rd, rs2) => write!(f, "c.and {rd},{rs2}"),
-            CInstruction::SUBW(rd, rs2) => write!(f, "c.subw {rd},{rs2}"),
-            CInstruction::ADDW(rd, rs2) => write!(f, "c.addw {rd},{rs2}"),
-            CInstruction::J(_) => todo!(),
+            CInstruction::SUB { rd, rs2 } => write!(f, "c.sub {rd},{rs2}"),
+            CInstruction::XOR{ rd, rs2 } => write!(f, "c.xor {rd},{rs2}"),
+            CInstruction::OR{ rd, rs2 }=> write!(f, "c.or {rd},{rs2}"),
+            CInstruction::AND{ rd, rs2 } => write!(f, "c.and {rd},{rs2}"),
+            CInstruction::SUBW{ rd, rs2 } => write!(f, "c.subw {rd},{rs2}"),
+            CInstruction::ADDW{ rd, rs2 } => write!(f, "c.addw {rd},{rs2}"),
+            CInstruction::J(imm) => write!(f, "c.j {imm}"),
             CInstruction::BEQZ(rd, imm) => write!(f, "c.beqz {rd},{imm}"),
             CInstruction::BNEZ(rd, imm) => write!(f, "c.bnez {rd},{imm}"),
         }
@@ -73,7 +73,7 @@ impl Display for CInstruction {
 }
 
 pub fn decode_compressed_instruction(instruction: u16) -> Result<CInstruction, String> {
-    let crd = CIRegister::from_int((instruction >> 2) & 0b111);
+    let crs2 = CIRegister::from_int((instruction >> 2) & 0b111);
     let cfrd = CFRegister::from_int((instruction >> 2) & 0b111);
 
     let crs1 = CIRegister::from_int((instruction >> 7) & 0b111);
@@ -91,7 +91,7 @@ pub fn decode_compressed_instruction(instruction: u16) -> Result<CInstruction, S
                 if imm.val() == 0 {
                     Err("compressed illegal instruction".to_owned())
                 } else {
-                    Ok(CInstruction::ADDI4SPN(crd, imm))
+                    Ok(CInstruction::ADDI4SPN(crs2, imm))
                 }
             }
             0b001 => Ok(CInstruction::FLD(
@@ -100,12 +100,12 @@ pub fn decode_compressed_instruction(instruction: u16) -> Result<CInstruction, S
                 CDImmediate::from_u16(instruction),
             )),
             0b010 => Ok(CInstruction::LW(
-                crd,
+                crs2,
                 crs1,
                 CWImmediate::from_u16(instruction),
             )),
             0b011 => Ok(CInstruction::LD(
-                crd,
+                crs2,
                 crs1,
                 CDImmediate::from_u16(instruction),
             )),
@@ -116,12 +116,12 @@ pub fn decode_compressed_instruction(instruction: u16) -> Result<CInstruction, S
                 CDImmediate::from_u16(instruction),
             )),
             0b110 => Ok(CInstruction::SW(
-                crd,
+                crs2,
                 crs1,
                 CWImmediate::from_u16(instruction),
             )),
             0b111 => Ok(CInstruction::SD(
-                crd,
+                crs2,
                 crs1,
                 CDImmediate::from_u16(instruction),
             )),
@@ -147,10 +147,24 @@ pub fn decode_compressed_instruction(instruction: u16) -> Result<CInstruction, S
                     Ok(CInstruction::LUI(rd, ciimmediate))
                 }
             }
-            0b100 => Ok(CInstruction::SRLI(crs1, cshamt)),
-            0b101 => todo!(),
-            0b110 => todo!(),
-            0b111 => todo!(),
+            0b100 => match (instruction >> 10) & 0b11 {
+                0b00 => Ok(CInstruction::SRLI(crs1, cshamt)),
+                0b01 => Ok(CInstruction::SRAI(crs1, cshamt)),
+                0b10 => Ok(CInstruction::ANDI(crs1, ciimmediate)),
+                0b11 => match ((instruction >> 5) & 0b11, (instruction >> 12) & 0b1) {
+                    (0b00, 0b0) => Ok(CInstruction::SUB{rd: crs1, rs2: crs2}),
+                    (0b01, 0b0) => Ok(CInstruction::XOR{rd: crs1, rs2: crs2}),
+                    (0b10, 0b0) => Ok(CInstruction::OR{rd: crs1, rs2: crs2}),
+                    (0b11, 0b0) => Ok(CInstruction::AND{rd: crs1, rs2: crs2}),
+                    (0b00, 0b1) => Ok(CInstruction::SUBW{rd: crs1, rs2: crs2}),
+                    (0b01, 0b1) => Ok(CInstruction::ADDW{rd: crs1, rs2: crs2}),
+                    _ => Err("Reserved instruction".to_owned())
+                }
+                _ => unreachable!(),
+            }
+            0b101 => Ok(CInstruction::J(CJImmediate::from_u16(instruction))),
+            0b110 => Ok(CInstruction::BEQZ(crs1, CBImmediate::from_u16(instruction))),
+            0b111 => Ok(CInstruction::BNEZ(crs1, CBImmediate::from_u16(instruction))),
             _ => unreachable!(),
         },
         0b10 => todo!(),
@@ -271,6 +285,47 @@ impl CInstruction {
                     Err("c.srli requires 2 operands".to_owned())
                 }else {
                     Ok(CInstruction::SRLI(CIRegister::from_string(operands[0])?, CShamt::from_val(parse_int(operands[1])?)))
+                }
+            },
+            "srai" => {
+                if operands.len() != 2{
+                    Err("c.srai requires 2 operands".to_owned())
+                }else {
+                    Ok(CInstruction::SRAI(CIRegister::from_string(operands[0])?, CShamt::from_val(parse_int(operands[1])?)))
+                }
+            },
+            "andi" => {
+                if operands.len() != 2{
+                    Err("c.andi requires 2 operands".to_owned())
+                }else {
+                    Ok(CInstruction::ANDI(CIRegister::from_string(operands[0])?, CIImmediate::from_val(parse_int(operands[1])?)))
+                }
+            },
+            "sub" => cr_assemble!(SUB),
+            "xor" => cr_assemble!(XOR),
+            "or" => cr_assemble!(OR),
+            "and" => cr_assemble!(AND),
+            "subw" => cr_assemble!(SUBW),
+            "addw" => cr_assemble!(ADDW),
+            "j" => {
+                if operands.len() != 1 {
+                    Err("c.j requires 1 operand".to_owned())
+                }else {
+                    Ok(CInstruction::J(CJImmediate::from_val(parse_int(operands[0])?)))
+                }
+            }
+            "beqz" => {
+                if operands.len() != 2 {
+                    Err("c.beqz requires 2 operands".to_owned())
+                }else {
+                    Ok(CInstruction::BEQZ(CIRegister::from_string(operands[0])?, CBImmediate::from_val(parse_int(operands[1])?)))
+                }
+            }
+            "bnez" => {
+                if operands.len() != 2 {
+                    Err("c.bne requires 2 operands".to_owned())
+                }else {
+                    Ok(CInstruction::BNEZ(CIRegister::from_string(operands[0])?, CBImmediate::from_val(parse_int(operands[1])?)))
                 }
             }
             _ => Err(format!(

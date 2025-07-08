@@ -335,3 +335,27 @@ pub fn ci_assemble(input: TokenStream) -> TokenStream {
         panic!("expected identifier");
     }
 }
+
+/// Assembles a cr-type instruction
+#[proc_macro]
+pub fn cr_assemble(input: TokenStream) -> TokenStream {
+    if let TokenTree::Ident(i) = input.into_iter().next().unwrap() {
+        let name = i.to_string();
+        let lower = name.to_lowercase();
+        format!(
+            "
+        if operands.len() != 2 {{
+            Err(\"c.{lower} instruction requires 2 operands\".to_owned())
+        }} else {{
+            Ok(CInstruction::{name}{{
+                rd: CIRegister::from_string(operands[0])?,
+                rs2: CIRegister::from_string(operands[1])?,
+            }})
+        }}"
+        )
+        .parse()
+        .unwrap()
+    } else {
+        panic!("expected identifier");
+    }
+}
