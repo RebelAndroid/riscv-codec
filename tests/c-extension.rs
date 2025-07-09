@@ -1,5 +1,7 @@
 use riscv_disassembler::cinstruction::{CInstruction, decode_compressed_instruction};
-use riscv_disassembler::immediates::{CBImmediate, CDImmediate, CIImmediate, CJImmediate, CShamt, CWImmediate, CWideImmediate};
+use riscv_disassembler::immediates::{
+    CBImmediate, CDImmediate, CIImmediate, CJImmediate, CShamt, CWImmediate, CWideImmediate,
+};
 use riscv_disassembler::instruction::assemble_line;
 use riscv_disassembler::register::{CFRegister, CIRegister, IRegister};
 
@@ -266,7 +268,10 @@ fn and_immediate() {
 fn subtract() {
     // check assembler
     let i = assemble_line("c.sub a3,a0").unwrap().c();
-    let expected = CInstruction::SUB{rd: CIRegister::A3, rs2: CIRegister::A0};
+    let expected = CInstruction::SUB {
+        rd: CIRegister::A3,
+        rs2: CIRegister::A0,
+    };
     assert_eq!(i, expected);
 
     // check decoder
@@ -283,7 +288,10 @@ fn subtract() {
 fn exclusive_or() {
     // check assembler
     let i = assemble_line("c.xor a1,a4").unwrap().c();
-    let expected = CInstruction::XOR{rd: CIRegister::A1, rs2: CIRegister::A4};
+    let expected = CInstruction::XOR {
+        rd: CIRegister::A1,
+        rs2: CIRegister::A4,
+    };
     assert_eq!(i, expected);
 
     // check decoder
@@ -300,7 +308,10 @@ fn exclusive_or() {
 fn or() {
     // check assembler
     let i = assemble_line("c.or a5,a2").unwrap().c();
-    let expected = CInstruction::OR{rd: CIRegister::A5, rs2: CIRegister::A2};
+    let expected = CInstruction::OR {
+        rd: CIRegister::A5,
+        rs2: CIRegister::A2,
+    };
     assert_eq!(i, expected);
 
     // check decoder
@@ -317,7 +328,10 @@ fn or() {
 fn and() {
     // check assembler
     let i = assemble_line("c.and a5,a2").unwrap().c();
-    let expected = CInstruction::AND{rd: CIRegister::A5, rs2: CIRegister::A2};
+    let expected = CInstruction::AND {
+        rd: CIRegister::A5,
+        rs2: CIRegister::A2,
+    };
     assert_eq!(i, expected);
 
     // check decoder
@@ -334,7 +348,10 @@ fn and() {
 fn subtract_word() {
     // check assembler
     let i = assemble_line("c.subw a5,a2").unwrap().c();
-    let expected = CInstruction::SUBW{rd: CIRegister::A5, rs2: CIRegister::A2};
+    let expected = CInstruction::SUBW {
+        rd: CIRegister::A5,
+        rs2: CIRegister::A2,
+    };
     assert_eq!(i, expected);
 
     // check decoder
@@ -351,7 +368,10 @@ fn subtract_word() {
 fn add_word() {
     // check assembler
     let i = assemble_line("c.addw a5,a2").unwrap().c();
-    let expected = CInstruction::ADDW{rd: CIRegister::A5, rs2: CIRegister::A2};
+    let expected = CInstruction::ADDW {
+        rd: CIRegister::A5,
+        rs2: CIRegister::A2,
+    };
     assert_eq!(i, expected);
 
     // check decoder
@@ -459,6 +479,23 @@ fn branch_not_equal_zero() {
 
     // check decoder
     let i2 = decode_compressed_instruction(0xfffd).unwrap();
+    assert_eq!(i2, expected);
+
+    // check disassembler
+    println!("{}", CInstruction::disassemble(&i));
+    let i3 = assemble_line(&CInstruction::disassemble(&i)).unwrap().c();
+    assert_eq!(i, i3);
+}
+
+#[test]
+fn shfit_left_logical_immediate() {
+    // check assembler
+    let i = assemble_line("c.slli t6, 19").unwrap().c();
+    let expected = CInstruction::SLLI(IRegister::T6, CShamt::from_val(19));
+    assert_eq!(i, expected);
+
+    // check decoder
+    let i2 = decode_compressed_instruction(0x0fce).unwrap();
     assert_eq!(i2, expected);
 
     // check disassembler

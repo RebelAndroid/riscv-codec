@@ -509,3 +509,143 @@ impl Display for CJImmediate {
         write!(f, "{}", self.val)
     }
 }
+
+/// The immediate value in a CFLDSP or CLDSP instruction
+#[derive(Debug, PartialEq)]
+pub struct CDSPImmediate {
+    val: i32,
+}
+
+impl CDSPImmediate {
+    /// Extracts the `CDSPImmediate` from the appropriate position in a 16-bit instruction
+    pub fn from_u16(x: u16) -> Self {
+        let a = x >> 2 & 0b111;
+        let b = x >> 5 & 0b11;
+        let c = x >> 12 & 0b1;
+
+
+        let i: i32 = ((b << 3) | (c << 5) | (a << 6)) as i32;
+        CDSPImmediate { val: i }
+    }
+
+    pub fn from_val(val: i64) -> Self {
+        if val > 2i64.pow(9) - 1 || val < 0 {
+            panic!("attempted to construct out of range CDSPImmediate")
+        }
+        CDSPImmediate { val: val as i32}
+    }
+
+    pub fn val(&self) -> i64 {
+        self.val.into()
+    }
+}
+
+impl Display for CDSPImmediate {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(f, "{}", self.val)
+    }
+}
+
+/// The immediate value in a CLWSP instruction
+#[derive(Debug, PartialEq)]
+pub struct CWSPImmediate {
+    val: i32,
+}
+
+impl CWSPImmediate {
+    /// Extracts the `CDSPImmediate` from the appropriate position in a 16-bit instruction
+    pub fn from_u16(x: u16) -> Self {
+        let a = x >> 2 & 0b11;
+        let b = x >> 5 & 0b111;
+        let c = x >> 12 & 0b1;
+
+
+        let i: i32 = ((b << 2) | (c << 5) | (a << 6)) as i32;
+        CWSPImmediate { val: i }
+    }
+
+    pub fn from_val(val: i64) -> Self {
+        if val > 2i64.pow(9) - 1 || val < 0 {
+            panic!("attempted to construct out of range CDSPImmediate")
+        }
+        CWSPImmediate { val: val as i32}
+    }
+
+    pub fn val(&self) -> i64 {
+        self.val.into()
+    }
+}
+
+impl Display for CWSPImmediate {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(f, "{}", self.val)
+    }
+}
+
+/// The immediate value in a FSDSP or SDSP instruction
+#[derive(Debug, PartialEq)]
+pub struct CSDSPImmediate {
+    val: i32,
+}
+
+impl CSDSPImmediate {
+    /// Extracts the `CSDSPImmediate` from the appropriate position in a 16-bit instruction
+    pub fn from_u16(x: u16) -> Self {
+        let a = x >> 7 & 0b111;
+        let b = x >> 10 & 0b111;
+
+        let i: i32 = ((a << 3) | (b << 6)) as i32;
+        CSDSPImmediate { val: i }
+    }
+
+    pub fn from_val(val: i64) -> Self {
+        if val > 2i64.pow(9) - 1 || val < 0 {
+            panic!("attempted to construct out of range CDSPImmediate")
+        }
+        CSDSPImmediate { val: val as i32}
+    }
+
+    pub fn val(&self) -> i64 {
+        self.val.into()
+    }
+}
+
+impl Display for CSDSPImmediate {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(f, "{}", self.val)
+    }
+}
+
+/// The immediate value in a SWSP instruction
+#[derive(Debug, PartialEq)]
+pub struct CSWSPImmediate {
+    val: i32,
+}
+
+impl CSWSPImmediate {
+    /// Extracts the `CSWSPImmediate` from the appropriate position in a 16-bit instruction
+    pub fn from_u16(x: u16) -> Self {
+        let a = x >> 7 & 0b111;
+        let b = x >> 10 & 0b111;
+
+        let i: i32 = ((a << 2) | (b << 6)) as i32;
+        CSWSPImmediate { val: i }
+    }
+
+    pub fn from_val(val: i64) -> Self {
+        if val > 2i64.pow(8) - 1 || val < 0 {
+            panic!("attempted to construct out of range CSWSPImmediate")
+        }
+        CSWSPImmediate { val: val as i32}
+    }
+
+    pub fn val(&self) -> i64 {
+        self.val.into()
+    }
+}
+
+impl Display for CSWSPImmediate {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(f, "{}", self.val)
+    }
+}

@@ -3,9 +3,9 @@ use std::fmt::{Display, Formatter};
 use proc_macros::{ci_assemble, cr_assemble};
 
 use crate::{
-    immediates::{CBImmediate, CDImmediate, CIImmediate, CJImmediate, CShamt, CWImmediate, CWideImmediate},
+    immediates::{CBImmediate, CDImmediate, CDSPImmediate, CIImmediate, CJImmediate, CSDSPImmediate, CSWSPImmediate, CShamt, CWImmediate, CWSPImmediate, CWideImmediate},
     instruction::{parse_address_expression_compressed, parse_int},
-    register::{CFRegister, CIRegister, IRegister},
+    register::{CFRegister, CIRegister, FRegister, IRegister},
 };
 
 #[derive(Debug, PartialEq)]
@@ -38,6 +38,18 @@ pub enum CInstruction {
     J(CJImmediate),
     BEQZ(CIRegister, CBImmediate),
     BNEZ(CIRegister, CBImmediate),
+    SLLI(IRegister, CShamt),
+    FLDSP(IRegister, CDSPImmediate),
+    LWSP(IRegister, CWSPImmediate),
+    LDSP(IRegister, CDSPImmediate),
+    JR(IRegister),
+    MV{rd: IRegister, rs2: IRegister},
+    EBREAK(),
+    JALR(IRegister),
+    ADD{rd: IRegister, rs2: IRegister},
+    FSDSP(FRegister, CSDSPImmediate),
+    SWSP(IRegister, CSWSPImmediate),
+    SDSP(IRegister, CSDSPImmediate),
 }
 
 impl Display for CInstruction {
@@ -68,7 +80,19 @@ impl Display for CInstruction {
             CInstruction::J(imm) => write!(f, "c.j {imm}"),
             CInstruction::BEQZ(rd, imm) => write!(f, "c.beqz {rd},{imm}"),
             CInstruction::BNEZ(rd, imm) => write!(f, "c.bnez {rd},{imm}"),
-        }
+            CInstruction::SLLI(rd, imm) => write!(f, "c.slli {rd},{imm}"),
+            CInstruction::FLDSP(rd, imm) => write!(f, "c.fldsp {rd},{imm}"),
+            CInstruction::LWSP(rd, imm) => write!(f, "c.lwsp {rd},{imm}"),
+            CInstruction::LDSP(rd, imm) => write!(f, "c.ldsp {rd},{imm}"),
+            CInstruction::JR(rd) => write!(f, "c.jr {rd}"),
+            CInstruction::MV { rd, rs2 } => write!(f, "c.mv {rd},{rs2}"),
+            CInstruction::EBREAK() => write!(f, "c.ebreak"),
+            CInstruction::JALR(rs1) => write!(f, "c.jalr {rs1}"),
+            CInstruction::ADD { rd, rs2 } => write!(f, "c.add {rd},{rs2}"),
+            CInstruction::FSDSP(frd, imm) => write!(f, "c.fsdsp {frd},{imm}"),
+            CInstruction::SWSP(rd, imm) => write!(f, "c.swsp {rd},{imm}"),
+            CInstruction::SDSP(rd, imm) => write!(f, "c.sdsp {rd},{imm}"),
+                    }
     }
 }
 
@@ -84,6 +108,9 @@ pub fn decode_compressed_instruction(instruction: u16) -> Result<CInstruction, S
     let cshamt = CShamt::from_u16(instruction);
 
     let rd = IRegister::from_int(((instruction >> 7) & 0b1_1111) as u32);
+    let rs2 = IRegister::from_int(((instruction >> 2) & 0b1_1111) as u32);
+    let frs2 = FRegister::from_int(((instruction >> 2) & 0b1_1111) as u32);
+
     match instruction & 0b11 {
         0b00 => match instruction >> 13 {
             0b000 => {
@@ -167,7 +194,26 @@ pub fn decode_compressed_instruction(instruction: u16) -> Result<CInstruction, S
             0b111 => Ok(CInstruction::BNEZ(crs1, CBImmediate::from_u16(instruction))),
             _ => unreachable!(),
         },
-        0b10 => todo!(),
+        0b10 => match instruction >> 13 {
+            0b000 => Ok(CInstruction::SLLI(rd, cshamt)),
+            0b001 => Ok(CInstruction::FLDSP(rd, CDSPImmediate::from_u16(instruction))),
+            0b010 => Ok(CInstruction::LWSP(rd, CWSPImmediate::from_u16(instruction))),
+            0b011 => Ok(CInstruction::LDSP(rd, CDSPImmediate::from_u16(instruction))),
+            0b100 => {
+                match ((instruction >> 12) & 0b1, (instruction >> 7) & 0b1_1111, (instruction >> 2) & 0b1_1111){
+                    (0, _, 0) => Ok(CInstruction::JR(rd)),
+                    (0, _, _) => Ok(CInstruction::MV { rd, rs2 }),
+                    (1, 0, 0) => Ok(CInstruction::EBREAK()),
+                    (1, _, 0) => Ok(CInstruction::JALR(rd)),
+                    (1, _, _) => Ok(CInstruction::ADD{ rd, rs2 }),
+                    _ => unreachable!(),
+                }
+            },
+            0b101 => Ok(CInstruction::FSDSP(frs2, CSDSPImmediate::from_u16(instruction))),
+            0b110 => Ok(CInstruction::SWSP(rs2, CSWSPImmediate::from_u16(instruction))),
+            0b111 => Ok(CInstruction::SDSP(rs2, CSDSPImmediate::from_u16(instruction))),
+            _ => unreachable!(),
+        },
         0b11 => Err("attempting to decode larger instruction as though it were 16 bits".to_owned()),
         _ => unreachable!(),
     }
@@ -328,6 +374,13 @@ impl CInstruction {
                     Ok(CInstruction::BNEZ(CIRegister::from_string(operands[0])?, CBImmediate::from_val(parse_int(operands[1])?)))
                 }
             }
+            "slli" => {
+                if operands.len() != 2{
+                    Err("c.slli requires 2 operands".to_owned())
+                }else {
+                    Ok(CInstruction::SLLI(IRegister::from_string(operands[0])?, CShamt::from_val(parse_int(operands[1])?)))
+                }
+            },
             _ => Err(format!(
                 "unknown compressed instruction mnemonic: {}",
                 mnemonics[0]
