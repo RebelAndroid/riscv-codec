@@ -1,9 +1,9 @@
 use riscv_disassembler::cinstruction::{CInstruction, decode_compressed_instruction};
 use riscv_disassembler::immediates::{
-    CBImmediate, CDImmediate, CIImmediate, CJImmediate, CShamt, CWImmediate, CWideImmediate,
+    CBImmediate, CDImmediate, CDSPImmediate, CIImmediate, CJImmediate, CSDSPImmediate, CSWSPImmediate, CShamt, CWImmediate, CWSPImmediate, CWideImmediate
 };
 use riscv_disassembler::instruction::assemble_line;
-use riscv_disassembler::register::{CFRegister, CIRegister, IRegister};
+use riscv_disassembler::register::{CFRegister, CIRegister, FRegister, IRegister};
 
 #[test]
 fn add_4_immediate_stack_pointer() {
@@ -496,6 +496,195 @@ fn shfit_left_logical_immediate() {
 
     // check decoder
     let i2 = decode_compressed_instruction(0x0fce).unwrap();
+    assert_eq!(i2, expected);
+
+    // check disassembler
+    println!("{}", CInstruction::disassemble(&i));
+    let i3 = assemble_line(&CInstruction::disassemble(&i)).unwrap().c();
+    assert_eq!(i, i3);
+}
+
+#[test]
+fn float_load_double_stack_pointer() {
+    // check assembler
+    let i = assemble_line("c.fldsp ft8, 504").unwrap().c();
+    let expected = CInstruction::FLDSP(FRegister::FT8, CDSPImmediate::from_val(504));
+    assert_eq!(i, expected);
+
+    // check decoder
+    let i2 = decode_compressed_instruction(0x3e7e).unwrap();
+    assert_eq!(i2, expected);
+
+    // check disassembler
+    println!("{}", CInstruction::disassemble(&i));
+    let i3 = assemble_line(&CInstruction::disassemble(&i)).unwrap().c();
+    assert_eq!(i, i3);
+}
+
+#[test]
+fn load_word_stack_pointer() {
+    // check assembler
+    let i = assemble_line("c.lwsp s1, 200").unwrap().c();
+    let expected = CInstruction::LWSP(IRegister::S1, CWSPImmediate::from_val(200));
+    assert_eq!(i, expected);
+
+    // check decoder
+    let i2 = decode_compressed_instruction(0x44ae).unwrap();
+    assert_eq!(i2, expected);
+
+    // check disassembler
+    println!("{}", CInstruction::disassemble(&i));
+    let i3 = assemble_line(&CInstruction::disassemble(&i)).unwrap().c();
+    assert_eq!(i, i3);
+}
+
+#[test]
+fn load_double_stack_pointer() {
+    // check assembler
+    let i = assemble_line("c.ldsp fp, 400").unwrap().c();
+    let expected = CInstruction::LDSP(IRegister::FramePointer, CDSPImmediate::from_val(400));
+    assert_eq!(i, expected);
+
+    // check decoder
+    let i2 = decode_compressed_instruction(0x645a).unwrap();
+    assert_eq!(i2, expected);
+
+    // check disassembler
+    println!("{}", CInstruction::disassemble(&i));
+    let i3 = assemble_line(&CInstruction::disassemble(&i)).unwrap().c();
+    assert_eq!(i, i3);
+}
+
+#[test]
+fn jump_register() {
+    // check assembler
+    let i = assemble_line("c.jr t0").unwrap().c();
+    let expected = CInstruction::JR(IRegister::T0);
+    assert_eq!(i, expected);
+
+    // check decoder
+    let i2 = decode_compressed_instruction(0x8282).unwrap();
+    assert_eq!(i2, expected);
+
+    // check disassembler
+    println!("{}", CInstruction::disassemble(&i));
+    let i3 = assemble_line(&CInstruction::disassemble(&i)).unwrap().c();
+    assert_eq!(i, i3);
+}
+
+// this test is called "mv" rather than "move" becaue move is keyword in Rust
+#[test]
+fn mv() {
+    // check assembler
+    let i = assemble_line("c.jr t0").unwrap().c();
+    let expected = CInstruction::JR(IRegister::T0);
+    assert_eq!(i, expected);
+
+    // check decoder
+    let i2 = decode_compressed_instruction(0x8282).unwrap();
+    assert_eq!(i2, expected);
+
+    // check disassembler
+    println!("{}", CInstruction::disassemble(&i));
+    let i3 = assemble_line(&CInstruction::disassemble(&i)).unwrap().c();
+    assert_eq!(i, i3);
+}
+
+#[test]
+fn environment_break() {
+    // check assembler
+    let i = assemble_line("c.ebreak").unwrap().c();
+    let expected = CInstruction::EBREAK();
+    assert_eq!(i, expected);
+
+    // check decoder
+    let i2 = decode_compressed_instruction(0x9002).unwrap();
+    assert_eq!(i2, expected);
+
+    // check disassembler
+    println!("{}", CInstruction::disassemble(&i));
+    let i3 = assemble_line(&CInstruction::disassemble(&i)).unwrap().c();
+    assert_eq!(i, i3);
+}
+
+#[test]
+fn jump_and_link_register() {
+    // check assembler
+    let i = assemble_line("c.jalr s5").unwrap().c();
+    let expected = CInstruction::JALR(IRegister::S5);
+    assert_eq!(i, expected);
+
+    // check decoder
+    let i2 = decode_compressed_instruction(0x9a82).unwrap();
+    assert_eq!(i2, expected);
+
+    // check disassembler
+    println!("{}", CInstruction::disassemble(&i));
+    let i3 = assemble_line(&CInstruction::disassemble(&i)).unwrap().c();
+    assert_eq!(i, i3);
+}
+
+#[test]
+fn add() {
+    // check assembler
+    let i = assemble_line("c.add t0, s9").unwrap().c();
+    let expected = CInstruction::ADD{rd: IRegister::T0, rs2: IRegister::S9};
+    assert_eq!(i, expected);
+
+    // check decoder
+    let i2 = decode_compressed_instruction(0x92e6).unwrap();
+    assert_eq!(i2, expected);
+
+    // check disassembler
+    println!("{}", CInstruction::disassemble(&i));
+    let i3 = assemble_line(&CInstruction::disassemble(&i)).unwrap().c();
+    assert_eq!(i, i3);
+}
+
+#[test]
+fn float_store_double_stack_pointer() {
+    // check assembler
+    let i = assemble_line("c.fsdsp fa2, 136").unwrap().c();
+    let expected = CInstruction::FSDSP(FRegister::FA2, CSDSPImmediate::from_val(136));
+    assert_eq!(i, expected);
+
+    // check decoder
+    let i2 = decode_compressed_instruction(0xa532).unwrap();
+    assert_eq!(i2, expected);
+
+    // check disassembler
+    println!("{}", CInstruction::disassemble(&i));
+    let i3 = assemble_line(&CInstruction::disassemble(&i)).unwrap().c();
+    assert_eq!(i, i3);
+}
+
+
+#[test]
+fn store_word_stack_pointer() {
+    // check assembler
+    let i = assemble_line("c.swsp s7, 56").unwrap().c();
+    let expected = CInstruction::SWSP(IRegister::S7, CSWSPImmediate::from_val(56));
+    assert_eq!(i, expected);
+
+    // check decoder
+    let i2 = decode_compressed_instruction(0xdc5e).unwrap();
+    assert_eq!(i2, expected);
+
+    // check disassembler
+    println!("{}", CInstruction::disassemble(&i));
+    let i3 = assemble_line(&CInstruction::disassemble(&i)).unwrap().c();
+    assert_eq!(i, i3);
+}
+
+#[test]
+fn store_double_stack_pointer() {
+    // check assembler
+    let i = assemble_line("c.sdsp gp, 112").unwrap().c();
+    let expected = CInstruction::SDSP(IRegister::GlobalPointer, CSDSPImmediate::from_val(112));
+    assert_eq!(i, expected);
+
+    // check decoder
+    let i2 = decode_compressed_instruction(0xf88e).unwrap();
     assert_eq!(i2, expected);
 
     // check disassembler

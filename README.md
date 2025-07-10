@@ -4,7 +4,7 @@
 - [x] A
 - [x] F
 - [ ] D
-- [ ] C
+- [x] C
 - [ ] Zicsr
 - [ ] Zicntr
 - [ ] Ziccif

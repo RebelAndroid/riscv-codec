@@ -556,9 +556,9 @@ impl CWSPImmediate {
     /// Extracts the `CDSPImmediate` from the appropriate position in a 16-bit instruction
     pub fn from_u16(x: u16) -> Self {
         let a = x >> 2 & 0b11;
-        let b = x >> 5 & 0b111;
+        let b = x >> 4 & 0b111;
         let c = x >> 12 & 0b1;
-
+        println!("a: {a}, b: {b}, c: {c}");
 
         let i: i32 = ((b << 2) | (c << 5) | (a << 6)) as i32;
         CWSPImmediate { val: i }
@@ -593,8 +593,7 @@ impl CSDSPImmediate {
     pub fn from_u16(x: u16) -> Self {
         let a = x >> 7 & 0b111;
         let b = x >> 10 & 0b111;
-
-        let i: i32 = ((a << 3) | (b << 6)) as i32;
+        let i: i32 = ((b << 3) | (a << 6)) as i32;
         CSDSPImmediate { val: i }
     }
 
@@ -625,10 +624,10 @@ pub struct CSWSPImmediate {
 impl CSWSPImmediate {
     /// Extracts the `CSWSPImmediate` from the appropriate position in a 16-bit instruction
     pub fn from_u16(x: u16) -> Self {
-        let a = x >> 7 & 0b111;
-        let b = x >> 10 & 0b111;
+        let a = x >> 7 & 0b11;
+        let b = x >> 9 & 0b1111;
 
-        let i: i32 = ((a << 2) | (b << 6)) as i32;
+        let i: i32 = ((b << 2) | (a << 6)) as i32;
         CSWSPImmediate { val: i }
     }
 
