@@ -23,6 +23,7 @@ pub enum Opcode {
     Msub = 0b10_001_11,
     Nmsub = 0b10_010_11,
     Nmadd = 0b10_011_11,
+    System = 0b11_100_11,
     Reserved = 0,
 }
 
@@ -53,6 +54,7 @@ impl Opcode {
             0b10_011_11 => Self::Nmadd,
             0b00_001_11 => Self::LoadFp,
             0b01_001_11 => Self::StoreFp,
+            0b11_100_11 => Self::System,
             _ => Self::Reserved,
         }
     }

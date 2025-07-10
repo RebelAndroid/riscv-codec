@@ -648,3 +648,65 @@ impl Display for CSWSPImmediate {
         write!(f, "{}", self.val)
     }
 }
+
+/// The index of a CSR
+#[derive(Debug, PartialEq)]
+pub struct CSR {
+    val: u16,
+}
+
+impl CSR {
+    /// Extracts the `CSR` from the appropriate position in a 32-bit instruction
+    pub fn from_u32(x: u32) -> Self {
+        let i = (x >> 20) & 0b1111_1111_1111;
+        CSR { val: i as u16}
+    }
+
+    pub fn from_val(val: i64) -> Self {
+        if val > 2i64.pow(12) - 1 || val < 0 {
+            panic!("attempted to construct out of range CSR")
+        }
+        CSR { val: val as u16}
+    }
+
+    pub fn val(&self) -> i64 {
+        self.val.into()
+    }
+}
+
+impl Display for CSR {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(f, "{}", self.val)
+    }
+}
+
+/// The immediate value in a CSR immediate instruction
+#[derive(Debug, PartialEq)]
+pub struct CSRImmediate {
+    val: u16,
+}
+
+impl CSRImmediate {
+    /// Extracts the `CSRImmediate` from the appropriate position in a 32-bit instruction
+    pub fn from_u32(x: u32) -> Self {
+        let i = (x >> 15) & 0b1_1111;
+        CSRImmediate { val: i as u16}
+    }
+
+    pub fn from_val(val: i64) -> Self {
+        if val > 2i64.pow(5) - 1 || val < 0 {
+            panic!("attempted to construct out of range CSR")
+        }
+        CSRImmediate { val: val as u16}
+    }
+
+    pub fn val(&self) -> i64 {
+        self.val.into()
+    }
+}
+
+impl Display for CSRImmediate {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(f, "{}", self.val)
+    }
+}

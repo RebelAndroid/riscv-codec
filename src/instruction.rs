@@ -1,7 +1,6 @@
 use crate::cinstruction::CInstruction;
 use crate::immediates::{
-    BImmediate,
-    JImmediate, SImmediate, Shamt, ShamtW, UImmediate,
+    BImmediate, CSR, CSRImmediate, JImmediate, SImmediate, Shamt, ShamtW, UImmediate,
 };
 use crate::register::{CIRegister, FRegister, IRegister};
 use crate::{immediates::IImmediate, opcode::Opcode};
@@ -250,6 +249,15 @@ pub enum Instruction {
     FCVTLUS(IRegister, FRegister, RoundingMode),
     FCVTSL(FRegister, IRegister, RoundingMode),
     FCVTSLU(FRegister, IRegister, RoundingMode),
+    //
+    // Instructions in Zicsr Extension
+    //
+    CSRRW(IRegister, IRegister, CSR),
+    CSRRS(IRegister, IRegister, CSR),
+    CSRRC(IRegister, IRegister, CSR),
+    CSRRWI(IRegister, CSRImmediate, CSR),
+    CSRRSI(IRegister, CSRImmediate, CSR),
+    CSRRCI(IRegister, CSRImmediate, CSR),
 }
 
 fn aq_rl_suffix(aq: &bool, rl: &bool) -> &'static str {
@@ -433,6 +441,12 @@ impl Display for Instruction {
             Instruction::FCVTLUS(rd, rs1, rm) => write!(f, "fcvt.lu.s.{rm} {rd},{rs1}"),
             Instruction::FCVTSL(rd, rs1, rm) => write!(f, "fcvt.s.l.{rm} {rd},{rs1}"),
             Instruction::FCVTSLU(rd, rs1, rm) => write!(f, "fcvt.s.lu.{rm} {rd},{rs1}"),
+            Instruction::CSRRW(rd, rs1, csr) => write!(f, "csrrw {rd},{csr},{rs1}"),
+            Instruction::CSRRS(rd, rs1, csr) => write!(f, "csrrs {rd},{csr},{rs1}"),
+            Instruction::CSRRC(rd, rs1, csr) => write!(f, "csrrc {rd},{csr},{rs1}"),
+            Instruction::CSRRWI(rd, imm, csr) => write!(f, "csrrwi {rd},{csr},{imm}"),
+            Instruction::CSRRSI(rd, imm, csr) => write!(f, "csrrsi {rd},{csr},{imm}"),
+            Instruction::CSRRCI(rd, imm, csr) => write!(f, "csrrci {rd},{csr},{imm}"),
         }
     }
 }
@@ -533,7 +547,10 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
     } else {
         operands.split(',').collect()
     };
-    let operands: Vec<&str> = operands.iter().map(|operand| operand.to_owned().trim()).collect();
+    let operands: Vec<&str> = operands
+        .iter()
+        .map(|operand| operand.to_owned().trim())
+        .collect();
 
     println!("operands: {:?}", operands);
     println!("mnemonics: {:?}", mnemonics);
@@ -1027,6 +1044,48 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                     Err("fle requires a suffix {s,d}".to_owned())
                 }
             }
+            "csrrw" => {
+                if operands.len() != 3 {
+                    Err("csrrw requires 3 operands".to_owned())
+                }else {
+                    Ok(Instruction::CSRRW(IRegister::from_string(operands[0])?, IRegister::from_string(operands[2])?, CSR::from_val(parse_int(operands[1])?)))
+                }
+            }
+            "csrrs" => {
+                if operands.len() != 3 {
+                    Err("csrrs requires 3 operands".to_owned())
+                }else {
+                    Ok(Instruction::CSRRS(IRegister::from_string(operands[0])?, IRegister::from_string(operands[2])?, CSR::from_val(parse_int(operands[1])?)))
+                }
+            }
+            "csrrc" => {
+                if operands.len() != 3 {
+                    Err("csrrc requires 3 operands".to_owned())
+                }else {
+                    Ok(Instruction::CSRRC(IRegister::from_string(operands[0])?, IRegister::from_string(operands[2])?, CSR::from_val(parse_int(operands[1])?)))
+                }
+            }
+            "csrrwi" => {
+                if operands.len() != 3 {
+                    Err("csrrwi requires 3 operands".to_owned())
+                }else {
+                    Ok(Instruction::CSRRWI(IRegister::from_string(operands[0])?, CSRImmediate::from_val(parse_int(operands[2])?), CSR::from_val(parse_int(operands[1])?)))
+                }
+            }
+            "csrrsi" => {
+                if operands.len() != 3 {
+                    Err("csrrsi requires 3 operands".to_owned())
+                }else {
+                    Ok(Instruction::CSRRSI(IRegister::from_string(operands[0])?, CSRImmediate::from_val(parse_int(operands[2])?), CSR::from_val(parse_int(operands[1])?)))
+                }
+            }
+            "csrrci" => {
+                if operands.len() != 3 {
+                    Err("csrrci requires 3 operands".to_owned())
+                }else {
+                    Ok(Instruction::CSRRCI(IRegister::from_string(operands[0])?, CSRImmediate::from_val(parse_int(operands[2])?), CSR::from_val(parse_int(operands[1])?)))
+                }
+            }
             _ => Err(format!("unknown mnemonic: {}", mnemonic)),
         };
         x.map(AssemblyResult::I)
@@ -1457,5 +1516,16 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
                 ))
             }
         }
+        Opcode::System => match func3 {
+            0b000 => Err("Reserved func3 in Opcode SYSTEM".to_owned()),
+            0b001 => Ok(Instruction::CSRRW(rd, rs1, CSR::from_u32(instruction))),
+            0b010 => Ok(Instruction::CSRRS(rd, rs1, CSR::from_u32(instruction))),
+            0b011 => Ok(Instruction::CSRRC(rd, rs1, CSR::from_u32(instruction))),
+            0b100 => Err("Reserved func3 in Opcode SYSTEM".to_owned()),
+            0b101 => Ok(Instruction::CSRRWI(rd, CSRImmediate::from_u32(instruction), CSR::from_u32(instruction))),
+            0b110 => Ok(Instruction::CSRRSI(rd, CSRImmediate::from_u32(instruction), CSR::from_u32(instruction))),
+            0b111 => Ok(Instruction::CSRRCI(rd, CSRImmediate::from_u32(instruction), CSR::from_u32(instruction))),
+            _ => unreachable!(),
+        },
     }
 }
