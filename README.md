@@ -7,11 +7,11 @@
 - [x] C
 - [ ] Zicsr
 - [ ] Zicntr
-- [ ] Ziccif
-- [ ] Ziccrse
-- [ ] Ziccamoa
-- [ ] Za128rs
-- [ ] Zicclsm
+- [ ] Ziccif   (feature)
+- [ ] Ziccrse  (feature)
+- [ ] Ziccamoa (feature)
+- [ ] Za128rs  (feature)
+- [ ] Zicclsm  (feature)
 
 # RVA20S64
 - [ ] Zifencei
