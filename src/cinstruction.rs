@@ -4,10 +4,11 @@ use proc_macros::{ci_assemble, cr_assemble};
 
 use crate::{
     immediates::{
-        CBImmediate, CDImmediate, CDSPImmediate, CIImmediate, CJImmediate, CSDSPImmediate,
-        CSWSPImmediate, CShamt, CWImmediate, CWSPImmediate, CWideImmediate,
+        BImmediate, CBImmediate, CDImmediate, CDSPImmediate, CIImmediate, CJImmediate,
+        CSDSPImmediate, CSWSPImmediate, CShamt, CWImmediate, CWSPImmediate, CWideImmediate,
+        IImmediate, JImmediate, SImmediate, Shamt,
     },
-    instruction::{parse_address_expression_compressed, parse_int},
+    instruction::{Instruction, parse_address_expression_compressed, parse_int},
     register::{CFRegister, CIRegister, FRegister, IRegister},
 };
 
@@ -46,7 +47,7 @@ pub enum CInstruction {
     LDSP(IRegister, CDSPImmediate),
     JR(IRegister),
     MV { rd: IRegister, rs2: IRegister },
-    EBREAK(),
+    EBREAK,
     JALR(IRegister),
     ADD { rd: IRegister, rs2: IRegister },
     FSDSP(FRegister, CSDSPImmediate),
@@ -87,7 +88,7 @@ impl Display for CInstruction {
             CInstruction::LDSP(rd, imm) => write!(f, "c.ldsp {rd},{imm}"),
             CInstruction::JR(rd) => write!(f, "c.jr {rd}"),
             CInstruction::MV { rd, rs2 } => write!(f, "c.mv {rd},{rs2}"),
-            CInstruction::EBREAK() => write!(f, "c.ebreak"),
+            CInstruction::EBREAK => write!(f, "c.ebreak"),
             CInstruction::JALR(rs1) => write!(f, "c.jalr {rs1}"),
             CInstruction::ADD { rd, rs2 } => write!(f, "c.add {rd},{rs2}"),
             CInstruction::FSDSP(frd, imm) => write!(f, "c.fsdsp {frd},{imm}"),
@@ -230,7 +231,7 @@ pub fn decode_compressed_instruction(instruction: u16) -> Result<CInstruction, S
                 ) {
                     (0, _, 0) => Ok(CInstruction::JR(rd)),
                     (0, _, _) => Ok(CInstruction::MV { rd, rs2 }),
-                    (1, 0, 0) => Ok(CInstruction::EBREAK()),
+                    (1, 0, 0) => Ok(CInstruction::EBREAK),
                     (1, _, 0) => Ok(CInstruction::JALR(rd)),
                     (1, _, _) => Ok(CInstruction::ADD { rd, rs2 }),
                     _ => unreachable!(),
@@ -492,34 +493,159 @@ impl CInstruction {
                 if operands.len() != 2 {
                     Err("c.add requires 2 operands".to_owned())
                 } else {
-                    Ok(CInstruction::ADD{rd: IRegister::from_string(operands[0])?, rs2: IRegister::from_string(operands[1])?})
+                    Ok(CInstruction::ADD {
+                        rd: IRegister::from_string(operands[0])?,
+                        rs2: IRegister::from_string(operands[1])?,
+                    })
                 }
             }
             "fsdsp" => {
                 if operands.len() != 2 {
                     Err("c.fsdsp requires 2 operands".to_owned())
                 } else {
-                    Ok(CInstruction::FSDSP(FRegister::from_string(operands[0])?, CSDSPImmediate::from_val(parse_int(operands[1])?)))
+                    Ok(CInstruction::FSDSP(
+                        FRegister::from_string(operands[0])?,
+                        CSDSPImmediate::from_val(parse_int(operands[1])?),
+                    ))
                 }
             }
             "swsp" => {
                 if operands.len() != 2 {
                     Err("c.swsp requires 2 operands".to_owned())
                 } else {
-                    Ok(CInstruction::SWSP(IRegister::from_string(operands[0])?, CSWSPImmediate::from_val(parse_int(operands[1])?)))
+                    Ok(CInstruction::SWSP(
+                        IRegister::from_string(operands[0])?,
+                        CSWSPImmediate::from_val(parse_int(operands[1])?),
+                    ))
                 }
             }
             "sdsp" => {
                 if operands.len() != 2 {
                     Err("c.sdsp requires 2 operands".to_owned())
                 } else {
-                    Ok(CInstruction::SDSP(IRegister::from_string(operands[0])?, CSDSPImmediate::from_val(parse_int(operands[1])?)))
+                    Ok(CInstruction::SDSP(
+                        IRegister::from_string(operands[0])?,
+                        CSDSPImmediate::from_val(parse_int(operands[1])?),
+                    ))
                 }
             }
             _ => Err(format!(
                 "unknown compressed instruction mnemonic: {}",
                 mnemonics[0]
             )),
+        }
+    }
+
+    // expands a compressed instruction to its 32 bit form
+    pub fn expand(&self) -> Instruction {
+        match self {
+            CInstruction::ADDI4SPN(rd, imm) => Instruction::ADDI(
+                rd.expand(),
+                IRegister::StackPointer,
+                IImmediate::from_val(imm.val()),
+            ),
+            CInstruction::FLD(_, _, _) => todo!(), // needs unimplemented double extension
+            CInstruction::LW(rd, rs1, imm) => {
+                Instruction::LW(rd.expand(), rs1.expand(), IImmediate::from_val(imm.val()))
+            }
+            CInstruction::LD(rd, rs1, imm) => {
+                Instruction::LD(rd.expand(), rs1.expand(), IImmediate::from_val(imm.val()))
+            }
+            CInstruction::FSD(_, _, _) => todo!(), // needs unimplemented double extension
+            CInstruction::SW(rs2, rs1, imm) => {
+                Instruction::SW(rs1.expand(), rs2.expand(), SImmediate::from_val(imm.val()))
+            }
+            CInstruction::SD(rs2, rs1, imm) => {
+                Instruction::SD(rs1.expand(), rs2.expand(), SImmediate::from_val(imm.val()))
+            }
+            CInstruction::ADDI(rd, imm) => {
+                Instruction::ADDI(*rd, *rd, IImmediate::from_val(imm.val()))
+            }
+            CInstruction::ADDIW(rd, imm) => {
+                Instruction::ADDIW(*rd, *rd, IImmediate::from_val(imm.val()))
+            }
+            CInstruction::LI(rd, imm) => {
+                Instruction::ADDI(*rd, IRegister::Zero, IImmediate::from_val(imm.val()))
+            }
+            CInstruction::ADDI16SP(imm) => Instruction::ADDI(
+                IRegister::StackPointer,
+                IRegister::StackPointer,
+                IImmediate::from_val(*imm as i64),
+            ),
+            CInstruction::LUI(rd, imm) => {
+                Instruction::ADDI(*rd, IRegister::Zero, IImmediate::from_val(imm.val()))
+            }
+            CInstruction::SRLI(rd, shamt) => {
+                Instruction::SRLI(rd.expand(), rd.expand(), Shamt::from_val(shamt.val()))
+            }
+            CInstruction::SRAI(rd, shamt) => {
+                Instruction::SRAI(rd.expand(), rd.expand(), Shamt::from_val(shamt.val()))
+            }
+            CInstruction::ANDI(rd, imm) => {
+                Instruction::ANDI(rd.expand(), rd.expand(), IImmediate::from_val(imm.val()))
+            }
+            CInstruction::SUB { rd, rs2 } => {
+                Instruction::SUB(rd.expand(), rd.expand(), rs2.expand())
+            }
+            CInstruction::XOR { rd, rs2 } => {
+                Instruction::XOR(rd.expand(), rd.expand(), rs2.expand())
+            }
+            CInstruction::OR { rd, rs2 } => Instruction::OR(rd.expand(), rd.expand(), rs2.expand()),
+            CInstruction::AND { rd, rs2 } => {
+                Instruction::AND(rd.expand(), rd.expand(), rs2.expand())
+            }
+            CInstruction::SUBW { rd, rs2 } => {
+                Instruction::SUBW(rd.expand(), rd.expand(), rs2.expand())
+            }
+            CInstruction::ADDW { rd, rs2 } => {
+                Instruction::ADDW(rd.expand(), rd.expand(), rs2.expand())
+            }
+            CInstruction::J(imm) => {
+                Instruction::JAL(IRegister::Zero, JImmediate::from_val(imm.val()))
+            }
+            CInstruction::BEQZ(rs1, imm) => Instruction::BEQ(
+                rs1.expand(),
+                IRegister::Zero,
+                BImmediate::from_val(imm.val()),
+            ),
+            CInstruction::BNEZ(rs1, imm) => Instruction::BNE(
+                rs1.expand(),
+                IRegister::Zero,
+                BImmediate::from_val(imm.val()),
+            ),
+            CInstruction::SLLI(rd, shamt) => {
+                Instruction::SLLI(*rd, *rd, Shamt::from_val(shamt.val()))
+            }
+            CInstruction::FLDSP(_, _) => todo!(), // needs unimplemented double extension
+            CInstruction::LWSP(rd, imm) => Instruction::LW(
+                *rd,
+                IRegister::StackPointer,
+                IImmediate::from_val(imm.val()),
+            ),
+            CInstruction::LDSP(rd, imm) => Instruction::LD(
+                *rd,
+                IRegister::StackPointer,
+                IImmediate::from_val(imm.val()),
+            ),
+            CInstruction::JR(rs1) => {
+                Instruction::JALR(IRegister::Zero, *rs1, IImmediate::from_val(0))
+            }
+            CInstruction::MV { rd, rs2 } => Instruction::ADD(*rd, IRegister::Zero, *rs2),
+            CInstruction::EBREAK => Instruction::EBREAK,
+            // CInstruction::JALR(rs1) => Instruction::JALR(IRegister::ReturnAddress, *rs1, IImmediate::from_val(0)),
+            CInstruction::JALR(_) => todo!(), // not exactly the same as the expanded version (see manual)
+            CInstruction::ADD { rd, rs2 } => Instruction::ADD(*rd, *rd, *rs2),
+            CInstruction::FSDSP(_, _) => todo!(), // needs unimplemented double extension
+            CInstruction::SWSP(rs2, imm) => Instruction::SW(
+                *rs2,
+                IRegister::StackPointer,
+                SImmediate::from_val(imm.val()),
+            ),
+            CInstruction::SDSP(rs2, imm) => Instruction::SD(
+                *rs2,
+                IRegister::StackPointer,
+                SImmediate::from_val(imm.val()),
+            ),
         }
     }
 }

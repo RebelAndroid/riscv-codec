@@ -1,6 +1,6 @@
 use std::fmt::{Display, Formatter};
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub enum IRegister {
     Zero = 0,
     ReturnAddress = 1,
@@ -159,7 +159,7 @@ impl IRegister {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub enum FRegister {
     FT0 = 0,
     FT1 = 1,
@@ -317,7 +317,7 @@ impl FRegister {
 }
 
 /// One of the limited set of registers available in compressed instructions
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub enum CIRegister {
     FramePointer,
     S1,
@@ -364,6 +364,19 @@ impl CIRegister {
             )),
         }
     }
+
+    pub fn expand(&self) -> IRegister {
+        match self {
+            CIRegister::FramePointer => IRegister::FramePointer,
+            CIRegister::S1 => IRegister::S1,
+            CIRegister::A0 => IRegister::A0,
+            CIRegister::A1 => IRegister::A1,
+            CIRegister::A2 => IRegister::A2,
+            CIRegister::A3 => IRegister::A3,
+            CIRegister::A4 => IRegister::A4,
+            CIRegister::A5 => IRegister::A5,
+        }
+    }
 }
 
 impl Display for CIRegister {
@@ -385,7 +398,7 @@ impl Display for CIRegister {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub enum CFRegister {
     FS0,
     FS1,
@@ -429,6 +442,19 @@ impl CFRegister {
                 "converted invalid str to float register in compressed instruction {}",
                 x
             )),
+        }
+    }
+    
+    pub fn expand(&self) -> FRegister {
+        match self {
+            CFRegister::FS0 => FRegister::FS0,
+            CFRegister::FS1 => FRegister::FS1,
+            CFRegister::FA0 => FRegister::FA0,
+            CFRegister::FA1 => FRegister::FA1,
+            CFRegister::FA2 => FRegister::FA2,
+            CFRegister::FA3 => FRegister::FA3,
+            CFRegister::FA4 => FRegister::FA4,
+            CFRegister::FA5 => FRegister::FA5,
         }
     }
 }
