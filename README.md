@@ -5,8 +5,8 @@
 - [x] F
 - [ ] D
 - [x] C
-- [ ] Zicsr
-- [ ] Zicntr
+- [x] Zicsr
+- [ ] Zicntr   (feature)
 - [ ] Ziccif   (feature)
 - [ ] Ziccrse  (feature)
 - [ ] Ziccamoa (feature)
@@ -14,7 +14,7 @@
 - [ ] Zicclsm  (feature)
 
 # RVA20S64
-- [ ] Zifencei
+- [x] Zifencei
 - [ ] Ss1p11
 - [ ] Svbare
 - [ ] Sv39

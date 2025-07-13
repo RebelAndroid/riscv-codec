@@ -258,6 +258,10 @@ pub enum Instruction {
     CSRRWI(IRegister, CSRImmediate, CSR),
     CSRRSI(IRegister, CSRImmediate, CSR),
     CSRRCI(IRegister, CSRImmediate, CSR),
+    //
+    // Instructions in Zifencei Extension
+    //
+    FENCEI,
 }
 
 fn aq_rl_suffix(aq: &bool, rl: &bool) -> &'static str {
@@ -447,6 +451,7 @@ impl Display for Instruction {
             Instruction::CSRRWI(rd, imm, csr) => write!(f, "csrrwi {rd},{csr},{imm}"),
             Instruction::CSRRSI(rd, imm, csr) => write!(f, "csrrsi {rd},{csr},{imm}"),
             Instruction::CSRRCI(rd, imm, csr) => write!(f, "csrrci {rd},{csr},{imm}"),
+            Instruction::FENCEI => write!(f, "fence.i"),
         }
     }
 }
@@ -693,7 +698,7 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                             0, //fm field, always zero for a non-tso fence
                         ))
                     }
-                } else if mnemonics[1] == ".tso" {
+                } else if mnemonics[1] == "tso" {
                     if operands.len() != 2 {
                         Err("fence.tso instruction requires 2 operands".to_owned())
                     } else {
@@ -710,6 +715,12 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                                 0b1000, // tso fence
                             ))
                         }
+                    }
+                } else if mnemonics[1] == "i" {
+                    if operands.len() != 0 {
+                        Err("fence.i requires 0 operands".to_owned())
+                    } else {
+                        Ok(Instruction::FENCEI)
                     }
                 } else {
                     Err("invalid fence".to_owned())
@@ -1047,43 +1058,67 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
             "csrrw" => {
                 if operands.len() != 3 {
                     Err("csrrw requires 3 operands".to_owned())
-                }else {
-                    Ok(Instruction::CSRRW(IRegister::from_string(operands[0])?, IRegister::from_string(operands[2])?, CSR::from_val(parse_int(operands[1])?)))
+                } else {
+                    Ok(Instruction::CSRRW(
+                        IRegister::from_string(operands[0])?,
+                        IRegister::from_string(operands[2])?,
+                        CSR::from_val(parse_int(operands[1])?),
+                    ))
                 }
             }
             "csrrs" => {
                 if operands.len() != 3 {
                     Err("csrrs requires 3 operands".to_owned())
-                }else {
-                    Ok(Instruction::CSRRS(IRegister::from_string(operands[0])?, IRegister::from_string(operands[2])?, CSR::from_val(parse_int(operands[1])?)))
+                } else {
+                    Ok(Instruction::CSRRS(
+                        IRegister::from_string(operands[0])?,
+                        IRegister::from_string(operands[2])?,
+                        CSR::from_val(parse_int(operands[1])?),
+                    ))
                 }
             }
             "csrrc" => {
                 if operands.len() != 3 {
                     Err("csrrc requires 3 operands".to_owned())
-                }else {
-                    Ok(Instruction::CSRRC(IRegister::from_string(operands[0])?, IRegister::from_string(operands[2])?, CSR::from_val(parse_int(operands[1])?)))
+                } else {
+                    Ok(Instruction::CSRRC(
+                        IRegister::from_string(operands[0])?,
+                        IRegister::from_string(operands[2])?,
+                        CSR::from_val(parse_int(operands[1])?),
+                    ))
                 }
             }
             "csrrwi" => {
                 if operands.len() != 3 {
                     Err("csrrwi requires 3 operands".to_owned())
-                }else {
-                    Ok(Instruction::CSRRWI(IRegister::from_string(operands[0])?, CSRImmediate::from_val(parse_int(operands[2])?), CSR::from_val(parse_int(operands[1])?)))
+                } else {
+                    Ok(Instruction::CSRRWI(
+                        IRegister::from_string(operands[0])?,
+                        CSRImmediate::from_val(parse_int(operands[2])?),
+                        CSR::from_val(parse_int(operands[1])?),
+                    ))
                 }
             }
             "csrrsi" => {
                 if operands.len() != 3 {
                     Err("csrrsi requires 3 operands".to_owned())
-                }else {
-                    Ok(Instruction::CSRRSI(IRegister::from_string(operands[0])?, CSRImmediate::from_val(parse_int(operands[2])?), CSR::from_val(parse_int(operands[1])?)))
+                } else {
+                    Ok(Instruction::CSRRSI(
+                        IRegister::from_string(operands[0])?,
+                        CSRImmediate::from_val(parse_int(operands[2])?),
+                        CSR::from_val(parse_int(operands[1])?),
+                    ))
                 }
             }
             "csrrci" => {
                 if operands.len() != 3 {
                     Err("csrrci requires 3 operands".to_owned())
-                }else {
-                    Ok(Instruction::CSRRCI(IRegister::from_string(operands[0])?, CSRImmediate::from_val(parse_int(operands[2])?), CSR::from_val(parse_int(operands[1])?)))
+                } else {
+                    Ok(Instruction::CSRRCI(
+                        IRegister::from_string(operands[0])?,
+                        CSRImmediate::from_val(parse_int(operands[2])?),
+                        CSR::from_val(parse_int(operands[1])?),
+                    ))
                 }
             }
             _ => Err(format!("unknown mnemonic: {}", mnemonic)),
@@ -1261,6 +1296,19 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
                             ((instruction >> 20) & 0xFF) as u8,
                             ((instruction >> 28) & 0b1111) as u8,
                         ))
+                    }
+                }
+            }
+            0b001 => {
+                if rd != IRegister::Zero || rs1 != IRegister::Zero {
+                    // technicially, we are supposed to ignore these fields
+                    Err("reserved register fields not set to zero".to_owned())
+                } else {
+                    let func12 = instruction >> 20;
+                    if func12 != 0 {
+                        Err("reserved register fields not set to zero".to_owned())
+                    } else {
+                        Ok(Instruction::FENCEI)
                     }
                 }
             }
@@ -1522,9 +1570,21 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
             0b010 => Ok(Instruction::CSRRS(rd, rs1, CSR::from_u32(instruction))),
             0b011 => Ok(Instruction::CSRRC(rd, rs1, CSR::from_u32(instruction))),
             0b100 => Err("Reserved func3 in Opcode SYSTEM".to_owned()),
-            0b101 => Ok(Instruction::CSRRWI(rd, CSRImmediate::from_u32(instruction), CSR::from_u32(instruction))),
-            0b110 => Ok(Instruction::CSRRSI(rd, CSRImmediate::from_u32(instruction), CSR::from_u32(instruction))),
-            0b111 => Ok(Instruction::CSRRCI(rd, CSRImmediate::from_u32(instruction), CSR::from_u32(instruction))),
+            0b101 => Ok(Instruction::CSRRWI(
+                rd,
+                CSRImmediate::from_u32(instruction),
+                CSR::from_u32(instruction),
+            )),
+            0b110 => Ok(Instruction::CSRRSI(
+                rd,
+                CSRImmediate::from_u32(instruction),
+                CSR::from_u32(instruction),
+            )),
+            0b111 => Ok(Instruction::CSRRCI(
+                rd,
+                CSRImmediate::from_u32(instruction),
+                CSR::from_u32(instruction),
+            )),
             _ => unreachable!(),
         },
     }
