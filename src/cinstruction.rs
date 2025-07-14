@@ -486,7 +486,7 @@ impl CInstruction {
                 if operands.len() != 0 {
                     Err("c.jr requires 0 operands".to_owned())
                 } else {
-                    Ok(CInstruction::EBREAK())
+                    Ok(CInstruction::EBREAK)
                 }
             }
             "add" => {

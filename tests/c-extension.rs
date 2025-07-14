@@ -594,7 +594,7 @@ fn mv() {
 fn environment_break() {
     // check assembler
     let i = assemble_line("c.ebreak").unwrap().c();
-    let expected = CInstruction::EBREAK();
+    let expected = CInstruction::EBREAK;
     assert_eq!(i, expected);
 
     // check decoder
