@@ -323,10 +323,10 @@ pub fn ci_assemble(input: TokenStream) -> TokenStream {
         if operands.len() != 2 {{
             Err(\"c.{lower} instruction requires 2 operands\".to_owned())
         }} else {{
-            Ok(CInstruction::{name}(
-                IRegister::from_string(operands[0])?,
-                CIImmediate::from_val(parse_int(operands[1])?),
-            ))
+            Ok(CInstruction::{name}{{
+                dest: IRegister::from_string(operands[0])?,
+                imm: CIImmediate::from_val(parse_int(operands[1])?),
+            }})
         }}"
         )
         .parse()
@@ -348,8 +348,8 @@ pub fn cr_assemble(input: TokenStream) -> TokenStream {
             Err(\"c.{lower} instruction requires 2 operands\".to_owned())
         }} else {{
             Ok(CInstruction::{name}{{
-                rd: CIRegister::from_string(operands[0])?,
-                rs2: CIRegister::from_string(operands[1])?,
+                dest: CIRegister::from_string(operands[0])?,
+                src: CIRegister::from_string(operands[1])?,
             }})
         }}"
         )

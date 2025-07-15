@@ -17,19 +17,22 @@ pub enum CInstruction {
     //
     // Instructions in C extension
     //
-    ADDI4SPN(CIRegister, CWideImmediate),
+    ADDI4SPN {
+        dest: CIRegister,
+        imm: CWideImmediate,
+    },
     FLD {
-        rd: CFRegister,
+        dest: CFRegister,
         base: CIRegister,
         offset: CDImmediate,
     },
     LW {
-        rd: CIRegister,
+        dest: CIRegister,
         base: CIRegister,
         offset: CWImmediate,
     },
     LD {
-        rd: CIRegister,
+        dest: CIRegister,
         base: CIRegister,
         offset: CDImmediate,
     },
@@ -48,47 +51,88 @@ pub enum CInstruction {
         base: CIRegister,
         offset: CDImmediate,
     },
-    ADDI(IRegister, CIImmediate),
-    ADDIW(IRegister, CIImmediate),
-    LI(IRegister, CIImmediate),
-    ADDI16SP(i16),
-    LUI(IRegister, CIImmediate),
-    SRLI(CIRegister, CShamt),
-    SRAI(CIRegister, CShamt),
-    ANDI(CIRegister, CIImmediate),
+    ADDI {
+        dest: IRegister,
+        imm: CIImmediate,
+    },
+    ADDIW {
+        dest: IRegister,
+        imm: CIImmediate,
+    },
+    LI {
+        dest: IRegister,
+        imm: CIImmediate,
+    },
+    ADDI16SP {
+        imm: i16,
+    },
+    LUI {
+        dest: IRegister,
+        imm: CIImmediate,
+    },
+    SRLI {
+        dest: CIRegister,
+        shamt: CShamt,
+    },
+    SRAI {
+        dest: CIRegister,
+        shamt: CShamt,
+    },
+    ANDI {
+        dest: CIRegister,
+        imm: CIImmediate,
+    },
     SUB {
-        rd: CIRegister,
-        rs2: CIRegister,
+        dest: CIRegister,
+        src: CIRegister,
     },
     XOR {
-        rd: CIRegister,
-        rs2: CIRegister,
+        dest: CIRegister,
+        src: CIRegister,
     },
     OR {
-        rd: CIRegister,
-        rs2: CIRegister,
+        dest: CIRegister,
+        src: CIRegister,
     },
     AND {
-        rd: CIRegister,
-        rs2: CIRegister,
+        dest: CIRegister,
+        src: CIRegister,
     },
     SUBW {
-        rd: CIRegister,
-        rs2: CIRegister,
+        dest: CIRegister,
+        src: CIRegister,
     },
     ADDW {
-        rd: CIRegister,
-        rs2: CIRegister,
+        dest: CIRegister,
+        src: CIRegister,
     },
     J {
         offset: CJImmediate,
     },
-    BEQZ(CIRegister, CBImmediate),
-    BNEZ(CIRegister, CBImmediate),
-    SLLI(IRegister, CShamt),
-    FLDSP(FRegister, CDSPImmediate),
-    LWSP(IRegister, CWSPImmediate),
-    LDSP(IRegister, CDSPImmediate),
+    BEQZ {
+        src: CIRegister,
+        offset: CBImmediate,
+    },
+    BNEZ {
+        src: CIRegister,
+        offset: CBImmediate,
+    },
+    SLLI {
+        dest: IRegister,
+        shamt: CShamt,
+    },
+    FLDSP {
+        dest: FRegister,
+        offset: CDSPImmediate,
+    },
+    LWSP {
+        dest: IRegister,
+        offset: CWSPImmediate,
+    },
+    LDSP {
+        dest: IRegister,
+        offset: CDSPImmediate,
+    },
     JR {
         src: IRegister,
     },
@@ -101,53 +145,62 @@ pub enum CInstruction {
         src: IRegister,
     },
     ADD {
-        rd: IRegister,
-        rs2: IRegister,
+        dest: IRegister,
+        src: IRegister,
     },
-    FSDSP(FRegister, CSDSPImmediate),
-    SWSP(IRegister, CSWSPImmediate),
-    SDSP(IRegister, CSDSPImmediate),
+    FSDSP {
+        src: FRegister,
+        offset: CSDSPImmediate,
+    },
+    SWSP {
+        src: IRegister,
+        offset: CSWSPImmediate,
+    },
+    SDSP {
+        src: IRegister,
+        offset: CSDSPImmediate,
+    },
 }
 
 impl Display for CInstruction {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
-            CInstruction::ADDI4SPN(rd, imm) => write!(f, "c.addi4spn {rd},{imm}"),
-            CInstruction::FLD { rd, base, offset } => write!(f, "c.fld {rd},{offset}({base})"),
-            CInstruction::LW { rd, base, offset } => write!(f, "c.lw {rd},{offset}({base})"),
-            CInstruction::LD { rd, base, offset } => write!(f, "c.ld {rd},{offset}({base})"),
+            CInstruction::ADDI4SPN { dest, imm } => write!(f, "c.addi4spn {dest},{imm}"),
+            CInstruction::FLD { dest: rd, base, offset } => write!(f, "c.fld {rd},{offset}({base})"),
+            CInstruction::LW { dest: rd, base, offset } => write!(f, "c.lw {rd},{offset}({base})"),
+            CInstruction::LD { dest: rd, base, offset } => write!(f, "c.ld {rd},{offset}({base})"),
             CInstruction::FSD { src, base, offset } => write!(f, "c.fsd {src},{offset}({base})"),
             CInstruction::SW { src, base, offset } => write!(f, "c.sw {src},{offset}({base})"),
             CInstruction::SD { src, base, offset } => write!(f, "c.sd {src},{offset}({base})"),
-            CInstruction::ADDI(rd, imm) => write!(f, "c.addi {rd},{imm}"),
-            CInstruction::ADDIW(rd, imm) => write!(f, "c.addiw {rd},{imm}"),
-            CInstruction::LI(rd, imm) => write!(f, "c.li {rd},{imm}"),
-            CInstruction::ADDI16SP(imm) => write!(f, "c.addi16sp {imm}"),
-            CInstruction::LUI(rd, imm) => write!(f, "c.lui {rd},{imm}"),
-            CInstruction::SRLI(rd, imm) => write!(f, "c.srli {rd},{imm}"),
-            CInstruction::SRAI(rd, imm) => write!(f, "c.srai {rd},{imm}"),
-            CInstruction::ANDI(rd, imm) => write!(f, "c.andi {rd},{imm}"),
-            CInstruction::SUB { rd, rs2 } => write!(f, "c.sub {rd},{rs2}"),
-            CInstruction::XOR { rd, rs2 } => write!(f, "c.xor {rd},{rs2}"),
-            CInstruction::OR { rd, rs2 } => write!(f, "c.or {rd},{rs2}"),
-            CInstruction::AND { rd, rs2 } => write!(f, "c.and {rd},{rs2}"),
-            CInstruction::SUBW { rd, rs2 } => write!(f, "c.subw {rd},{rs2}"),
-            CInstruction::ADDW { rd, rs2 } => write!(f, "c.addw {rd},{rs2}"),
+            CInstruction::ADDI { dest, imm } => write!(f, "c.addi {dest},{imm}"),
+            CInstruction::ADDIW { dest, imm } => write!(f, "c.addiw {dest},{imm}"),
+            CInstruction::LI { dest, imm } => write!(f, "c.li {dest},{imm}"),
+            CInstruction::ADDI16SP { imm } => write!(f, "c.addi16sp {imm}"),
+            CInstruction::LUI { dest, imm } => write!(f, "c.lui {dest},{imm}"),
+            CInstruction::SRLI { dest, shamt } => write!(f, "c.srli {dest},{shamt}"),
+            CInstruction::SRAI { dest, shamt } => write!(f, "c.srai {dest},{shamt}"),
+            CInstruction::ANDI { dest, imm } => write!(f, "c.andi {dest},{imm}"),
+            CInstruction::SUB { dest: rd, src: rs2 } => write!(f, "c.sub {rd},{rs2}"),
+            CInstruction::XOR { dest: rd, src: rs2 } => write!(f, "c.xor {rd},{rs2}"),
+            CInstruction::OR { dest: rd, src: rs2 } => write!(f, "c.or {rd},{rs2}"),
+            CInstruction::AND { dest: rd, src: rs2 } => write!(f, "c.and {rd},{rs2}"),
+            CInstruction::SUBW { dest: rd, src: rs2 } => write!(f, "c.subw {rd},{rs2}"),
+            CInstruction::ADDW { dest: rd, src: rs2 } => write!(f, "c.addw {rd},{rs2}"),
             CInstruction::J { offset } => write!(f, "c.j {offset}"),
-            CInstruction::BEQZ(rd, imm) => write!(f, "c.beqz {rd},{imm}"),
-            CInstruction::BNEZ(rd, imm) => write!(f, "c.bnez {rd},{imm}"),
-            CInstruction::SLLI(rd, imm) => write!(f, "c.slli {rd},{imm}"),
-            CInstruction::FLDSP(rd, imm) => write!(f, "c.fldsp {rd},{imm}"),
-            CInstruction::LWSP(rd, imm) => write!(f, "c.lwsp {rd},{imm}"),
-            CInstruction::LDSP(rd, imm) => write!(f, "c.ldsp {rd},{imm}"),
+            CInstruction::BEQZ { src, offset } => write!(f, "c.beqz {src},{offset}"),
+            CInstruction::BNEZ { src, offset } => write!(f, "c.bnez {src},{offset}"),
+            CInstruction::SLLI { dest, shamt } => write!(f, "c.slli {dest},{shamt}"),
+            CInstruction::FLDSP { dest, offset } => write!(f, "c.fldsp {dest},{offset}"),
+            CInstruction::LWSP { dest, offset } => write!(f, "c.lwsp {dest},{offset}"),
+            CInstruction::LDSP { dest, offset } => write!(f, "c.ldsp {dest},{offset}"),
             CInstruction::JR { src } => write!(f, "c.jr {src}"),
             CInstruction::MV { dest, src } => write!(f, "c.mv {dest},{src}"),
             CInstruction::EBREAK => write!(f, "c.ebreak"),
             CInstruction::JALR { src } => write!(f, "c.jalr {src}"),
-            CInstruction::ADD { rd, rs2 } => write!(f, "c.add {rd},{rs2}"),
-            CInstruction::FSDSP(frd, imm) => write!(f, "c.fsdsp {frd},{imm}"),
-            CInstruction::SWSP(rd, imm) => write!(f, "c.swsp {rd},{imm}"),
-            CInstruction::SDSP(rd, imm) => write!(f, "c.sdsp {rd},{imm}"),
+            CInstruction::ADD { dest: rd, src: rs2 } => write!(f, "c.add {rd},{rs2}"),
+            CInstruction::FSDSP { src, offset } => write!(f, "c.fsdsp {src},{offset}"),
+            CInstruction::SWSP { src, offset } => write!(f, "c.swsp {src},{offset}"),
+            CInstruction::SDSP { src, offset } => write!(f, "c.sdsp {src},{offset}"),
         }
     }
 }
@@ -175,21 +228,21 @@ pub fn decode_compressed_instruction(instruction: u16) -> Result<CInstruction, S
                 if imm.val() == 0 {
                     Err("compressed illegal instruction".to_owned())
                 } else {
-                    Ok(CInstruction::ADDI4SPN(crs2, imm))
+                    Ok(CInstruction::ADDI4SPN { dest: crs2, imm })
                 }
             }
             0b001 => Ok(CInstruction::FLD {
-                rd: cfrd,
+                dest: cfrd,
                 base: crs1,
                 offset: CDImmediate::from_u16(instruction),
             }),
             0b010 => Ok(CInstruction::LW {
-                rd: crs2,
+                dest: crs2,
                 base: crs1,
                 offset: CWImmediate::from_u16(instruction),
             }),
             0b011 => Ok(CInstruction::LD {
-                rd: crs2,
+                dest: crs2,
                 base: crs1,
                 offset: CDImmediate::from_u16(instruction),
             }),
@@ -212,9 +265,18 @@ pub fn decode_compressed_instruction(instruction: u16) -> Result<CInstruction, S
             _ => unreachable!(),
         },
         0b01 => match instruction >> 13 {
-            0b000 => Ok(CInstruction::ADDI(rd, ciimmediate)),
-            0b001 => Ok(CInstruction::ADDIW(rd, ciimmediate)),
-            0b010 => Ok(CInstruction::LI(rd, ciimmediate)),
+            0b000 => Ok(CInstruction::ADDI {
+                dest: rd,
+                imm: ciimmediate,
+            }),
+            0b001 => Ok(CInstruction::ADDIW {
+                dest: rd,
+                imm: ciimmediate,
+            }),
+            0b010 => Ok(CInstruction::LI {
+                dest: rd,
+                imm: ciimmediate,
+            }),
             0b011 => {
                 if (instruction >> 7) & 0b111 == 2 {
                     let a = (instruction >> 2) & 0b1;
@@ -226,39 +288,51 @@ pub fn decode_compressed_instruction(instruction: u16) -> Result<CInstruction, S
                     let i = ((d << 4) | (a << 5) | (c << 6) | (b << 7) | (e << 9)) as i16;
                     println!("i: {i}");
                     let i2 = (i << 6) >> 6;
-                    Ok(CInstruction::ADDI16SP(i2))
+                    Ok(CInstruction::ADDI16SP { imm: i2 })
                 } else {
-                    Ok(CInstruction::LUI(rd, ciimmediate))
+                    Ok(CInstruction::LUI {
+                        dest: rd,
+                        imm: ciimmediate,
+                    })
                 }
             }
             0b100 => match (instruction >> 10) & 0b11 {
-                0b00 => Ok(CInstruction::SRLI(crs1, cshamt)),
-                0b01 => Ok(CInstruction::SRAI(crs1, cshamt)),
-                0b10 => Ok(CInstruction::ANDI(crs1, ciimmediate)),
+                0b00 => Ok(CInstruction::SRLI {
+                    dest: crs1,
+                    shamt: cshamt,
+                }),
+                0b01 => Ok(CInstruction::SRAI {
+                    dest: crs1,
+                    shamt: cshamt,
+                }),
+                0b10 => Ok(CInstruction::ANDI {
+                    dest: crs1,
+                    imm: ciimmediate,
+                }),
                 0b11 => match ((instruction >> 5) & 0b11, (instruction >> 12) & 0b1) {
                     (0b00, 0b0) => Ok(CInstruction::SUB {
-                        rd: crs1,
-                        rs2: crs2,
+                        dest: crs1,
+                        src: crs2,
                     }),
                     (0b01, 0b0) => Ok(CInstruction::XOR {
-                        rd: crs1,
-                        rs2: crs2,
+                        dest: crs1,
+                        src: crs2,
                     }),
                     (0b10, 0b0) => Ok(CInstruction::OR {
-                        rd: crs1,
-                        rs2: crs2,
+                        dest: crs1,
+                        src: crs2,
                     }),
                     (0b11, 0b0) => Ok(CInstruction::AND {
-                        rd: crs1,
-                        rs2: crs2,
+                        dest: crs1,
+                        src: crs2,
                     }),
                     (0b00, 0b1) => Ok(CInstruction::SUBW {
-                        rd: crs1,
-                        rs2: crs2,
+                        dest: crs1,
+                        src: crs2,
                     }),
                     (0b01, 0b1) => Ok(CInstruction::ADDW {
-                        rd: crs1,
-                        rs2: crs2,
+                        dest: crs1,
+                        src: crs2,
                     }),
                     _ => Err("Reserved instruction".to_owned()),
                 },
@@ -267,18 +341,33 @@ pub fn decode_compressed_instruction(instruction: u16) -> Result<CInstruction, S
             0b101 => Ok(CInstruction::J {
                 offset: CJImmediate::from_u16(instruction),
             }),
-            0b110 => Ok(CInstruction::BEQZ(crs1, CBImmediate::from_u16(instruction))),
-            0b111 => Ok(CInstruction::BNEZ(crs1, CBImmediate::from_u16(instruction))),
+            0b110 => Ok(CInstruction::BEQZ {
+                src: crs1,
+                offset: CBImmediate::from_u16(instruction),
+            }),
+            0b111 => Ok(CInstruction::BNEZ {
+                src: crs1,
+                offset: CBImmediate::from_u16(instruction),
+            }),
             _ => unreachable!(),
         },
         0b10 => match instruction >> 13 {
-            0b000 => Ok(CInstruction::SLLI(rd, cshamt)),
-            0b001 => Ok(CInstruction::FLDSP(
-                frd,
-                CDSPImmediate::from_u16(instruction),
-            )),
-            0b010 => Ok(CInstruction::LWSP(rd, CWSPImmediate::from_u16(instruction))),
-            0b011 => Ok(CInstruction::LDSP(rd, CDSPImmediate::from_u16(instruction))),
+            0b000 => Ok(CInstruction::SLLI {
+                dest: rd,
+                shamt: cshamt,
+            }),
+            0b001 => Ok(CInstruction::FLDSP {
+                dest: frd,
+                offset: CDSPImmediate::from_u16(instruction),
+            }),
+            0b010 => Ok(CInstruction::LWSP {
+                dest: rd,
+                offset: CWSPImmediate::from_u16(instruction),
+            }),
+            0b011 => Ok(CInstruction::LDSP {
+                dest: rd,
+                offset: CDSPImmediate::from_u16(instruction),
+            }),
             0b100 => {
                 match (
                     (instruction >> 12) & 0b1,
@@ -289,22 +378,22 @@ pub fn decode_compressed_instruction(instruction: u16) -> Result<CInstruction, S
                     (0, _, _) => Ok(CInstruction::MV { dest: rd, src: rs2 }),
                     (1, 0, 0) => Ok(CInstruction::EBREAK),
                     (1, _, 0) => Ok(CInstruction::JALR { src: rd }),
-                    (1, _, _) => Ok(CInstruction::ADD { rd, rs2 }),
+                    (1, _, _) => Ok(CInstruction::ADD { dest: rd, src: rs2 }),
                     _ => unreachable!(),
                 }
             }
-            0b101 => Ok(CInstruction::FSDSP(
-                frs2,
-                CSDSPImmediate::from_u16(instruction),
-            )),
-            0b110 => Ok(CInstruction::SWSP(
-                rs2,
-                CSWSPImmediate::from_u16(instruction),
-            )),
-            0b111 => Ok(CInstruction::SDSP(
-                rs2,
-                CSDSPImmediate::from_u16(instruction),
-            )),
+            0b101 => Ok(CInstruction::FSDSP {
+                src: frs2,
+                offset: CSDSPImmediate::from_u16(instruction),
+            }),
+            0b110 => Ok(CInstruction::SWSP {
+                src: rs2,
+                offset: CSWSPImmediate::from_u16(instruction),
+            }),
+            0b111 => Ok(CInstruction::SDSP {
+                src: rs2,
+                offset: CSDSPImmediate::from_u16(instruction),
+            }),
             _ => unreachable!(),
         },
         0b11 => Err("attempting to decode larger instruction as though it were 16 bits".to_owned()),
@@ -323,10 +412,10 @@ impl CInstruction {
                 if operands.len() != 2 {
                     Err("c.addi4spn requires 2 operands".to_owned())
                 } else {
-                    Ok(CInstruction::ADDI4SPN(
-                        CIRegister::from_string(operands[0])?,
-                        CWideImmediate::from_val(parse_int(operands[1])?),
-                    ))
+                    Ok(CInstruction::ADDI4SPN {
+                        dest: CIRegister::from_string(operands[0])?,
+                        imm: CWideImmediate::from_val(parse_int(operands[1])?),
+                    })
                 }
             }
             "fld" => {
@@ -335,7 +424,7 @@ impl CInstruction {
                 } else {
                     let (base, imm) = parse_address_expression_compressed(operands[1])?;
                     Ok(CInstruction::FLD {
-                        rd: CFRegister::from_string(operands[0])?,
+                        dest: CFRegister::from_string(operands[0])?,
                         base,
                         offset: CDImmediate::from_val(imm),
                     })
@@ -347,7 +436,7 @@ impl CInstruction {
                 } else {
                     let (base, imm) = parse_address_expression_compressed(operands[1])?;
                     Ok(CInstruction::LW {
-                        rd: CIRegister::from_string(operands[0])?,
+                        dest: CIRegister::from_string(operands[0])?,
                         base,
                         offset: CWImmediate::from_val(imm),
                     })
@@ -359,7 +448,7 @@ impl CInstruction {
                 } else {
                     let (base, imm) = parse_address_expression_compressed(operands[1])?;
                     Ok(CInstruction::LD {
-                        rd: CIRegister::from_string(operands[0])?,
+                        dest: CIRegister::from_string(operands[0])?,
                         base,
                         offset: CDImmediate::from_val(imm),
                     })
@@ -415,7 +504,7 @@ impl CInstruction {
                     if i % 16 != 0 {
                         panic!("attempted to construct non multiple of 4 CWImmediate")
                     }
-                    Ok(CInstruction::ADDI16SP(i as i16))
+                    Ok(CInstruction::ADDI16SP { imm: i as i16 })
                 }
             }
             "lui" => ci_assemble!(LUI),
@@ -423,30 +512,30 @@ impl CInstruction {
                 if operands.len() != 2 {
                     Err("c.srli requires 2 operands".to_owned())
                 } else {
-                    Ok(CInstruction::SRLI(
-                        CIRegister::from_string(operands[0])?,
-                        CShamt::from_val(parse_int(operands[1])?),
-                    ))
+                    Ok(CInstruction::SRLI {
+                        dest: CIRegister::from_string(operands[0])?,
+                        shamt: CShamt::from_val(parse_int(operands[1])?),
+                    })
                 }
             }
             "srai" => {
                 if operands.len() != 2 {
                     Err("c.srai requires 2 operands".to_owned())
                 } else {
-                    Ok(CInstruction::SRAI(
-                        CIRegister::from_string(operands[0])?,
-                        CShamt::from_val(parse_int(operands[1])?),
-                    ))
+                    Ok(CInstruction::SRAI {
+                        dest: CIRegister::from_string(operands[0])?,
+                        shamt: CShamt::from_val(parse_int(operands[1])?),
+                    })
                 }
             }
             "andi" => {
                 if operands.len() != 2 {
                     Err("c.andi requires 2 operands".to_owned())
                 } else {
-                    Ok(CInstruction::ANDI(
-                        CIRegister::from_string(operands[0])?,
-                        CIImmediate::from_val(parse_int(operands[1])?),
-                    ))
+                    Ok(CInstruction::ANDI {
+                        dest: CIRegister::from_string(operands[0])?,
+                        imm: CIImmediate::from_val(parse_int(operands[1])?),
+                    })
                 }
             }
             "sub" => cr_assemble!(SUB),
@@ -468,60 +557,60 @@ impl CInstruction {
                 if operands.len() != 2 {
                     Err("c.beqz requires 2 operands".to_owned())
                 } else {
-                    Ok(CInstruction::BEQZ(
-                        CIRegister::from_string(operands[0])?,
-                        CBImmediate::from_val(parse_int(operands[1])?),
-                    ))
+                    Ok(CInstruction::BEQZ {
+                        src: CIRegister::from_string(operands[0])?,
+                        offset: CBImmediate::from_val(parse_int(operands[1])?),
+                    })
                 }
             }
             "bnez" => {
                 if operands.len() != 2 {
                     Err("c.bne requires 2 operands".to_owned())
                 } else {
-                    Ok(CInstruction::BNEZ(
-                        CIRegister::from_string(operands[0])?,
-                        CBImmediate::from_val(parse_int(operands[1])?),
-                    ))
+                    Ok(CInstruction::BNEZ {
+                        src: CIRegister::from_string(operands[0])?,
+                        offset: CBImmediate::from_val(parse_int(operands[1])?),
+                    })
                 }
             }
             "slli" => {
                 if operands.len() != 2 {
                     Err("c.slli requires 2 operands".to_owned())
                 } else {
-                    Ok(CInstruction::SLLI(
-                        IRegister::from_string(operands[0])?,
-                        CShamt::from_val(parse_int(operands[1])?),
-                    ))
+                    Ok(CInstruction::SLLI {
+                        dest: IRegister::from_string(operands[0])?,
+                        shamt: CShamt::from_val(parse_int(operands[1])?),
+                    })
                 }
             }
             "fldsp" => {
                 if operands.len() != 2 {
                     Err("c.fldsp requires 2 operands".to_owned())
                 } else {
-                    Ok(CInstruction::FLDSP(
-                        FRegister::from_string(operands[0])?,
-                        CDSPImmediate::from_val(parse_int(operands[1])?),
-                    ))
+                    Ok(CInstruction::FLDSP {
+                        dest: FRegister::from_string(operands[0])?,
+                        offset: CDSPImmediate::from_val(parse_int(operands[1])?),
+                    })
                 }
             }
             "ldsp" => {
                 if operands.len() != 2 {
                     Err("c.ldsp requires 2 operands".to_owned())
                 } else {
-                    Ok(CInstruction::LDSP(
-                        IRegister::from_string(operands[0])?,
-                        CDSPImmediate::from_val(parse_int(operands[1])?),
-                    ))
+                    Ok(CInstruction::LDSP {
+                        dest: IRegister::from_string(operands[0])?,
+                        offset: CDSPImmediate::from_val(parse_int(operands[1])?),
+                    })
                 }
             }
             "lwsp" => {
                 if operands.len() != 2 {
                     Err("c.lwsp requires 2 operands".to_owned())
                 } else {
-                    Ok(CInstruction::LWSP(
-                        IRegister::from_string(operands[0])?,
-                        CWSPImmediate::from_val(parse_int(operands[1])?),
-                    ))
+                    Ok(CInstruction::LWSP {
+                        dest: IRegister::from_string(operands[0])?,
+                        offset: CWSPImmediate::from_val(parse_int(operands[1])?),
+                    })
                 }
             }
             "jr" => {
@@ -554,8 +643,8 @@ impl CInstruction {
                     Err("c.add requires 2 operands".to_owned())
                 } else {
                     Ok(CInstruction::ADD {
-                        rd: IRegister::from_string(operands[0])?,
-                        rs2: IRegister::from_string(operands[1])?,
+                        dest: IRegister::from_string(operands[0])?,
+                        src: IRegister::from_string(operands[1])?,
                     })
                 }
             }
@@ -563,30 +652,30 @@ impl CInstruction {
                 if operands.len() != 2 {
                     Err("c.fsdsp requires 2 operands".to_owned())
                 } else {
-                    Ok(CInstruction::FSDSP(
-                        FRegister::from_string(operands[0])?,
-                        CSDSPImmediate::from_val(parse_int(operands[1])?),
-                    ))
+                    Ok(CInstruction::FSDSP {
+                        src: FRegister::from_string(operands[0])?,
+                        offset: CSDSPImmediate::from_val(parse_int(operands[1])?),
+                    })
                 }
             }
             "swsp" => {
                 if operands.len() != 2 {
                     Err("c.swsp requires 2 operands".to_owned())
                 } else {
-                    Ok(CInstruction::SWSP(
-                        IRegister::from_string(operands[0])?,
-                        CSWSPImmediate::from_val(parse_int(operands[1])?),
-                    ))
+                    Ok(CInstruction::SWSP {
+                        src: IRegister::from_string(operands[0])?,
+                        offset: CSWSPImmediate::from_val(parse_int(operands[1])?),
+                    })
                 }
             }
             "sdsp" => {
                 if operands.len() != 2 {
                     Err("c.sdsp requires 2 operands".to_owned())
                 } else {
-                    Ok(CInstruction::SDSP(
-                        IRegister::from_string(operands[0])?,
-                        CSDSPImmediate::from_val(parse_int(operands[1])?),
-                    ))
+                    Ok(CInstruction::SDSP {
+                        src: IRegister::from_string(operands[0])?,
+                        offset: CSDSPImmediate::from_val(parse_int(operands[1])?),
+                    })
                 }
             }
             "mv" => {
@@ -609,18 +698,18 @@ impl CInstruction {
     // expands a compressed instruction to its 32 bit form
     pub fn expand(&self) -> Instruction {
         match self {
-            CInstruction::ADDI4SPN(rd, imm) => Instruction::ADDI(
-                rd.expand(),
+            CInstruction::ADDI4SPN { dest, imm } => Instruction::ADDI(
+                dest.expand(),
                 IRegister::StackPointer,
                 IImmediate::from_val(imm.val()),
             ),
             CInstruction::FLD { .. } => todo!(), // needs unimplemented double extension
-            CInstruction::LW { rd, base, offset } => Instruction::LW(
+            CInstruction::LW { dest: rd, base, offset } => Instruction::LW(
                 rd.expand(),
                 base.expand(),
                 IImmediate::from_val(offset.val()),
             ),
-            CInstruction::LD { rd, base, offset } => Instruction::LD(
+            CInstruction::LD { dest: rd, base, offset } => Instruction::LD(
                 rd.expand(),
                 base.expand(),
                 IImmediate::from_val(offset.val()),
@@ -636,74 +725,76 @@ impl CInstruction {
                 base.expand(),
                 SImmediate::from_val(offset.val()),
             ),
-            CInstruction::ADDI(rd, imm) => {
-                Instruction::ADDI(*rd, *rd, IImmediate::from_val(imm.val()))
+            CInstruction::ADDI { dest, imm } => {
+                Instruction::ADDI(*dest, *dest, IImmediate::from_val(imm.val()))
             }
-            CInstruction::ADDIW(rd, imm) => {
-                Instruction::ADDIW(*rd, *rd, IImmediate::from_val(imm.val()))
+            CInstruction::ADDIW { dest, imm } => {
+                Instruction::ADDIW(*dest, *dest, IImmediate::from_val(imm.val()))
             }
-            CInstruction::LI(rd, imm) => {
-                Instruction::ADDI(*rd, IRegister::Zero, IImmediate::from_val(imm.val()))
+            CInstruction::LI { dest, imm } => {
+                Instruction::ADDI(*dest, IRegister::Zero, IImmediate::from_val(imm.val()))
             }
-            CInstruction::ADDI16SP(imm) => Instruction::ADDI(
+            CInstruction::ADDI16SP { imm } => Instruction::ADDI(
                 IRegister::StackPointer,
                 IRegister::StackPointer,
                 IImmediate::from_val(*imm as i64),
             ),
-            CInstruction::LUI(rd, imm) => {
-                Instruction::ADDI(*rd, IRegister::Zero, IImmediate::from_val(imm.val()))
+            CInstruction::LUI { dest, imm } => {
+                Instruction::ADDI(*dest, IRegister::Zero, IImmediate::from_val(imm.val()))
             }
-            CInstruction::SRLI(rd, shamt) => {
-                Instruction::SRLI(rd.expand(), rd.expand(), Shamt::from_val(shamt.val()))
+            CInstruction::SRLI { dest, shamt } => {
+                Instruction::SRLI(dest.expand(), dest.expand(), Shamt::from_val(shamt.val()))
             }
-            CInstruction::SRAI(rd, shamt) => {
-                Instruction::SRAI(rd.expand(), rd.expand(), Shamt::from_val(shamt.val()))
+            CInstruction::SRAI { dest, shamt } => {
+                Instruction::SRAI(dest.expand(), dest.expand(), Shamt::from_val(shamt.val()))
             }
-            CInstruction::ANDI(rd, imm) => {
-                Instruction::ANDI(rd.expand(), rd.expand(), IImmediate::from_val(imm.val()))
-            }
-            CInstruction::SUB { rd, rs2 } => {
+            CInstruction::ANDI { dest, imm } => Instruction::ANDI(
+                dest.expand(),
+                dest.expand(),
+                IImmediate::from_val(imm.val()),
+            ),
+            CInstruction::SUB { dest: rd, src: rs2 } => {
                 Instruction::SUB(rd.expand(), rd.expand(), rs2.expand())
             }
-            CInstruction::XOR { rd, rs2 } => {
+            CInstruction::XOR { dest: rd, src: rs2 } => {
                 Instruction::XOR(rd.expand(), rd.expand(), rs2.expand())
             }
-            CInstruction::OR { rd, rs2 } => Instruction::OR(rd.expand(), rd.expand(), rs2.expand()),
-            CInstruction::AND { rd, rs2 } => {
+            CInstruction::OR { dest: rd, src: rs2 } => Instruction::OR(rd.expand(), rd.expand(), rs2.expand()),
+            CInstruction::AND { dest: rd, src: rs2 } => {
                 Instruction::AND(rd.expand(), rd.expand(), rs2.expand())
             }
-            CInstruction::SUBW { rd, rs2 } => {
+            CInstruction::SUBW { dest: rd, src: rs2 } => {
                 Instruction::SUBW(rd.expand(), rd.expand(), rs2.expand())
             }
-            CInstruction::ADDW { rd, rs2 } => {
+            CInstruction::ADDW { dest: rd, src: rs2 } => {
                 Instruction::ADDW(rd.expand(), rd.expand(), rs2.expand())
             }
             CInstruction::J { offset } => {
                 Instruction::JAL(IRegister::Zero, JImmediate::from_val(offset.val()))
             }
-            CInstruction::BEQZ(rs1, imm) => Instruction::BEQ(
-                rs1.expand(),
+            CInstruction::BEQZ { src, offset } => Instruction::BEQ(
+                src.expand(),
                 IRegister::Zero,
-                BImmediate::from_val(imm.val()),
+                BImmediate::from_val(offset.val()),
             ),
-            CInstruction::BNEZ(rs1, imm) => Instruction::BNE(
-                rs1.expand(),
+            CInstruction::BNEZ { src, offset } => Instruction::BNE(
+                src.expand(),
                 IRegister::Zero,
-                BImmediate::from_val(imm.val()),
+                BImmediate::from_val(offset.val()),
             ),
-            CInstruction::SLLI(rd, shamt) => {
-                Instruction::SLLI(*rd, *rd, Shamt::from_val(shamt.val()))
+            CInstruction::SLLI { dest, shamt } => {
+                Instruction::SLLI(*dest, *dest, Shamt::from_val(shamt.val()))
             }
-            CInstruction::FLDSP(_, _) => todo!(), // needs unimplemented double extension
-            CInstruction::LWSP(rd, imm) => Instruction::LW(
-                *rd,
+            CInstruction::FLDSP{..} => todo!(), // needs unimplemented double extension
+            CInstruction::LWSP{dest, offset} => Instruction::LW(
+                *dest,
                 IRegister::StackPointer,
-                IImmediate::from_val(imm.val()),
+                IImmediate::from_val(offset.val()),
             ),
-            CInstruction::LDSP(rd, imm) => Instruction::LD(
-                *rd,
+            CInstruction::LDSP { dest, offset } => Instruction::LD(
+                *dest,
                 IRegister::StackPointer,
-                IImmediate::from_val(imm.val()),
+                IImmediate::from_val(offset.val()),
             ),
             CInstruction::JR { src } => {
                 Instruction::JALR(IRegister::Zero, *src, IImmediate::from_val(0))
@@ -712,17 +803,17 @@ impl CInstruction {
             CInstruction::EBREAK => Instruction::EBREAK,
             // CInstruction::JALR(rs1) => Instruction::JALR(IRegister::ReturnAddress, *rs1, IImmediate::from_val(0)),
             CInstruction::JALR { .. } => todo!(), // not exactly the same as the expanded version (see manual)
-            CInstruction::ADD { rd, rs2 } => Instruction::ADD(*rd, *rd, *rs2),
-            CInstruction::FSDSP(_, _) => todo!(), // needs unimplemented double extension
-            CInstruction::SWSP(rs2, imm) => Instruction::SW(
-                *rs2,
+            CInstruction::ADD { dest: rd, src: rs2 } => Instruction::ADD(*rd, *rd, *rs2),
+            CInstruction::FSDSP { .. } => todo!(), // needs unimplemented double extension
+            CInstruction::SWSP { src, offset } => Instruction::SW(
+                *src,
                 IRegister::StackPointer,
-                SImmediate::from_val(imm.val()),
+                SImmediate::from_val(offset.val()),
             ),
-            CInstruction::SDSP(rs2, imm) => Instruction::SD(
-                *rs2,
+            CInstruction::SDSP { src, offset } => Instruction::SD(
+                *src,
                 IRegister::StackPointer,
-                SImmediate::from_val(imm.val()),
+                SImmediate::from_val(offset.val()),
             ),
         }
     }

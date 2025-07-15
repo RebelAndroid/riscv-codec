@@ -1,6 +1,7 @@
 use riscv_disassembler::cinstruction::{CInstruction, decode_compressed_instruction};
 use riscv_disassembler::immediates::{
-    CBImmediate, CDImmediate, CDSPImmediate, CIImmediate, CJImmediate, CSDSPImmediate, CSWSPImmediate, CShamt, CWImmediate, CWSPImmediate, CWideImmediate
+    CBImmediate, CDImmediate, CDSPImmediate, CIImmediate, CJImmediate, CSDSPImmediate,
+    CSWSPImmediate, CShamt, CWImmediate, CWSPImmediate, CWideImmediate,
 };
 use riscv_disassembler::instruction::assemble_line;
 use riscv_disassembler::register::{CFRegister, CIRegister, FRegister, IRegister};
@@ -9,7 +10,10 @@ use riscv_disassembler::register::{CFRegister, CIRegister, FRegister, IRegister}
 fn add_4_immediate_stack_pointer() {
     // check assembler
     let i = assemble_line("c.addi4spn a0,280").unwrap().c();
-    let expected = CInstruction::ADDI4SPN(CIRegister::A0, CWideImmediate::from_val(280));
+    let expected = CInstruction::ADDI4SPN {
+        dest: CIRegister::A0,
+        imm: CWideImmediate::from_val(280),
+    };
     assert_eq!(i, expected);
 
     // check decoder
@@ -26,7 +30,11 @@ fn add_4_immediate_stack_pointer() {
 fn float_load_double() {
     // check assembler
     let i = assemble_line("c.fld fa0,152(a1)").unwrap().c();
-    let expected = CInstruction::FLD{rd: CFRegister::FA0, base: CIRegister::A1, offset: CDImmediate::from_val(152)};
+    let expected = CInstruction::FLD {
+        dest: CFRegister::FA0,
+        base: CIRegister::A1,
+        offset: CDImmediate::from_val(152),
+    };
     assert_eq!(i, expected);
 
     // check decoder
@@ -43,8 +51,8 @@ fn float_load_double() {
 fn load_word() {
     // check assembler
     let i = assemble_line("c.lw a2,0(fp)").unwrap().c();
-    let expected = CInstruction::LW{
-        rd: CIRegister::A2,
+    let expected = CInstruction::LW {
+        dest: CIRegister::A2,
         base: CIRegister::FramePointer,
         offset: CWImmediate::from_val(0),
     };
@@ -64,7 +72,11 @@ fn load_word() {
 fn load_doubleword() {
     // check assembler
     let i = assemble_line("c.ld a3,248(a4)").unwrap().c();
-    let expected = CInstruction::LD{rd: CIRegister::A3, base: CIRegister::A4, offset: CDImmediate::from_val(248)};
+    let expected = CInstruction::LD {
+        dest: CIRegister::A3,
+        base: CIRegister::A4,
+        offset: CDImmediate::from_val(248),
+    };
     assert_eq!(i, expected);
 
     // check decoder
@@ -81,7 +93,11 @@ fn load_doubleword() {
 fn float_store_double() {
     // check assembler
     let i = assemble_line("c.fsd fs0,8(a5)").unwrap().c();
-    let expected = CInstruction::FSD{src: CFRegister::FS0, base: CIRegister::A5, offset: CDImmediate::from_val(8)};
+    let expected = CInstruction::FSD {
+        src: CFRegister::FS0,
+        base: CIRegister::A5,
+        offset: CDImmediate::from_val(8),
+    };
     assert_eq!(i, expected);
 
     // check decoder
@@ -98,7 +114,11 @@ fn float_store_double() {
 fn store_word() {
     // check assembler
     let i = assemble_line("c.sw a2,124(a2)").unwrap().c();
-    let expected = CInstruction::SW{src: CIRegister::A2, base: CIRegister::A2, offset: CWImmediate::from_val(124)};
+    let expected = CInstruction::SW {
+        src: CIRegister::A2,
+        base: CIRegister::A2,
+        offset: CWImmediate::from_val(124),
+    };
     assert_eq!(i, expected);
 
     // check decoder
@@ -115,7 +135,11 @@ fn store_word() {
 fn store_double() {
     // check assembler
     let i = assemble_line("c.sd a4,248(a3)").unwrap().c();
-    let expected = CInstruction::SD{src: CIRegister::A4, base: CIRegister::A3, offset: CDImmediate::from_val(248)};
+    let expected = CInstruction::SD {
+        src: CIRegister::A4,
+        base: CIRegister::A3,
+        offset: CDImmediate::from_val(248),
+    };
     assert_eq!(i, expected);
 
     // check decoder
@@ -132,7 +156,10 @@ fn store_double() {
 fn add_immediate() {
     // check assembler
     let i = assemble_line("c.addi t1,12").unwrap().c();
-    let expected = CInstruction::ADDI(IRegister::T1, CIImmediate::from_val(12));
+    let expected = CInstruction::ADDI {
+        dest: IRegister::T1,
+        imm: CIImmediate::from_val(12),
+    };
     assert_eq!(i, expected);
 
     // check decoder
@@ -149,7 +176,10 @@ fn add_immediate() {
 fn add_immediate_word() {
     // check assembler
     let i = assemble_line("c.addiw s6,31").unwrap().c();
-    let expected = CInstruction::ADDIW(IRegister::S6, CIImmediate::from_val(31));
+    let expected = CInstruction::ADDIW {
+        dest: IRegister::S6,
+        imm: CIImmediate::from_val(31),
+    };
     assert_eq!(i, expected);
 
     // check decoder
@@ -166,7 +196,10 @@ fn add_immediate_word() {
 fn load_immediate() {
     // check assembler
     let i = assemble_line("c.li t4,-32").unwrap().c();
-    let expected = CInstruction::LI(IRegister::T4, CIImmediate::from_val(-32));
+    let expected = CInstruction::LI {
+        dest: IRegister::T4,
+        imm: CIImmediate::from_val(-32),
+    };
     assert_eq!(i, expected);
 
     // check decoder
@@ -183,7 +216,7 @@ fn load_immediate() {
 fn add_16_immediate_stack_pointer() {
     // check assembler
     let i = assemble_line("c.addi16sp 80").unwrap().c();
-    let expected = CInstruction::ADDI16SP(80);
+    let expected = CInstruction::ADDI16SP { imm: 80 };
     assert_eq!(i, expected);
 
     // check decoder
@@ -200,7 +233,10 @@ fn add_16_immediate_stack_pointer() {
 fn load_upper_immediate() {
     // check assembler
     let i = assemble_line("c.lui s9,24").unwrap().c();
-    let expected = CInstruction::LUI(IRegister::S9, CIImmediate::from_val(24));
+    let expected = CInstruction::LUI {
+        dest: IRegister::S9,
+        imm: CIImmediate::from_val(24),
+    };
     assert_eq!(i, expected);
 
     // check decoder
@@ -217,7 +253,10 @@ fn load_upper_immediate() {
 fn shift_right_logical_immediate() {
     // check assembler
     let i = assemble_line("c.srli a2,35").unwrap().c();
-    let expected = CInstruction::SRLI(CIRegister::A2, CShamt::from_val(35));
+    let expected = CInstruction::SRLI {
+        dest: CIRegister::A2,
+        shamt: CShamt::from_val(35),
+    };
     assert_eq!(i, expected);
 
     // check decoder
@@ -234,7 +273,10 @@ fn shift_right_logical_immediate() {
 fn shift_right_arithmetic_immediate() {
     // check assembler
     let i = assemble_line("c.srai fp,63").unwrap().c();
-    let expected = CInstruction::SRAI(CIRegister::FramePointer, CShamt::from_val(63));
+    let expected = CInstruction::SRAI {
+        dest: CIRegister::FramePointer,
+        shamt: CShamt::from_val(63),
+    };
     assert_eq!(i, expected);
 
     // check decoder
@@ -251,7 +293,10 @@ fn shift_right_arithmetic_immediate() {
 fn and_immediate() {
     // check assembler
     let i = assemble_line("c.andi s1,-1").unwrap().c();
-    let expected = CInstruction::ANDI(CIRegister::S1, CIImmediate::from_val(-1));
+    let expected = CInstruction::ANDI {
+        dest: CIRegister::S1,
+        imm: CIImmediate::from_val(-1),
+    };
     assert_eq!(i, expected);
 
     // check decoder
@@ -269,8 +314,8 @@ fn subtract() {
     // check assembler
     let i = assemble_line("c.sub a3,a0").unwrap().c();
     let expected = CInstruction::SUB {
-        rd: CIRegister::A3,
-        rs2: CIRegister::A0,
+        dest: CIRegister::A3,
+        src: CIRegister::A0,
     };
     assert_eq!(i, expected);
 
@@ -289,8 +334,8 @@ fn exclusive_or() {
     // check assembler
     let i = assemble_line("c.xor a1,a4").unwrap().c();
     let expected = CInstruction::XOR {
-        rd: CIRegister::A1,
-        rs2: CIRegister::A4,
+        dest: CIRegister::A1,
+        src: CIRegister::A4,
     };
     assert_eq!(i, expected);
 
@@ -309,8 +354,8 @@ fn or() {
     // check assembler
     let i = assemble_line("c.or a5,a2").unwrap().c();
     let expected = CInstruction::OR {
-        rd: CIRegister::A5,
-        rs2: CIRegister::A2,
+        dest: CIRegister::A5,
+        src: CIRegister::A2,
     };
     assert_eq!(i, expected);
 
@@ -329,8 +374,8 @@ fn and() {
     // check assembler
     let i = assemble_line("c.and a5,a2").unwrap().c();
     let expected = CInstruction::AND {
-        rd: CIRegister::A5,
-        rs2: CIRegister::A2,
+        dest: CIRegister::A5,
+        src: CIRegister::A2,
     };
     assert_eq!(i, expected);
 
@@ -349,8 +394,8 @@ fn subtract_word() {
     // check assembler
     let i = assemble_line("c.subw a5,a2").unwrap().c();
     let expected = CInstruction::SUBW {
-        rd: CIRegister::A5,
-        rs2: CIRegister::A2,
+        dest: CIRegister::A5,
+        src: CIRegister::A2,
     };
     assert_eq!(i, expected);
 
@@ -369,8 +414,8 @@ fn add_word() {
     // check assembler
     let i = assemble_line("c.addw a5,a2").unwrap().c();
     let expected = CInstruction::ADDW {
-        rd: CIRegister::A5,
-        rs2: CIRegister::A2,
+        dest: CIRegister::A5,
+        src: CIRegister::A2,
     };
     assert_eq!(i, expected);
 
@@ -388,7 +433,9 @@ fn add_word() {
 fn jump() {
     // check assembler
     let i = assemble_line("c.j 72").unwrap().c();
-    let expected = CInstruction::J{offset: CJImmediate::from_val(72)};
+    let expected = CInstruction::J {
+        offset: CJImmediate::from_val(72),
+    };
     assert_eq!(i, expected);
 
     // check decoder
@@ -406,7 +453,9 @@ fn jump() {
 fn jump2() {
     // check assembler
     let i = assemble_line("c.j 1538").unwrap().c();
-    let expected = CInstruction::J{offset: CJImmediate::from_val(1538)};
+    let expected = CInstruction::J {
+        offset: CJImmediate::from_val(1538),
+    };
     assert_eq!(i, expected);
 
     // check decoder
@@ -423,7 +472,9 @@ fn jump2() {
 fn jump3() {
     // check assembler
     let i = assemble_line("c.j -2").unwrap().c();
-    let expected = CInstruction::J{offset: CJImmediate::from_val(-2)};
+    let expected = CInstruction::J {
+        offset: CJImmediate::from_val(-2),
+    };
     assert_eq!(i, expected);
 
     // check decoder
@@ -440,7 +491,9 @@ fn jump3() {
 fn jump4() {
     // check assembler
     let i = assemble_line("c.j -216").unwrap().c();
-    let expected = CInstruction::J{offset: CJImmediate::from_val(-216)};
+    let expected = CInstruction::J {
+        offset: CJImmediate::from_val(-216),
+    };
     assert_eq!(i, expected);
 
     // check decoder
@@ -457,7 +510,10 @@ fn jump4() {
 fn branch_equal_zero() {
     // check assembler
     let i = assemble_line("c.beqz a5, 72").unwrap().c();
-    let expected = CInstruction::BEQZ(CIRegister::A5, CBImmediate::from_val(72));
+    let expected = CInstruction::BEQZ {
+        src: CIRegister::A5,
+        offset: CBImmediate::from_val(72),
+    };
     assert_eq!(i, expected);
 
     // check decoder
@@ -474,7 +530,10 @@ fn branch_equal_zero() {
 fn branch_not_equal_zero() {
     // check assembler
     let i = assemble_line("c.bnez a5, -2").unwrap().c();
-    let expected = CInstruction::BNEZ(CIRegister::A5, CBImmediate::from_val(-2));
+    let expected = CInstruction::BNEZ {
+        src: CIRegister::A5,
+        offset: CBImmediate::from_val(-2),
+    };
     assert_eq!(i, expected);
 
     // check decoder
@@ -491,7 +550,10 @@ fn branch_not_equal_zero() {
 fn shfit_left_logical_immediate() {
     // check assembler
     let i = assemble_line("c.slli t6, 19").unwrap().c();
-    let expected = CInstruction::SLLI(IRegister::T6, CShamt::from_val(19));
+    let expected = CInstruction::SLLI {
+        dest: IRegister::T6,
+        shamt: CShamt::from_val(19),
+    };
     assert_eq!(i, expected);
 
     // check decoder
@@ -508,7 +570,7 @@ fn shfit_left_logical_immediate() {
 fn float_load_double_stack_pointer() {
     // check assembler
     let i = assemble_line("c.fldsp ft8, 504").unwrap().c();
-    let expected = CInstruction::FLDSP(FRegister::FT8, CDSPImmediate::from_val(504));
+    let expected = CInstruction::FLDSP{dest: FRegister::FT8, offset: CDSPImmediate::from_val(504)};
     assert_eq!(i, expected);
 
     // check decoder
@@ -525,7 +587,7 @@ fn float_load_double_stack_pointer() {
 fn load_word_stack_pointer() {
     // check assembler
     let i = assemble_line("c.lwsp s1, 200").unwrap().c();
-    let expected = CInstruction::LWSP(IRegister::S1, CWSPImmediate::from_val(200));
+    let expected = CInstruction::LWSP{dest: IRegister::S1, offset: CWSPImmediate::from_val(200)};
     assert_eq!(i, expected);
 
     // check decoder
@@ -542,7 +604,7 @@ fn load_word_stack_pointer() {
 fn load_double_stack_pointer() {
     // check assembler
     let i = assemble_line("c.ldsp fp, 400").unwrap().c();
-    let expected = CInstruction::LDSP(IRegister::FramePointer, CDSPImmediate::from_val(400));
+    let expected = CInstruction::LDSP{dest: IRegister::FramePointer, offset: CDSPImmediate::from_val(400)};
     assert_eq!(i, expected);
 
     // check decoder
@@ -559,7 +621,7 @@ fn load_double_stack_pointer() {
 fn jump_register() {
     // check assembler
     let i = assemble_line("c.jr t0").unwrap().c();
-    let expected = CInstruction::JR{src: IRegister::T0};
+    let expected = CInstruction::JR { src: IRegister::T0 };
     assert_eq!(i, expected);
 
     // check decoder
@@ -577,7 +639,10 @@ fn jump_register() {
 fn mv() {
     // check assembler
     let i = assemble_line("c.mv a7, t3").unwrap().c();
-    let expected = CInstruction::MV{dest: IRegister::A7, src: IRegister::T3};
+    let expected = CInstruction::MV {
+        dest: IRegister::A7,
+        src: IRegister::T3,
+    };
     assert_eq!(i, expected);
 
     // check decoder
@@ -611,7 +676,7 @@ fn environment_break() {
 fn jump_and_link_register() {
     // check assembler
     let i = assemble_line("c.jalr s5").unwrap().c();
-    let expected = CInstruction::JALR{src: IRegister::S5};
+    let expected = CInstruction::JALR { src: IRegister::S5 };
     assert_eq!(i, expected);
 
     // check decoder
@@ -628,7 +693,10 @@ fn jump_and_link_register() {
 fn add() {
     // check assembler
     let i = assemble_line("c.add t0, s9").unwrap().c();
-    let expected = CInstruction::ADD{rd: IRegister::T0, rs2: IRegister::S9};
+    let expected = CInstruction::ADD {
+        dest: IRegister::T0,
+        src: IRegister::S9,
+    };
     assert_eq!(i, expected);
 
     // check decoder
@@ -645,7 +713,10 @@ fn add() {
 fn float_store_double_stack_pointer() {
     // check assembler
     let i = assemble_line("c.fsdsp fa2, 136").unwrap().c();
-    let expected = CInstruction::FSDSP(FRegister::FA2, CSDSPImmediate::from_val(136));
+    let expected = CInstruction::FSDSP {
+        src: FRegister::FA2,
+        offset: CSDSPImmediate::from_val(136),
+    };
     assert_eq!(i, expected);
 
     // check decoder
@@ -658,12 +729,14 @@ fn float_store_double_stack_pointer() {
     assert_eq!(i, i3);
 }
 
-
 #[test]
 fn store_word_stack_pointer() {
     // check assembler
     let i = assemble_line("c.swsp s7, 56").unwrap().c();
-    let expected = CInstruction::SWSP(IRegister::S7, CSWSPImmediate::from_val(56));
+    let expected = CInstruction::SWSP {
+        src: IRegister::S7,
+        offset: CSWSPImmediate::from_val(56),
+    };
     assert_eq!(i, expected);
 
     // check decoder
@@ -680,7 +753,10 @@ fn store_word_stack_pointer() {
 fn store_double_stack_pointer() {
     // check assembler
     let i = assemble_line("c.sdsp gp, 112").unwrap().c();
-    let expected = CInstruction::SDSP(IRegister::GlobalPointer, CSDSPImmediate::from_val(112));
+    let expected = CInstruction::SDSP {
+        src: IRegister::GlobalPointer,
+        offset: CSDSPImmediate::from_val(112),
+    };
     assert_eq!(i, expected);
 
     // check decoder
