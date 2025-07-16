@@ -71,177 +71,670 @@ pub enum Instruction {
     // Instructions from RV32I
     //
     /// Load upper immediate
-    LUI(IRegister, UImmediate),
+    LUI {
+        dest: IRegister,
+        imm: UImmediate,
+    },
     /// Add upper immediate to PC
-    AUIPC(IRegister, UImmediate),
+    AUIPC {
+        dest: IRegister,
+        imm: UImmediate,
+    },
     /// Jump and Link
-    JAL(IRegister, JImmediate),
+    JAL {
+        dest: IRegister,
+        offset: JImmediate,
+    },
     /// Jump and Link Register
-    JALR(IRegister, IRegister, IImmediate),
-    BEQ(IRegister, IRegister, BImmediate),
-    BNE(IRegister, IRegister, BImmediate),
-    BLT(IRegister, IRegister, BImmediate),
-    BGE(IRegister, IRegister, BImmediate),
-    BLTU(IRegister, IRegister, BImmediate),
-    BGEU(IRegister, IRegister, BImmediate),
+    JALR {
+        dest: IRegister,
+        base: IRegister,
+        offset: IImmediate,
+    },
+    BEQ {
+        src1: IRegister,
+        src2: IRegister,
+        offset: BImmediate,
+    },
+    BNE {
+        src1: IRegister,
+        src2: IRegister,
+        offset: BImmediate,
+    },
+    BLT {
+        src1: IRegister,
+        src2: IRegister,
+        offset: BImmediate,
+    },
+    BGE {
+        src1: IRegister,
+        src2: IRegister,
+        offset: BImmediate,
+    },
+    BLTU {
+        src1: IRegister,
+        src2: IRegister,
+        offset: BImmediate,
+    },
+    BGEU {
+        src1: IRegister,
+        src2: IRegister,
+        offset: BImmediate,
+    },
     /// Load Byte
-    LB(IRegister, IRegister, IImmediate),
+    LB {
+        dest: IRegister,
+        base: IRegister,
+        offset: IImmediate,
+    },
     /// Load Halfword
-    LH(IRegister, IRegister, IImmediate),
+    LH {
+        dest: IRegister,
+        base: IRegister,
+        offset: IImmediate,
+    },
     /// Load Word
-    LW(IRegister, IRegister, IImmediate),
+    LW {
+        dest: IRegister,
+        base: IRegister,
+        offset: IImmediate,
+    },
     /// Load Byte Unsigned
-    LBU(IRegister, IRegister, IImmediate),
+    LBU {
+        dest: IRegister,
+        base: IRegister,
+        offset: IImmediate,
+    },
     /// Load Halfword Unsigned
-    LHU(IRegister, IRegister, IImmediate),
+    LHU {
+        dest: IRegister,
+        base: IRegister,
+        offset: IImmediate,
+    },
     /// Store Byte
-    SB(IRegister, IRegister, SImmediate),
+    SB {
+        src: IRegister,
+        base: IRegister,
+        offset: SImmediate,
+    },
     /// Store Halfword
-    SH(IRegister, IRegister, SImmediate),
+    SH {
+        src: IRegister,
+        base: IRegister,
+        offset: SImmediate,
+    },
     /// Store Word
-    SW(IRegister, IRegister, SImmediate),
-    ADDI(IRegister, IRegister, IImmediate),
-    SLTI(IRegister, IRegister, IImmediate),
-    SLTIU(IRegister, IRegister, IImmediate),
-    XORI(IRegister, IRegister, IImmediate),
-    ORI(IRegister, IRegister, IImmediate),
-    ANDI(IRegister, IRegister, IImmediate),
+    SW {
+        src: IRegister,
+        base: IRegister,
+        offset: SImmediate,
+    },
+    ADDI {
+        dest: IRegister,
+        src: IRegister,
+        imm: IImmediate,
+    },
+    SLTI {
+        dest: IRegister,
+        src: IRegister,
+        imm: IImmediate,
+    },
+    SLTIU {
+        dest: IRegister,
+        src: IRegister,
+        imm: IImmediate,
+    },
+    XORI {
+        dest: IRegister,
+        src: IRegister,
+        imm: IImmediate,
+    },
+    ORI {
+        dest: IRegister,
+        src: IRegister,
+        imm: IImmediate,
+    },
+    ANDI {
+        dest: IRegister,
+        src: IRegister,
+        imm: IImmediate,
+    },
     /// Left Shift Immediate
-    SLLI(IRegister, IRegister, Shamt),
+    SLLI {
+        dest: IRegister,
+        src: IRegister,
+        shamt: Shamt,
+    },
     /// Logical Right Shift Immediate
-    SRLI(IRegister, IRegister, Shamt),
+    SRLI {
+        dest: IRegister,
+        src: IRegister,
+        shamt: Shamt,
+    },
     /// Arithmetic Right Shift Immediate
-    SRAI(IRegister, IRegister, Shamt),
-    ADD(IRegister, IRegister, IRegister),
-    SUB(IRegister, IRegister, IRegister),
+    SRAI {
+        dest: IRegister,
+        src: IRegister,
+        shamt: Shamt,
+    },
+    ADD {
+        dest: IRegister,
+        src1: IRegister,
+        src2: IRegister,
+    },
+    SUB {
+        dest: IRegister,
+        src1: IRegister,
+        src2: IRegister,
+    },
     /// Left Shift
-    SLL(IRegister, IRegister, IRegister),
+    SLL {
+        dest: IRegister,
+        src1: IRegister,
+        src2: IRegister,
+    },
     /// Branch if Equal
-    SLT(IRegister, IRegister, IRegister),
-    SLTU(IRegister, IRegister, IRegister),
-    XOR(IRegister, IRegister, IRegister),
+    SLT {
+        dest: IRegister,
+        src1: IRegister,
+        src2: IRegister,
+    },
+    SLTU {
+        dest: IRegister,
+        src1: IRegister,
+        src2: IRegister,
+    },
+    XOR {
+        dest: IRegister,
+        src1: IRegister,
+        src2: IRegister,
+    },
     /// Logical Right Shift Immediate
-    SRL(IRegister, IRegister, IRegister),
+    SRL {
+        dest: IRegister,
+        src1: IRegister,
+        src2: IRegister,
+    },
     /// Arithmetic Right Shift Immediate
-    SRA(IRegister, IRegister, IRegister),
-    OR(IRegister, IRegister, IRegister),
-    AND(IRegister, IRegister, IRegister),
-    FENCE(IRegister, IRegister, u8, u8),
+    SRA {
+        dest: IRegister,
+        src1: IRegister,
+        src2: IRegister,
+    },
+    OR {
+        dest: IRegister,
+        src1: IRegister,
+        src2: IRegister,
+    },
+    AND {
+        dest: IRegister,
+        src1: IRegister,
+        src2: IRegister,
+    },
+    FENCE {
+        rd: IRegister,
+        rs1: IRegister,
+        ops: u8,
+        fm: u8,
+    },
     ECALL,
     EBREAK,
     //
     // Instructions Added In RV64I
     //
     /// Load Word Unsigned
-    LWU(IRegister, IRegister, IImmediate),
+    LWU {
+        dest: IRegister,
+        base: IRegister,
+        offset: IImmediate,
+    },
     /// Load Doubleword
-    LD(IRegister, IRegister, IImmediate),
+    LD {
+        dest: IRegister,
+        base: IRegister,
+        offset: IImmediate,
+    },
     /// Store Doubleword
-    SD(IRegister, IRegister, SImmediate),
+    SD {
+        src: IRegister,
+        base: IRegister,
+        offset: SImmediate,
+    },
     /// Add Immediate (word)
-    ADDIW(IRegister, IRegister, IImmediate),
+    ADDIW {
+        dest: IRegister,
+        src: IRegister,
+        imm: IImmediate,
+    },
     /// Left Shift Immediate (word)
-    SLLIW(IRegister, IRegister, ShamtW),
+    SLLIW {
+        dest: IRegister,
+        src: IRegister,
+        shamt: ShamtW,
+    },
     /// Logical Right Shift Immediate (word)
-    SRLIW(IRegister, IRegister, ShamtW),
+    SRLIW {
+        dest: IRegister,
+        src: IRegister,
+        shamt: ShamtW,
+    },
     /// Arithmetic Right Shift Immediate (word)
-    SRAIW(IRegister, IRegister, ShamtW),
+    SRAIW {
+        dest: IRegister,
+        src: IRegister,
+        shamt: ShamtW,
+    },
     /// Add (word)
-    ADDW(IRegister, IRegister, IRegister),
+    ADDW {
+        dest: IRegister,
+        src1: IRegister,
+        src2: IRegister,
+    },
     /// Subtract (word)
-    SUBW(IRegister, IRegister, IRegister),
+    SUBW {
+        dest: IRegister,
+        src1: IRegister,
+        src2: IRegister,
+    },
     /// Left Shift (word)
-    SLLW(IRegister, IRegister, IRegister),
+    SLLW {
+        dest: IRegister,
+        src1: IRegister,
+        src2: IRegister,
+    },
     /// Logical Right Shift (word)
-    SRLW(IRegister, IRegister, IRegister),
+    SRLW {
+        dest: IRegister,
+        src1: IRegister,
+        src2: IRegister,
+    },
     /// Arithmetic Right Shift (word)
-    SRAW(IRegister, IRegister, IRegister),
+    SRAW {
+        dest: IRegister,
+        src1: IRegister,
+        src2: IRegister,
+    },
     //
     // Instructions In M Extension
     //
     /// Multiply
-    MUL(IRegister, IRegister, IRegister),
+    MUL {
+        dest: IRegister,
+        src1: IRegister,
+        src2: IRegister,
+    },
     /// Multiply (High bits)
-    MULH(IRegister, IRegister, IRegister),
+    MULH {
+        dest: IRegister,
+        src1: IRegister,
+        src2: IRegister,
+    },
     /// Multiply Signed-Unsigned (High bits)
-    MULHSU(IRegister, IRegister, IRegister),
+    MULHSU {
+        dest: IRegister,
+        src1: IRegister,
+        src2: IRegister,
+    },
     /// Multiply Unsigned (High)
-    MULHU(IRegister, IRegister, IRegister),
+    MULHU {
+        dest: IRegister,
+        src1: IRegister,
+        src2: IRegister,
+    },
     /// Divide
-    DIV(IRegister, IRegister, IRegister),
+    DIV {
+        dest: IRegister,
+        src1: IRegister,
+        src2: IRegister,
+    },
     /// Divide (Unsigned)
-    DIVU(IRegister, IRegister, IRegister),
+    DIVU {
+        dest: IRegister,
+        src1: IRegister,
+        src2: IRegister,
+    },
     /// Remainder
-    REM(IRegister, IRegister, IRegister),
+    REM {
+        dest: IRegister,
+        src1: IRegister,
+        src2: IRegister,
+    },
     /// Remainder (Unsigned)
-    REMU(IRegister, IRegister, IRegister),
+    REMU {
+        dest: IRegister,
+        src1: IRegister,
+        src2: IRegister,
+    },
     /// Multiply Word
-    MULW(IRegister, IRegister, IRegister),
+    MULW {
+        dest: IRegister,
+        src1: IRegister,
+        src2: IRegister,
+    },
     /// Divide Word
-    DIVW(IRegister, IRegister, IRegister),
+    DIVW {
+        dest: IRegister,
+        src1: IRegister,
+        src2: IRegister,
+    },
     /// Divide Unsigned Word
-    DIVUW(IRegister, IRegister, IRegister),
+    DIVUW {
+        dest: IRegister,
+        src1: IRegister,
+        src2: IRegister,
+    },
     /// Remainder Word
-    REMW(IRegister, IRegister, IRegister),
+    REMW {
+        dest: IRegister,
+        src1: IRegister,
+        src2: IRegister,
+    },
     /// Remainder Unsigned Word
-    REMUW(IRegister, IRegister, IRegister),
+    REMUW {
+        dest: IRegister,
+        src1: IRegister,
+        src2: IRegister,
+    },
     //
     // Instructions In A Extension
     //
     /// Load Reserved Word
     // rd, rs1, ac, rl
-    LRW(IRegister, IRegister, bool, bool),
-    SCW(IRegister, IRegister, IRegister, bool, bool),
-    AMOSWAPW(IRegister, IRegister, IRegister, bool, bool),
-    AMOADDW(IRegister, IRegister, IRegister, bool, bool),
-    AMOXORW(IRegister, IRegister, IRegister, bool, bool),
-    AMOANDW(IRegister, IRegister, IRegister, bool, bool),
-    AMOORW(IRegister, IRegister, IRegister, bool, bool),
-    AMOMINW(IRegister, IRegister, IRegister, bool, bool),
-    AMOMAXW(IRegister, IRegister, IRegister, bool, bool),
-    AMOMINUW(IRegister, IRegister, IRegister, bool, bool),
-    AMOMAXUW(IRegister, IRegister, IRegister, bool, bool),
+    LRW {
+        dest: IRegister,
+        addr: IRegister,
+        aq: bool,
+        rl: bool,
+    },
+    SCW {
+        dest: IRegister,
+        addr: IRegister,
+        src: IRegister,
+        aq: bool,
+        rl: bool,
+    },
+    AMOSWAPW {
+        dest: IRegister,
+        addr: IRegister,
+        src: IRegister,
+        aq: bool,
+        rl: bool,
+    },
+    AMOADDW {
+        dest: IRegister,
+        addr: IRegister,
+        src: IRegister,
+        aq: bool,
+        rl: bool,
+    },
+    AMOXORW {
+        dest: IRegister,
+        addr: IRegister,
+        src: IRegister,
+        aq: bool,
+        rl: bool,
+    },
+    AMOANDW {
+        dest: IRegister,
+        addr: IRegister,
+        src: IRegister,
+        aq: bool,
+        rl: bool,
+    },
+    AMOORW {
+        dest: IRegister,
+        addr: IRegister,
+        src: IRegister,
+        aq: bool,
+        rl: bool,
+    },
+    AMOMINW {
+        dest: IRegister,
+        addr: IRegister,
+        src: IRegister,
+        aq: bool,
+        rl: bool,
+    },
+    AMOMAXW {
+        dest: IRegister,
+        addr: IRegister,
+        src: IRegister,
+        aq: bool,
+        rl: bool,
+    },
+    AMOMINUW {
+        dest: IRegister,
+        addr: IRegister,
+        src: IRegister,
+        aq: bool,
+        rl: bool,
+    },
+    AMOMAXUW {
+        dest: IRegister,
+        addr: IRegister,
+        src: IRegister,
+        aq: bool,
+        rl: bool,
+    },
     //
-    LRD(IRegister, IRegister, bool, bool),
-    SCD(IRegister, IRegister, IRegister, bool, bool),
-    AMOSWAPD(IRegister, IRegister, IRegister, bool, bool),
-    AMOADDD(IRegister, IRegister, IRegister, bool, bool),
-    AMOXORD(IRegister, IRegister, IRegister, bool, bool),
-    AMOANDD(IRegister, IRegister, IRegister, bool, bool),
-    AMOORD(IRegister, IRegister, IRegister, bool, bool),
-    AMOMIND(IRegister, IRegister, IRegister, bool, bool),
-    AMOMAXD(IRegister, IRegister, IRegister, bool, bool),
-    AMOMINUD(IRegister, IRegister, IRegister, bool, bool),
-    AMOMAXUD(IRegister, IRegister, IRegister, bool, bool),
+    LRD {
+        dest: IRegister,
+        addr: IRegister,
+        aq: bool,
+        rl: bool,
+    },
+    SCD {
+        dest: IRegister,
+        addr: IRegister,
+        src: IRegister,
+        aq: bool,
+        rl: bool,
+    },
+    AMOSWAPD {
+        dest: IRegister,
+        addr: IRegister,
+        src: IRegister,
+        aq: bool,
+        rl: bool,
+    },
+    AMOADDD {
+        dest: IRegister,
+        addr: IRegister,
+        src: IRegister,
+        aq: bool,
+        rl: bool,
+    },
+    AMOXORD {
+        dest: IRegister,
+        addr: IRegister,
+        src: IRegister,
+        aq: bool,
+        rl: bool,
+    },
+    AMOANDD {
+        dest: IRegister,
+        addr: IRegister,
+        src: IRegister,
+        aq: bool,
+        rl: bool,
+    },
+    AMOORD {
+        dest: IRegister,
+        addr: IRegister,
+        src: IRegister,
+        aq: bool,
+        rl: bool,
+    },
+    AMOMIND {
+        dest: IRegister,
+        addr: IRegister,
+        src: IRegister,
+        aq: bool,
+        rl: bool,
+    },
+    AMOMAXD {
+        dest: IRegister,
+        addr: IRegister,
+        src: IRegister,
+        aq: bool,
+        rl: bool,
+    },
+    AMOMINUD {
+        dest: IRegister,
+        addr: IRegister,
+        src: IRegister,
+        aq: bool,
+        rl: bool,
+    },
+    AMOMAXUD {
+        dest: IRegister,
+        addr: IRegister,
+        src: IRegister,
+        aq: bool,
+        rl: bool,
+    },
     //
     // Instructions in F Extension
     //
-    FLW(FRegister, IRegister, IImmediate),
-    FSW(IRegister, FRegister, SImmediate),
-    FMADDS(FRegister, FRegister, FRegister, FRegister, RoundingMode),
-    FMSUBS(FRegister, FRegister, FRegister, FRegister, RoundingMode),
-    FNMSUBS(FRegister, FRegister, FRegister, FRegister, RoundingMode),
-    FNMADDS(FRegister, FRegister, FRegister, FRegister, RoundingMode),
-    FADDS(FRegister, FRegister, FRegister, RoundingMode),
-    FSUBS(FRegister, FRegister, FRegister, RoundingMode),
-    FMULS(FRegister, FRegister, FRegister, RoundingMode),
-    FDIVS(FRegister, FRegister, FRegister, RoundingMode),
-    FSQRTS(FRegister, FRegister, RoundingMode),
-    FSGNJS(FRegister, FRegister, FRegister),
-    FSGNJNS(FRegister, FRegister, FRegister),
-    FSGNJXS(FRegister, FRegister, FRegister),
-    FMINS(FRegister, FRegister, FRegister),
-    FMAXS(FRegister, FRegister, FRegister),
-    FCVTWS(IRegister, FRegister, RoundingMode),
-    FCVTWUS(IRegister, FRegister, RoundingMode),
-    FMVXW(IRegister, FRegister),
-    FEQS(IRegister, FRegister, FRegister),
-    FLTS(IRegister, FRegister, FRegister),
-    FLES(IRegister, FRegister, FRegister),
-    FCLASSS(IRegister, FRegister),
-    FCVTSW(FRegister, IRegister, RoundingMode),
-    FCVTSWU(FRegister, IRegister, RoundingMode),
-    FMVWX(FRegister, IRegister),
+    FLW {
+        dest: FRegister,
+        base: IRegister,
+        offset: IImmediate,
+    },
+    FSW {
+        base: IRegister,
+        src: FRegister,
+        offset: SImmediate,
+    },
+    FMADDS {
+        dest: FRegister,
+        src1: FRegister,
+        src2: FRegister,
+        src3: FRegister,
+        rm: RoundingMode,
+    },
+    FMSUBS {
+        dest: FRegister,
+        src1: FRegister,
+        src2: FRegister,
+        src3: FRegister,
+        rm: RoundingMode,
+    },
+    FNMSUBS {
+        dest: FRegister,
+        src1: FRegister,
+        src2: FRegister,
+        src3: FRegister,
+        rm: RoundingMode,
+    },
+    FNMADDS {
+        dest: FRegister,
+        src1: FRegister,
+        src2: FRegister,
+        src3: FRegister,
+        rm: RoundingMode,
+    },
+    FADDS {
+        dest: FRegister,
+        src1: FRegister,
+        src2: FRegister,
+        rm: RoundingMode,
+    },
+    FSUBS {
+        dest: FRegister,
+        src1: FRegister,
+        src2: FRegister,
+        rm: RoundingMode,
+    },
+    FMULS {
+        dest: FRegister,
+        src1: FRegister,
+        src2: FRegister,
+        rm: RoundingMode,
+    },
+    FDIVS {
+        dest: FRegister,
+        src1: FRegister,
+        src2: FRegister,
+        rm: RoundingMode,
+    },
+    FSQRTS {
+        dest: FRegister,
+        src: FRegister,
+        rm: RoundingMode,
+    },
+    FSGNJS {
+        dest: FRegister,
+        src1: FRegister,
+        src2: FRegister,
+    },
+    FSGNJNS {
+        dest: FRegister,
+        src1: FRegister,
+        src2: FRegister,
+    },
+    FSGNJXS {
+        dest: FRegister,
+        src1: FRegister,
+        src2: FRegister,
+    },
+    FMINS {
+        dest: FRegister,
+        src1: FRegister,
+        src2: FRegister,
+    },
+    FMAXS {
+        dest: FRegister,
+        src1: FRegister,
+        src2: FRegister,
+    },
+    FCVTWS {
+        dest: IRegister,
+        src: FRegister,
+        rm: RoundingMode,
+    },
+    FCVTWUS {
+        dest: IRegister,
+        src: FRegister,
+        rm: RoundingMode,
+    },
+    FMVXW {
+        dest: IRegister,
+        src: FRegister,
+    },
+    FEQS {
+        dest: IRegister,
+        src1: FRegister,
+        src2: FRegister,
+    },
+    FLTS {
+        dest: IRegister,
+        src1: FRegister,
+        src2: FRegister,
+    },
+    FLES {
+        dest: IRegister,
+        src1: FRegister,
+        src2: FRegister,
+    },
+    FCLASSS {
+        dest: IRegister,
+        src: FRegister,
+    },
+    FCVTSW {
+        dest: FRegister,
+        src: IRegister,
+        rm: RoundingMode,
+    },
+    FCVTSWU {
+        dest: FRegister,
+        src: IRegister,
+        rm: RoundingMode,
+    },
+    FMVWX {
+        dest: FRegister,
+        src: IRegister,
+    },
     //
     // Instructions in F Extension (RV64)
     //
@@ -276,171 +769,336 @@ fn aq_rl_suffix(aq: &bool, rl: &bool) -> &'static str {
 impl Display for Instruction {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
         match self {
-            Instruction::LUI(rd, imm) => write!(f, "lui {},{}", rd, imm),
-            Instruction::AUIPC(rd, imm) => write!(f, "auipc {},{}", rd, imm),
-            Instruction::JAL(rd, offset) => write!(f, "jal {},{}", rd, offset),
-            Instruction::JALR(rd, rs1, imm) => write!(f, "jalr {},{}({})", rd, imm, rs1),
-            Instruction::BEQ(rs1, rs2, imm) => write!(f, "beq {},{},{}", rs1, rs2, imm),
-            Instruction::BNE(rs1, rs2, imm) => write!(f, "bne {},{},{}", rs1, rs2, imm),
-            Instruction::BLT(rs1, rs2, imm) => write!(f, "blt {},{},{}", rs1, rs2, imm),
-            Instruction::BGE(rs1, rs2, imm) => write!(f, "bge {rs1},{rs2},{imm}"),
-            Instruction::BLTU(rs1, rs2, imm) => write!(f, "bltu {rs1},{rs2},{imm}"),
-            Instruction::BGEU(rs1, rs2, imm) => write!(f, "bgeu {rs1},{rs2},{imm}"),
-            Instruction::LB(rd, rs1, imm) => write!(f, "lb {rd},{imm}({rs1})"),
-            Instruction::LH(rd, rs1, imm) => write!(f, "lh {rd},{imm}({rs1})"),
-            Instruction::LW(rd, rs1, imm) => write!(f, "lw {rd},{imm}({rs1})"),
-            Instruction::LBU(rd, rs1, imm) => write!(f, "lbu {rd},{imm}({rs1})"),
-            Instruction::LHU(rd, rs1, imm) => write!(f, "lhu {rd},{imm}({rs1})"),
-            Instruction::SB(rs1, rs2, imm) => write!(f, "sb {rs2},{imm}({rs1})"),
-            Instruction::SH(rs1, rs2, imm) => write!(f, "sh {rs2},{imm}({rs1})"),
-            Instruction::SW(rs1, rs2, imm) => write!(f, "sw {rs2},{imm}({rs1})"),
-            Instruction::ADDI(rd, rs1, imm) => write!(f, "addi {rd},{rs1},{imm}"),
-            Instruction::SLTI(rd, rs1, imm) => write!(f, "slti {rd},{rs1},{imm}"),
-            Instruction::SLTIU(rd, rs1, imm) => write!(f, "sltiu {rd},{rs1},{imm}"),
-            Instruction::XORI(rd, rs1, imm) => write!(f, "xori {rd},{rs1},{imm}"),
-            Instruction::ORI(rd, rs1, imm) => write!(f, "ori {rd},{rs1},{imm}"),
-            Instruction::ANDI(rd, rs1, imm) => write!(f, "andi {rd},{rs1},{imm}"),
-            Instruction::SLLI(rd, rs1, imm) => write!(f, "slli {rd},{rs1},{imm}"),
-            Instruction::SRLI(rd, rs1, imm) => write!(f, "srli {rd},{rs1},{imm}"),
-            Instruction::SRAI(rd, rs1, imm) => write!(f, "srai {rd},{rs1},{imm}"),
-            Instruction::ADD(rd, rs1, rs2) => write!(f, "add {rd},{rs1},{rs2}"),
-            Instruction::SUB(rd, rs1, rs2) => write!(f, "sub {rd},{rs1},{rs2}"),
-            Instruction::SLL(rd, rs1, rs2) => write!(f, "sll {rd},{rs1},{rs2}"),
-            Instruction::SLT(rd, rs1, rs2) => write!(f, "slt {rd},{rs1},{rs2}"),
-            Instruction::SLTU(rd, rs1, rs2) => write!(f, "sltu {rd},{rs1},{rs2}"),
-            Instruction::XOR(rd, rs1, rs2) => write!(f, "xor {rd},{rs1},{rs2}"),
-            Instruction::SRL(rd, rs1, rs2) => write!(f, "srl {rd},{rs1},{rs2}"),
-            Instruction::SRA(rd, rs1, rs2) => write!(f, "sra {rd},{rs1},{rs2}"),
-            Instruction::OR(rd, rs1, rs2) => write!(f, "or {rd},{rs1},{rs2}"),
-            Instruction::AND(rd, rs1, rs2) => write!(f, "and {rd},{rs1},{rs2}"),
-            Instruction::FENCE(_, _, _, _) => write!(f, "{}", self.fmt_fence()),
+            Instruction::LUI { dest, imm } => write!(f, "lui {dest},{imm}"),
+            Instruction::AUIPC { dest, imm } => write!(f, "auipc {dest},{imm}"),
+            Instruction::JAL { dest, offset } => write!(f, "jal {dest},{offset}"),
+            Instruction::JALR { dest, base, offset } => write!(f, "jalr {dest},{offset}({base})"),
+            Instruction::BEQ { src1, src2, offset } => write!(f, "beq {src1},{src2},{offset}"),
+            Instruction::BNE { src1, src2, offset } => write!(f, "bne {src1},{src2},{offset}"),
+            Instruction::BLT { src1, src2, offset } => write!(f, "blt {src1},{src2},{offset}"),
+            Instruction::BGE { src1, src2, offset } => write!(f, "bge {src1},{src2},{offset}"),
+            Instruction::BLTU { src1, src2, offset } => write!(f, "bltu {src1},{src2},{offset}"),
+            Instruction::BGEU { src1, src2, offset } => write!(f, "bgeu {src1},{src2},{offset}"),
+            Instruction::LB { dest, base, offset } => write!(f, "lb {dest},{offset}({base})"),
+            Instruction::LH { dest, base, offset } => write!(f, "lh {dest},{offset}({base})"),
+            Instruction::LW { dest, base, offset } => write!(f, "lw {dest},{offset}({base})"),
+            Instruction::LBU { dest, base, offset } => write!(f, "lbu {dest},{offset}({base})"),
+            Instruction::LHU { dest, base, offset } => write!(f, "lhu {dest},{offset}({base})"),
+            Instruction::SB { src, base, offset } => write!(f, "sb {src},{offset}({base})"),
+            Instruction::SH { src, base, offset } => write!(f, "sh {src},{offset}({base})"),
+            Instruction::SW { src, base, offset } => write!(f, "sw {src},{offset}({base})"),
+            Instruction::ADDI { dest, src, imm } => write!(f, "addi {dest},{src},{imm}"),
+            Instruction::SLTI { dest, src, imm } => write!(f, "slti {dest},{src},{imm}"),
+            Instruction::SLTIU { dest, src, imm } => write!(f, "sltiu {dest},{src},{imm}"),
+            Instruction::XORI { dest, src, imm } => write!(f, "xori {dest},{src},{imm}"),
+            Instruction::ORI { dest, src, imm } => write!(f, "ori {dest},{src},{imm}"),
+            Instruction::ANDI { dest, src, imm } => write!(f, "andi {dest},{src},{imm}"),
+            Instruction::SLLI { dest, src, shamt } => write!(f, "slli {dest},{src},{shamt}"),
+            Instruction::SRLI { dest, src, shamt } => write!(f, "srli {dest},{src},{shamt}"),
+            Instruction::SRAI { dest, src, shamt } => write!(f, "srai {dest},{src},{shamt}"),
+            Instruction::ADD { dest, src1, src2 } => write!(f, "add {dest},{src1},{src2}"),
+            Instruction::SUB { dest, src1, src2 } => write!(f, "sub {dest},{src1},{src2}"),
+            Instruction::SLL { dest, src1, src2 } => write!(f, "sll {dest},{src1},{src2}"),
+            Instruction::SLT { dest, src1, src2 } => write!(f, "slt {dest},{src1},{src2}"),
+            Instruction::SLTU { dest, src1, src2 } => write!(f, "sltu {dest},{src1},{src2}"),
+            Instruction::XOR { dest, src1, src2 } => write!(f, "xor {dest},{src1},{src2}"),
+            Instruction::SRL { dest, src1, src2 } => write!(f, "srl {dest},{src1},{src2}"),
+            Instruction::SRA { dest, src1, src2 } => write!(f, "sra {dest},{src1},{src2}"),
+            Instruction::OR { dest, src1, src2 } => write!(f, "or {dest},{src1},{src2}"),
+            Instruction::AND { dest, src1, src2 } => write!(f, "and {dest},{src1},{src2}"),
+            Instruction::FENCE { .. } => write!(f, "{}", self.fmt_fence()),
             Instruction::ECALL => write!(f, "ecall"),
             Instruction::EBREAK => write!(f, "ebreak"),
-            Instruction::LWU(rd, rs1, imm) => write!(f, "lwu {rd},{imm}({rs1})"),
-            Instruction::LD(rd, rs1, imm) => write!(f, "ld {rd},{imm}({rs1})"),
-            Instruction::SD(rs1, rs2, imm) => write!(f, "sd {rs2},{imm}({rs1})"),
-            Instruction::ADDIW(rd, rs1, imm) => write!(f, "addiw {rd},{rs1},{imm}"),
-            Instruction::SLLIW(rd, rs1, imm) => write!(f, "slliw {rd},{rs1},{imm}"),
-            Instruction::SRLIW(rd, rs1, imm) => write!(f, "srliw {rd},{rs1},{imm}"),
-            Instruction::SRAIW(rd, rs1, imm) => write!(f, "sraiw {rd},{rs1},{imm}"),
-            Instruction::ADDW(rd, rs1, rs2) => write!(f, "addw {rd},{rs1},{rs2}"),
-            Instruction::SUBW(rd, rs1, rs2) => write!(f, "subw {rd},{rs1},{rs2}"),
-            Instruction::SLLW(rd, rs1, rs2) => write!(f, "sllw {rd},{rs1},{rs2}"),
-            Instruction::SRLW(rd, rs1, rs2) => write!(f, "srlw {rd},{rs1},{rs2}"),
-            Instruction::SRAW(rd, rs1, rs2) => write!(f, "sraw {rd},{rs1},{rs2}"),
-            Instruction::MUL(rd, rs1, rs2) => write!(f, "mul {rd},{rs1},{rs2}"),
-            Instruction::MULH(rd, rs1, rs2) => write!(f, "mulh {rd},{rs1},{rs2}"),
-            Instruction::MULHSU(rd, rs1, rs2) => write!(f, "mulhsu {rd},{rs1},{rs2}"),
-            Instruction::MULHU(rd, rs1, rs2) => write!(f, "mulhu {rd},{rs1},{rs2}"),
-            Instruction::DIV(rd, rs1, rs2) => write!(f, "div {rd},{rs1},{rs2}"),
-            Instruction::DIVU(rd, rs1, rs2) => write!(f, "divu {rd},{rs1},{rs2}"),
-            Instruction::REM(rd, rs1, rs2) => write!(f, "rem {rd},{rs1},{rs2}"),
-            Instruction::REMU(rd, rs1, rs2) => write!(f, "remu {rd},{rs1},{rs2}"),
-            Instruction::MULW(rd, rs1, rs2) => write!(f, "mulw {rd},{rs1},{rs2}"),
-            Instruction::DIVW(rd, rs1, rs2) => write!(f, "divw {rd},{rs1},{rs2}"),
-            Instruction::DIVUW(rd, rs1, rs2) => write!(f, "divuw {rd},{rs1},{rs2}"),
-            Instruction::REMW(rd, rs1, rs2) => write!(f, "remw {rd},{rs1},{rs2}"),
-            Instruction::REMUW(rd, rs1, rs2) => write!(f, "remuw {rd},{rs1},{rs2}"),
-            Instruction::LRW(rd, rs1, aq, rl) => {
-                write!(f, "lr.w{} {rd},{rs1}", aq_rl_suffix(aq, rl))
-            }
-            Instruction::SCW(rd, rs1, rs2, aq, rl) => {
-                write!(f, "sc.w{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
-            }
-            Instruction::AMOSWAPW(rd, rs1, rs2, aq, rl) => {
-                write!(f, "amoswap.w{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
-            }
-            Instruction::AMOADDW(rd, rs1, rs2, aq, rl) => {
-                write!(f, "amoadd.w{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
-            }
-            Instruction::AMOXORW(rd, rs1, rs2, aq, rl) => {
-                write!(f, "amoxor.w{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
-            }
-            Instruction::AMOANDW(rd, rs1, rs2, aq, rl) => {
-                write!(f, "amoand.w{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
-            }
-            Instruction::AMOORW(rd, rs1, rs2, aq, rl) => {
-                write!(f, "amoor.w{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
-            }
-            Instruction::AMOMINW(rd, rs1, rs2, aq, rl) => {
-                write!(f, "amomin.w{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
-            }
-            Instruction::AMOMAXW(rd, rs1, rs2, aq, rl) => {
-                write!(f, "amomax.w{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
-            }
-            Instruction::AMOMINUW(rd, rs1, rs2, aq, rl) => {
-                write!(f, "amominu.w{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
-            }
-            Instruction::AMOMAXUW(rd, rs1, rs2, aq, rl) => {
-                write!(f, "amomaxu.w{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
-            }
-            Instruction::LRD(rd, rs1, aq, rl) => {
-                write!(f, "lr.d{} {rd},{rs1}", aq_rl_suffix(aq, rl))
-            }
-            Instruction::SCD(rd, rs1, rs2, aq, rl) => {
-                write!(f, "sc.d{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
-            }
-            Instruction::AMOSWAPD(rd, rs1, rs2, aq, rl) => {
-                write!(f, "amoswap.d{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
-            }
-            Instruction::AMOADDD(rd, rs1, rs2, aq, rl) => {
-                write!(f, "amoadd.d{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
-            }
-            Instruction::AMOXORD(rd, rs1, rs2, aq, rl) => {
-                write!(f, "amoxor.d{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
-            }
-            Instruction::AMOANDD(rd, rs1, rs2, aq, rl) => {
-                write!(f, "amoand.d{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
-            }
-            Instruction::AMOORD(rd, rs1, rs2, aq, rl) => {
-                write!(f, "amoor.d{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
-            }
-            Instruction::AMOMIND(rd, rs1, rs2, aq, rl) => {
-                write!(f, "amomin.d{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
-            }
-            Instruction::AMOMAXD(rd, rs1, rs2, aq, rl) => {
-                write!(f, "amomax.d{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
-            }
-            Instruction::AMOMINUD(rd, rs1, rs2, aq, rl) => {
-                write!(f, "amominu.d{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
-            }
-            Instruction::AMOMAXUD(rd, rs1, rs2, aq, rl) => {
-                write!(f, "amomaxu.d{} {rd},{rs1},{rs2}", aq_rl_suffix(aq, rl))
-            }
-            Instruction::FLW(rd, rs1, imm) => write!(f, "flw {rd},{imm}({rs1})"),
-            Instruction::FSW(rs1, rs2, imm) => write!(f, "fsw {rs2},{imm}({rs1})"),
-            Instruction::FMADDS(rd, rs1, rs2, rs3, rm) => {
-                write!(f, "fmadd.s.{rm} {rd},{rs1},{rs2},{rs3}")
-            }
-            Instruction::FMSUBS(rd, rs1, rs2, rs3, rm) => {
-                write!(f, "fmsub.s.{rm} {rd},{rs1},{rs2},{rs3}")
-            }
-            Instruction::FNMSUBS(rd, rs1, rs2, rs3, rm) => {
-                write!(f, "fnmsub.s.{rm} {rd},{rs1},{rs2},{rs3}")
-            }
-            Instruction::FNMADDS(rd, rs1, rs2, rs3, rm) => {
-                write!(f, "fnmadd.s.{rm} {rd},{rs1},{rs2},{rs3}")
-            }
-            Instruction::FADDS(rd, rs1, rs2, rm) => write!(f, "fadd.s.{rm} {rd},{rs1},{rs2}"),
-            Instruction::FSUBS(rd, rs1, rs2, rm) => write!(f, "fsub.s.{rm} {rd},{rs1},{rs2}"),
-            Instruction::FMULS(rd, rs1, rs2, rm) => write!(f, "fmul.s.{rm} {rd},{rs1},{rs2}"),
-            Instruction::FDIVS(rd, rs1, rs2, rm) => write!(f, "fdiv.s.{rm} {rd},{rs1},{rs2}"),
-            Instruction::FSQRTS(rd, rs1, rm) => write!(f, "fsqrt.s.{rm} {rd},{rs1}"),
-            Instruction::FSGNJS(rd, rs1, rs2) => write!(f, "fsgnj.s {rd},{rs1},{rs2}"),
-            Instruction::FSGNJNS(rd, rs1, rs2) => write!(f, "fsgnjn.s {rd},{rs1},{rs2}"),
-            Instruction::FSGNJXS(rd, rs1, rs2) => write!(f, "fsgnjx.s {rd},{rs1},{rs2}"),
-            Instruction::FMINS(rd, rs1, rs2) => write!(f, "fmin.s {rd},{rs1},{rs2}"),
-            Instruction::FMAXS(rd, rs1, rs2) => write!(f, "fmax.s {rd},{rs1},{rs2}"),
-            Instruction::FCVTWS(rd, rs1, rm) => write!(f, "fcvt.w.s.{rm} {rd},{rs1}"),
-            Instruction::FCVTWUS(rd, rs1, rm) => write!(f, "fcvt.wu.s.{rm} {rd},{rs1}"),
-            Instruction::FMVXW(rd, rs1) => write!(f, "fmv.x.w {rd},{rs1}"),
-            Instruction::FEQS(rd, rs1, rs2) => write!(f, "feq.s {rd},{rs1},{rs2}"),
-            Instruction::FLTS(rd, rs1, rs2) => write!(f, "flt.s {rd},{rs1},{rs2}"),
-            Instruction::FLES(rd, rs1, rs2) => write!(f, "fle.s {rd},{rs1},{rs2}"),
-            Instruction::FCLASSS(rd, rs1) => write!(f, "fclass.s {rd},{rs1}"),
-            Instruction::FCVTSW(rd, rs1, rm) => write!(f, "fcvt.s.w.{rm} {rd},{rs1}"),
-            Instruction::FCVTSWU(rd, rs1, rm) => write!(f, "fcvt.s.wu.{rm} {rd},{rs1}"),
-            Instruction::FMVWX(rd, rs1) => write!(f, "fmv.w.x {rd},{rs1}"),
+            Instruction::LWU { dest, base, offset } => write!(f, "lwu {dest},{offset}({base})"),
+            Instruction::LD { dest, base, offset } => write!(f, "ld {dest},{offset}({base})"),
+            Instruction::SD { src, base, offset } => write!(f, "sd {src},{offset}({base})"),
+            Instruction::ADDIW { dest, src, imm } => write!(f, "addiw {dest},{src},{imm}"),
+            Instruction::SLLIW { dest, src, shamt } => write!(f, "slliw {dest},{src},{shamt}"),
+            Instruction::SRLIW { dest, src, shamt } => write!(f, "srliw {dest},{src},{shamt}"),
+            Instruction::SRAIW { dest, src, shamt } => write!(f, "sraiw {dest},{src},{shamt}"),
+            Instruction::ADDW { dest, src1, src2 } => write!(f, "addw {dest},{src1},{src2}"),
+            Instruction::SUBW { dest, src1, src2 } => write!(f, "subw {dest},{src1},{src2}"),
+            Instruction::SLLW { dest, src1, src2 } => write!(f, "sllw {dest},{src1},{src2}"),
+            Instruction::SRLW { dest, src1, src2 } => write!(f, "srlw {dest},{src1},{src2}"),
+            Instruction::SRAW { dest, src1, src2 } => write!(f, "sraw {dest},{src1},{src2}"),
+            Instruction::MUL { dest, src1, src2 } => write!(f, "mul {dest},{src1},{src2}"),
+            Instruction::MULH { dest, src1, src2 } => write!(f, "mulh {dest},{src1},{src2}"),
+            Instruction::MULHSU { dest, src1, src2 } => write!(f, "mulhsu {dest},{src1},{src2}"),
+            Instruction::MULHU { dest, src1, src2 } => write!(f, "mulhu {dest},{src1},{src2}"),
+            Instruction::DIV { dest, src1, src2 } => write!(f, "div {dest},{src1},{src2}"),
+            Instruction::DIVU { dest, src1, src2 } => write!(f, "divu {dest},{src1},{src2}"),
+            Instruction::REM { dest, src1, src2 } => write!(f, "rem {dest},{src1},{src2}"),
+            Instruction::REMU { dest, src1, src2 } => write!(f, "remu {dest},{src1},{src2}"),
+            Instruction::MULW { dest, src1, src2 } => write!(f, "mulw {dest},{src1},{src2}"),
+            Instruction::DIVW { dest, src1, src2 } => write!(f, "divw {dest},{src1},{src2}"),
+            Instruction::DIVUW { dest, src1, src2 } => write!(f, "divuw {dest},{src1},{src2}"),
+            Instruction::REMW { dest, src1, src2 } => write!(f, "remw {dest},{src1},{src2}"),
+            Instruction::REMUW { dest, src1, src2 } => write!(f, "remuw {dest},{src1},{src2}"),
+            Instruction::LRW { dest, addr, aq, rl } => {
+                        write!(f, "lr.w{} {dest},{addr}", aq_rl_suffix(aq, rl))
+                    }
+            Instruction::SCW {
+                        dest,
+                        addr,
+                        src,
+                        aq,
+                        rl,
+                    } => {
+                        write!(f, "sc.w{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
+                    }
+            Instruction::AMOSWAPW {
+                        dest,
+                        addr,
+                        src,
+                        aq,
+                        rl,
+                    } => {
+                        write!(f, "amoswap.w{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
+                    }
+            Instruction::AMOADDW {
+                        dest,
+                        addr,
+                        src,
+                        aq,
+                        rl,
+                    } => {
+                        write!(f, "amoadd.w{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
+                    }
+            Instruction::AMOXORW {
+                        dest,
+                        addr,
+                        src,
+                        aq,
+                        rl,
+                    } => {
+                        write!(f, "amoxor.w{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
+                    }
+            Instruction::AMOANDW {
+                        dest,
+                        addr,
+                        src,
+                        aq,
+                        rl,
+                    } => {
+                        write!(f, "amoand.w{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
+                    }
+            Instruction::AMOORW {
+                        dest,
+                        addr,
+                        src,
+                        aq,
+                        rl,
+                    } => {
+                        write!(f, "amoor.w{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
+                    }
+                    
+            Instruction::AMOMINW {
+                        dest,
+                        addr,
+                        src,
+                        aq,
+                        rl,
+                    } => {
+                        write!(f, "amomin.w{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
+                    }
+            Instruction::AMOMAXW {
+                        dest,
+                        addr,
+                        src,
+                        aq,
+                        rl,
+                    } => {
+                        write!(f, "amomax.w{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
+                    }
+            Instruction::AMOMINUW {
+                        dest,
+                        addr,
+                        src,
+                        aq,
+                        rl,
+                    } => {
+                        write!(f, "amominu.w{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
+                    }
+            Instruction::AMOMAXUW {
+                        dest,
+                        addr,
+                        src,
+                        aq,
+                        rl,
+                    } => {
+                        write!(f, "amomaxu.w{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
+                    }
+            Instruction::LRD { dest, addr, aq, rl } => {
+                        write!(f, "lr.d{} {dest},{addr}", aq_rl_suffix(aq, rl))
+                    }
+            Instruction::SCD {
+                        dest,
+                        addr,
+                        src,
+                        aq,
+                        rl,
+                    } => {
+                        write!(f, "sc.d{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
+                    }
+            Instruction::AMOSWAPD {
+                        dest,
+                        addr,
+                        src,
+                        aq,
+                        rl,
+                    } => {
+                        write!(f, "amoswap.d{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
+                    }
+            Instruction::AMOADDD {
+                        dest,
+                        addr,
+                        src,
+                        aq,
+                        rl,
+                    } => {
+                        write!(f, "amoadd.d{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
+                    }
+            Instruction::AMOXORD {
+                        dest,
+                        addr,
+                        src,
+                        aq,
+                        rl,
+                    } => {
+                        write!(f, "amoxor.d{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
+                    }
+            Instruction::AMOANDD {
+                        dest,
+                        addr,
+                        src,
+                        aq,
+                        rl,
+                    } => {
+                        write!(f, "amoand.d{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
+                    }
+            Instruction::AMOORD {
+                        dest,
+                        addr,
+                        src,
+                        aq,
+                        rl,
+                    } => {
+                        write!(f, "amoor.d{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
+                    }
+            Instruction::AMOMIND {
+                        dest,
+                        addr,
+                        src,
+                        aq,
+                        rl,
+                    } => {
+                        write!(f, "amomin.d{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
+                    }
+            Instruction::AMOMAXD {
+                        dest,
+                        addr,
+                        src,
+                        aq,
+                        rl,
+                    } => {
+                        write!(f, "amomax.d{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
+                    }
+            Instruction::AMOMINUD {
+                        dest,
+                        addr,
+                        src,
+                        aq,
+                        rl,
+                    } => {
+                        write!(f, "amominu.d{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
+                    }
+            Instruction::AMOMAXUD {
+                        dest,
+                        addr,
+                        src,
+                        aq,
+                        rl,
+                    } => {
+                        write!(f, "amomaxu.d{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
+                    }
+            Instruction::FLW { dest, base, offset } => write!(f, "flw {dest},{offset}({base})"),
+            Instruction::FSW { base, src, offset } => write!(f, "fsw {src},{offset}({base})"),
+            Instruction::FMADDS {
+                        dest,
+                        src1,
+                        src2,
+                        src3,
+                        rm,
+                    } => {
+                        write!(f, "fmadd.s.{rm} {dest},{src1},{src2},{src3}")
+                    }
+            Instruction::FMSUBS {
+                        dest,
+                        src1,
+                        src2,
+                        src3,
+                        rm,
+                    } => {
+                        write!(f, "fmsub.s.{rm} {dest},{src1},{src2},{src3}")
+                    }
+            Instruction::FNMSUBS {
+                        dest,
+                        src1,
+                        src2,
+                        src3,
+                        rm,
+                    } => {
+                        write!(f, "fnmsub.s.{rm} {dest},{src1},{src2},{src3}")
+                    }
+            Instruction::FNMADDS {
+                        dest,
+                        src1,
+                        src2,
+                        src3,
+                        rm,
+                    } => {
+                        write!(f, "fnmadd.s.{rm} {dest},{src1},{src2},{src3}")
+                    }
+            Instruction::FADDS {
+                        dest,
+                        src1,
+                        src2,
+                        rm,
+                    } => write!(f, "fadd.s.{rm} {dest},{src1},{src2}"),
+            Instruction::FSUBS {
+                        dest,
+                        src1,
+                        src2,
+                        rm,
+                    } => write!(f, "fsub.s.{rm} {dest},{src1},{src2}"),
+            Instruction::FMULS {
+                        dest,
+                        src1,
+                        src2,
+                        rm,
+                    } => write!(f, "fmul.s.{rm} {dest},{src1},{src2}"),
+            Instruction::FDIVS {
+                        dest,
+                        src1,
+                        src2,
+                        rm,
+                    } => write!(f, "fdiv.s.{rm} {dest},{src1},{src2}"),
+            Instruction::FSQRTS { dest, src, rm } => write!(f, "fsqrt.s.{rm} {dest},{src}"),
+            Instruction::FSGNJS { dest, src1, src2 } => write!(f, "fsgnj.s {dest},{src1},{src2}"),
+            Instruction::FSGNJNS { dest, src1, src2 } => write!(f, "fsgnjn.s {dest},{src1},{src2}"),
+            Instruction::FSGNJXS { dest, src1, src2 } => write!(f, "fsgnjx.s {dest},{src1},{src2}"),
+            Instruction::FMINS { dest, src1, src2 } => write!(f, "fmin.s {dest},{src1},{src2}"),
+            Instruction::FMAXS { dest, src1, src2 } => write!(f, "fmax.s {dest},{src1},{src2}"),
+            Instruction::FCVTWS { dest, src, rm } => write!(f, "fcvt.w.s.{rm} {dest},{src}"),
+            Instruction::FCVTWUS { dest, src, rm } => write!(f, "fcvt.wu.s.{rm} {dest},{src}"),
+            Instruction::FMVXW { dest, src } => write!(f, "fmv.x.w {dest},{src}"),
+            Instruction::FEQS { dest, src1, src2 } => write!(f, "feq.s {dest},{src1},{src2}"),
+            Instruction::FLTS { dest, src1, src2 } => write!(f, "flt.s {dest},{src1},{src2}"),
+            Instruction::FLES { dest, src1, src2 } => write!(f, "fle.s {dest},{src1},{src2}"),
+            Instruction::FCLASSS { dest, src } => write!(f, "fclass.s {dest},{src}"),
+            Instruction::FCVTSW { dest, src, rm } => write!(f, "fcvt.s.w.{rm} {dest},{src}"),
+            Instruction::FCVTSWU { dest, src, rm } => write!(f, "fcvt.s.wu.{rm} {dest},{src}"),
+            Instruction::FMVWX { dest, src } => write!(f, "fmv.w.x {dest},{src}"),
             Instruction::FCVTLS(rd, rs1, rm) => write!(f, "fcvt.l.s.{rm} {rd},{rs1}"),
             Instruction::FCVTLUS(rd, rs1, rm) => write!(f, "fcvt.lu.s.{rm} {rd},{rs1}"),
             Instruction::FCVTSL(rd, rs1, rm) => write!(f, "fcvt.s.l.{rm} {rd},{rs1}"),
@@ -452,13 +1110,20 @@ impl Display for Instruction {
             Instruction::CSRRSI(rd, imm, csr) => write!(f, "csrrsi {rd},{csr},{imm}"),
             Instruction::CSRRCI(rd, imm, csr) => write!(f, "csrrci {rd},{csr},{imm}"),
             Instruction::FENCEI => write!(f, "fence.i"),
-        }
+            
+                    }
     }
 }
 
 impl Instruction {
     fn fmt_fence(&self) -> String {
-        if let Instruction::FENCE(_, _, ops, fm) = *self {
+        if let Instruction::FENCE {
+            rd: _,
+            rs1: _,
+            ops,
+            fm,
+        } = *self
+        {
             let sw = if ops & 0b0000_0001 != 0 { "w" } else { "" };
             let sr = if ops & 0b0000_0010 != 0 { "r" } else { "" };
             let so = if ops & 0b0000_0100 != 0 { "o" } else { "" };
@@ -636,21 +1301,21 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                     Err("jalr instruction requires 2 operands".to_owned())
                 } else {
                     let (base, offset) = parse_address_expression(operands[1])?;
-                    Ok(Instruction::JALR(
-                        IRegister::from_string(operands[0])?,
+                    Ok(Instruction::JALR {
+                        dest: IRegister::from_string(operands[0])?,
                         base,
-                        IImmediate::from_val(offset),
-                    ))
+                        offset: IImmediate::from_val(offset),
+                    })
                 }
             }
             "jal" => {
                 if operands.len() != 2 {
                     Err("jal instruction requires 2 operands".to_owned())
                 } else {
-                    Ok(Instruction::JAL(
-                        IRegister::from_string(operands[0])?,
-                        JImmediate::from_val(parse_int(operands[1])?),
-                    ))
+                    Ok(Instruction::JAL {
+                        dest: IRegister::from_string(operands[0])?,
+                        offset: JImmediate::from_val(parse_int(operands[1])?),
+                    })
                 }
             }
             "lui" => {
@@ -661,10 +1326,10 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                     if int > 2i64.pow(19) - 1 || int < -2i64.pow(19) {
                         Err("UImmediate out of range".to_owned())
                     } else {
-                        Ok(Instruction::LUI(
-                            IRegister::from_string(operands[0])?,
-                            UImmediate::from_val(int),
-                        ))
+                        Ok(Instruction::LUI {
+                            dest: IRegister::from_string(operands[0])?,
+                            imm: UImmediate::from_val(int),
+                        })
                     }
                 }
             }
@@ -676,10 +1341,10 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                     if int > 2i64.pow(19) - 1 || int < -2i64.pow(19) {
                         Err("UImmediate out of range".to_owned())
                     } else {
-                        Ok(Instruction::AUIPC(
-                            IRegister::from_string(operands[0])?,
-                            UImmediate::from_val(int),
-                        ))
+                        Ok(Instruction::AUIPC {
+                            dest: IRegister::from_string(operands[0])?,
+                            imm: UImmediate::from_val(int),
+                        })
                     }
                 }
             }
@@ -690,13 +1355,13 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                     } else {
                         let ops =
                             parse_fence_set(operands[1]) | (parse_fence_set(operands[0]) << 4);
-                        Ok(Instruction::FENCE(
+                        Ok(Instruction::FENCE {
                             // rd and rs1 are currently unused
-                            IRegister::Zero,
-                            IRegister::Zero,
+                            rd: IRegister::Zero,
+                            rs1: IRegister::Zero,
                             ops,
-                            0, //fm field, always zero for a non-tso fence
-                        ))
+                            fm: 0, //fm field, always zero for a non-tso fence
+                        })
                     }
                 } else if mnemonics[1] == "tso" {
                     if operands.len() != 2 {
@@ -707,13 +1372,13 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                         if ops != (parse_fence_set("rw") | (parse_fence_set("rw") << 4)) {
                             Err("fence.tso should be rw,rw".to_owned())
                         } else {
-                            Ok(Instruction::FENCE(
+                            Ok(Instruction::FENCE {
                                 // rd and rs1 are currently unused
-                                IRegister::Zero,
-                                IRegister::Zero,
+                                rd: IRegister::Zero,
+                                rs1: IRegister::Zero,
                                 ops,
-                                0b1000, // tso fence
-                            ))
+                                fm: 0b1000, // tso fence
+                            })
                         }
                     }
                 } else if mnemonics[1] == "i" {
@@ -732,19 +1397,19 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                     Err("lr must have size (w/d)".to_owned())
                 } else if mnemonics.len() == 2 {
                     if mnemonics[1] == "w" {
-                        Ok(Instruction::LRW(
-                            IRegister::from_string(operands[0])?,
-                            IRegister::from_string(operands[1])?,
-                            false,
-                            false,
-                        ))
+                        Ok(Instruction::LRW{
+                            dest: IRegister::from_string(operands[0])?,
+                            addr: IRegister::from_string(operands[1])?,
+                            aq: false,
+                            rl: false,
+                    })
                     } else if mnemonics[1] == "d" {
-                        Ok(Instruction::LRD(
-                            IRegister::from_string(operands[0])?,
-                            IRegister::from_string(operands[1])?,
-                            false,
-                            false,
-                        ))
+                        Ok(Instruction::LRD{
+                            dest: IRegister::from_string(operands[0])?,
+                            addr: IRegister::from_string(operands[1])?,
+                            aq: false,
+                            rl: false,
+                    })
                     } else {
                         Err("size of lr isntruction must be word (w) or doubleword (d)".to_owned())
                     }
@@ -757,19 +1422,19 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                         _ => return Err("ordering should be (aq)(rl)".to_owned()),
                     };
                     if mnemonics[1] == "w" {
-                        Ok(Instruction::LRW(
-                            IRegister::from_string(operands[0])?,
-                            IRegister::from_string(operands[1])?,
+                        Ok(Instruction::LRW{
+                            dest: IRegister::from_string(operands[0])?,
+                            addr: IRegister::from_string(operands[1])?,
                             aq,
                             rl,
-                        ))
+                    })
                     } else if mnemonics[1] == "d" {
-                        Ok(Instruction::LRD(
-                            IRegister::from_string(operands[0])?,
-                            IRegister::from_string(operands[1])?,
+                        Ok(Instruction::LRD{
+                            dest: IRegister::from_string(operands[0])?,
+                            addr: IRegister::from_string(operands[1])?,
                             aq,
                             rl,
-                        ))
+                    })
                     } else {
                         Err("size of lr isntruction must be word (w) or doubleword (d)".to_owned())
                     }
@@ -796,11 +1461,11 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                     Err("flw instruction requires 2 operands".to_owned())
                 } else {
                     let (base, offset) = parse_address_expression(operands[1])?;
-                    Ok(Instruction::FLW(
-                        FRegister::from_string(operands[0])?,
+                    Ok(Instruction::FLW {
+                        dest: FRegister::from_string(operands[0])?,
                         base,
-                        IImmediate::from_val(offset),
-                    ))
+                        offset: IImmediate::from_val(offset),
+                    })
                 }
             }
             "fsw" => {
@@ -809,28 +1474,28 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                     Err("fsw instruction requires 2 operands".to_owned())
                 } else {
                     let (base, offset) = parse_address_expression(operands[1])?;
-                    Ok(Instruction::FSW(
+                    Ok(Instruction::FSW {
                         base,
-                        FRegister::from_string(operands[0])?,
-                        SImmediate::from_val(offset),
-                    ))
+                        src: FRegister::from_string(operands[0])?,
+                        offset: SImmediate::from_val(offset),
+                    })
                 }
             }
             "fsqrt" => {
                 if operands.len() != 2 {
                     Err("fsqrt instruction requires 2 operands".to_owned())
                 } else if mnemonics.len() == 2 {
-                    Ok(Instruction::FSQRTS(
-                        FRegister::from_string(operands[0])?,
-                        FRegister::from_string(operands[1])?,
-                        RoundingMode::DYN,
-                    ))
+                    Ok(Instruction::FSQRTS {
+                        dest: FRegister::from_string(operands[0])?,
+                        src: FRegister::from_string(operands[1])?,
+                        rm: RoundingMode::DYN,
+                    })
                 } else if mnemonics.len() == 3 {
-                    Ok(Instruction::FSQRTS(
-                        FRegister::from_string(operands[0])?,
-                        FRegister::from_string(operands[1])?,
-                        RoundingMode::from_str(mnemonics[2])?,
-                    ))
+                    Ok(Instruction::FSQRTS {
+                        dest: FRegister::from_string(operands[0])?,
+                        src: FRegister::from_string(operands[1])?,
+                        rm: RoundingMode::from_str(mnemonics[2])?,
+                    })
                 } else {
                     Err("fsqrt instruction requires a suffix {s,d}".to_owned())
                 }
@@ -843,11 +1508,11 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                 if operands.len() != 3 {
                     Err("fmin instruction requires 3 operands".to_owned())
                 } else if mnemonics.len() == 2 {
-                    Ok(Instruction::FMINS(
-                        FRegister::from_string(operands[0])?,
-                        FRegister::from_string(operands[1])?,
-                        FRegister::from_string(operands[2])?,
-                    ))
+                    Ok(Instruction::FMINS {
+                        dest: FRegister::from_string(operands[0])?,
+                        src1: FRegister::from_string(operands[1])?,
+                        src2: FRegister::from_string(operands[2])?,
+                    })
                 } else {
                     Err("fmin instruction requires a suffix {s,d}".to_owned())
                 }
@@ -856,11 +1521,11 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                 if operands.len() != 3 {
                     Err("fmax instruction requires 3 operands".to_owned())
                 } else if mnemonics.len() == 2 {
-                    Ok(Instruction::FMAXS(
-                        FRegister::from_string(operands[0])?,
-                        FRegister::from_string(operands[1])?,
-                        FRegister::from_string(operands[2])?,
-                    ))
+                    Ok(Instruction::FMAXS {
+                        dest: FRegister::from_string(operands[0])?,
+                        src1: FRegister::from_string(operands[1])?,
+                        src2: FRegister::from_string(operands[2])?,
+                    })
                 } else {
                     Err("fmax instruction requires a suffix {s,d}".to_owned())
                 }
@@ -871,26 +1536,26 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                 } else if mnemonics.len() == 3 {
                     // default rounding mode
                     match (mnemonics[1], mnemonics[2]) {
-                        ("w", "s") => Ok(Instruction::FCVTWS(
-                            IRegister::from_string(operands[0])?,
-                            FRegister::from_string(operands[1])?,
-                            RoundingMode::DYN,
-                        )),
-                        ("wu", "s") => Ok(Instruction::FCVTWUS(
-                            IRegister::from_string(operands[0])?,
-                            FRegister::from_string(operands[1])?,
-                            RoundingMode::DYN,
-                        )),
-                        ("s", "w") => Ok(Instruction::FCVTSW(
-                            FRegister::from_string(operands[0])?,
-                            IRegister::from_string(operands[1])?,
-                            RoundingMode::DYN,
-                        )),
-                        ("s", "wu") => Ok(Instruction::FCVTSWU(
-                            FRegister::from_string(operands[0])?,
-                            IRegister::from_string(operands[1])?,
-                            RoundingMode::DYN,
-                        )),
+                        ("w", "s") => Ok(Instruction::FCVTWS {
+                            dest: IRegister::from_string(operands[0])?,
+                            src: FRegister::from_string(operands[1])?,
+                            rm: RoundingMode::DYN,
+                        }),
+                        ("wu", "s") => Ok(Instruction::FCVTWUS {
+                            dest: IRegister::from_string(operands[0])?,
+                            src: FRegister::from_string(operands[1])?,
+                            rm: RoundingMode::DYN,
+                        }),
+                        ("s", "w") => Ok(Instruction::FCVTSW {
+                            dest: FRegister::from_string(operands[0])?,
+                            src: IRegister::from_string(operands[1])?,
+                            rm: RoundingMode::DYN,
+                        }),
+                        ("s", "wu") => Ok(Instruction::FCVTSWU {
+                            dest: FRegister::from_string(operands[0])?,
+                            src: IRegister::from_string(operands[1])?,
+                            rm: RoundingMode::DYN,
+                        }),
                         ("l", "s") => Ok(Instruction::FCVTLS(
                             IRegister::from_string(operands[0])?,
                             FRegister::from_string(operands[1])?,
@@ -915,26 +1580,26 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                     }
                 } else if mnemonics.len() == 4 {
                     match (mnemonics[1], mnemonics[2]) {
-                        ("w", "s") => Ok(Instruction::FCVTWS(
-                            IRegister::from_string(operands[0])?,
-                            FRegister::from_string(operands[1])?,
-                            RoundingMode::from_str(mnemonics[3])?,
-                        )),
-                        ("wu", "s") => Ok(Instruction::FCVTWUS(
-                            IRegister::from_string(operands[0])?,
-                            FRegister::from_string(operands[1])?,
-                            RoundingMode::from_str(mnemonics[3])?,
-                        )),
-                        ("s", "w") => Ok(Instruction::FCVTSW(
-                            FRegister::from_string(operands[0])?,
-                            IRegister::from_string(operands[1])?,
-                            RoundingMode::from_str(mnemonics[3])?,
-                        )),
-                        ("s", "wu") => Ok(Instruction::FCVTSWU(
-                            FRegister::from_string(operands[0])?,
-                            IRegister::from_string(operands[1])?,
-                            RoundingMode::from_str(mnemonics[3])?,
-                        )),
+                        ("w", "s") => Ok(Instruction::FCVTWS {
+                            dest: IRegister::from_string(operands[0])?,
+                            src: FRegister::from_string(operands[1])?,
+                            rm: RoundingMode::from_str(mnemonics[3])?,
+                        }),
+                        ("wu", "s") => Ok(Instruction::FCVTWUS {
+                            dest: IRegister::from_string(operands[0])?,
+                            src: FRegister::from_string(operands[1])?,
+                            rm: RoundingMode::from_str(mnemonics[3])?,
+                        }),
+                        ("s", "w") => Ok(Instruction::FCVTSW {
+                            dest: FRegister::from_string(operands[0])?,
+                            src: IRegister::from_string(operands[1])?,
+                            rm: RoundingMode::from_str(mnemonics[3])?,
+                        }),
+                        ("s", "wu") => Ok(Instruction::FCVTSWU {
+                            dest: FRegister::from_string(operands[0])?,
+                            src: IRegister::from_string(operands[1])?,
+                            rm: RoundingMode::from_str(mnemonics[3])?,
+                        }),
                         ("l", "s") => Ok(Instruction::FCVTLS(
                             IRegister::from_string(operands[0])?,
                             FRegister::from_string(operands[1])?,
@@ -966,14 +1631,14 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                     Err("fmv requires 2 operands".to_owned())
                 } else if mnemonics.len() == 3 {
                     match (mnemonics[1], mnemonics[2]) {
-                        ("x", "w") => Ok(Instruction::FMVXW(
-                            IRegister::from_string(operands[0])?,
-                            FRegister::from_string(operands[1])?,
-                        )),
-                        ("w", "x") => Ok(Instruction::FMVWX(
-                            FRegister::from_string(operands[0])?,
-                            IRegister::from_string(operands[1])?,
-                        )),
+                        ("x", "w") => Ok(Instruction::FMVXW {
+                            dest: IRegister::from_string(operands[0])?,
+                            src: FRegister::from_string(operands[1])?,
+                        }),
+                        ("w", "x") => Ok(Instruction::FMVWX {
+                            dest: FRegister::from_string(operands[0])?,
+                            src: IRegister::from_string(operands[1])?,
+                        }),
                         _ => Err("invalid fmv suffixes".to_owned()),
                     }
                 } else {
@@ -985,11 +1650,11 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                     Err("feq requires 3 operands".to_owned())
                 } else if mnemonics.len() == 2 {
                     match mnemonics[1] {
-                        "s" => Ok(Instruction::FEQS(
-                            IRegister::from_string(operands[0])?,
-                            FRegister::from_string(operands[1])?,
-                            FRegister::from_string(operands[2])?,
-                        )),
+                        "s" => Ok(Instruction::FEQS {
+                            dest: IRegister::from_string(operands[0])?,
+                            src1: FRegister::from_string(operands[1])?,
+                            src2: FRegister::from_string(operands[2])?,
+                        }),
                         "d" => todo!(),
                         "q" => todo!(),
                         "h" => todo!(),
@@ -1004,11 +1669,11 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                     Err("flt requires 3 operands".to_owned())
                 } else if mnemonics.len() == 2 {
                     match mnemonics[1] {
-                        "s" => Ok(Instruction::FLTS(
-                            IRegister::from_string(operands[0])?,
-                            FRegister::from_string(operands[1])?,
-                            FRegister::from_string(operands[2])?,
-                        )),
+                        "s" => Ok(Instruction::FLTS {
+                            dest: IRegister::from_string(operands[0])?,
+                            src1: FRegister::from_string(operands[1])?,
+                            src2: FRegister::from_string(operands[2])?,
+                        }),
                         "d" => todo!(),
                         "q" => todo!(),
                         "h" => todo!(),
@@ -1023,11 +1688,11 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                     Err("fle requires 3 operands".to_owned())
                 } else if mnemonics.len() == 2 {
                     match mnemonics[1] {
-                        "s" => Ok(Instruction::FLES(
-                            IRegister::from_string(operands[0])?,
-                            FRegister::from_string(operands[1])?,
-                            FRegister::from_string(operands[2])?,
-                        )),
+                        "s" => Ok(Instruction::FLES {
+                            dest: IRegister::from_string(operands[0])?,
+                            src1: FRegister::from_string(operands[1])?,
+                            src2: FRegister::from_string(operands[2])?,
+                        }),
                         "d" => todo!(),
                         "q" => todo!(),
                         "h" => todo!(),
@@ -1042,10 +1707,10 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                     Err("fclass requires 2 operands".to_owned())
                 } else if mnemonics.len() == 2 {
                     match mnemonics[1] {
-                        "s" => Ok(Instruction::FCLASSS(
-                            IRegister::from_string(operands[0])?,
-                            FRegister::from_string(operands[1])?,
-                        )),
+                        "s" => Ok(Instruction::FCLASSS {
+                            dest: IRegister::from_string(operands[0])?,
+                            src: FRegister::from_string(operands[1])?,
+                        }),
                         "d" => todo!(),
                         "q" => todo!(),
                         "h" => todo!(),
@@ -1184,98 +1849,343 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
 
     match opcode {
         Opcode::Load => match func3 {
-            0b000 => Ok(Instruction::LB(rd, rs1, i_immediate)),
-            0b001 => Ok(Instruction::LH(rd, rs1, i_immediate)),
-            0b010 => Ok(Instruction::LW(rd, rs1, i_immediate)),
-            0b011 => Ok(Instruction::LD(rd, rs1, i_immediate)),
-            0b100 => Ok(Instruction::LBU(rd, rs1, i_immediate)),
-            0b101 => Ok(Instruction::LHU(rd, rs1, i_immediate)),
-            0b110 => Ok(Instruction::LWU(rd, rs1, i_immediate)),
+            0b000 => Ok(Instruction::LB {
+                dest: rd,
+                base: rs1,
+                offset: i_immediate,
+            }),
+            0b001 => Ok(Instruction::LH {
+                dest: rd,
+                base: rs1,
+                offset: i_immediate,
+            }),
+            0b010 => Ok(Instruction::LW {
+                dest: rd,
+                base: rs1,
+                offset: i_immediate,
+            }),
+            0b011 => Ok(Instruction::LD {
+                dest: rd,
+                base: rs1,
+                offset: i_immediate,
+            }),
+            0b100 => Ok(Instruction::LBU {
+                dest: rd,
+                base: rs1,
+                offset: i_immediate,
+            }),
+            0b101 => Ok(Instruction::LHU {
+                dest: rd,
+                base: rs1,
+                offset: i_immediate,
+            }),
+            0b110 => Ok(Instruction::LWU {
+                dest: rd,
+                base: rs1,
+                offset: i_immediate,
+            }),
             0b111 => Err("Invalid load func3".to_owned()),
             _ => unreachable!(),
         },
-        Opcode::Auipc => Ok(Instruction::AUIPC(rd, u_immediate)),
+        Opcode::Auipc => Ok(Instruction::AUIPC {
+            dest: rd,
+            imm: u_immediate,
+        }),
         Opcode::Store => match func3 {
-            0b000 => Ok(Instruction::SB(rs1, rs2, s_immediate)),
-            0b001 => Ok(Instruction::SH(rs1, rs2, s_immediate)),
-            0b010 => Ok(Instruction::SW(rs1, rs2, s_immediate)),
-            0b011 => Ok(Instruction::SD(rs1, rs2, s_immediate)),
+            0b000 => Ok(Instruction::SB {
+                src: rs2,
+                base: rs1,
+                offset: s_immediate,
+            }),
+            0b001 => Ok(Instruction::SH {
+                src: rs2,
+                base: rs1,
+                offset: s_immediate,
+            }),
+            0b010 => Ok(Instruction::SW {
+                src: rs2,
+                base: rs1,
+                offset: s_immediate,
+            }),
+            0b011 => Ok(Instruction::SD {
+                src: rs2,
+                base: rs1,
+                offset: s_immediate,
+            }),
             x => Err(format!("invalid store func3: {}", x)),
         },
-        Opcode::Lui => Ok(Instruction::LUI(rd, u_immediate)),
+        Opcode::Lui => Ok(Instruction::LUI {
+            dest: rd,
+            imm: u_immediate,
+        }),
         Opcode::Op => match (func7, func3) {
-            (0b000_0000, 0b000) => Ok(Instruction::ADD(rd, rs1, rs2)),
-            (0b000_0000, 0b001) => Ok(Instruction::SLL(rd, rs1, rs2)),
-            (0b000_0000, 0b010) => Ok(Instruction::SLT(rd, rs1, rs2)),
-            (0b000_0000, 0b011) => Ok(Instruction::SLTU(rd, rs1, rs2)),
-            (0b000_0000, 0b100) => Ok(Instruction::XOR(rd, rs1, rs2)),
-            (0b000_0000, 0b101) => Ok(Instruction::SRL(rd, rs1, rs2)),
-            (0b000_0000, 0b110) => Ok(Instruction::OR(rd, rs1, rs2)),
-            (0b000_0000, 0b111) => Ok(Instruction::AND(rd, rs1, rs2)),
-            (0b010_0000, 0b000) => Ok(Instruction::SUB(rd, rs1, rs2)),
-            (0b010_0000, 0b101) => Ok(Instruction::SRA(rd, rs1, rs2)),
-            (0b000_0001, 0b000) => Ok(Instruction::MUL(rd, rs1, rs2)),
-            (0b000_0001, 0b001) => Ok(Instruction::MULH(rd, rs1, rs2)),
-            (0b000_0001, 0b010) => Ok(Instruction::MULHSU(rd, rs1, rs2)),
-            (0b000_0001, 0b011) => Ok(Instruction::MULHU(rd, rs1, rs2)),
-            (0b000_0001, 0b100) => Ok(Instruction::DIV(rd, rs1, rs2)),
-            (0b000_0001, 0b101) => Ok(Instruction::DIVU(rd, rs1, rs2)),
-            (0b000_0001, 0b110) => Ok(Instruction::REM(rd, rs1, rs2)),
-            (0b000_0001, 0b111) => Ok(Instruction::REMU(rd, rs1, rs2)),
+            (0b000_0000, 0b000) => Ok(Instruction::ADD {
+                dest: rd,
+                src1: rs1,
+                src2: rs2,
+            }),
+            (0b000_0000, 0b001) => Ok(Instruction::SLL {
+                dest: rd,
+                src1: rs1,
+                src2: rs2,
+            }),
+            (0b000_0000, 0b010) => Ok(Instruction::SLT {
+                dest: rd,
+                src1: rs1,
+                src2: rs2,
+            }),
+            (0b000_0000, 0b011) => Ok(Instruction::SLTU {
+                dest: rd,
+                src1: rs1,
+                src2: rs2,
+            }),
+            (0b000_0000, 0b100) => Ok(Instruction::XOR {
+                dest: rd,
+                src1: rs1,
+                src2: rs2,
+            }),
+            (0b000_0000, 0b101) => Ok(Instruction::SRL {
+                dest: rd,
+                src1: rs1,
+                src2: rs2,
+            }),
+            (0b000_0000, 0b110) => Ok(Instruction::OR {
+                dest: rd,
+                src1: rs1,
+                src2: rs2,
+            }),
+            (0b000_0000, 0b111) => Ok(Instruction::AND {
+                dest: rd,
+                src1: rs1,
+                src2: rs2,
+            }),
+            (0b010_0000, 0b000) => Ok(Instruction::SUB {
+                dest: rd,
+                src1: rs1,
+                src2: rs2,
+            }),
+            (0b010_0000, 0b101) => Ok(Instruction::SRA {
+                dest: rd,
+                src1: rs1,
+                src2: rs2,
+            }),
+            (0b000_0001, 0b000) => Ok(Instruction::MUL {
+                dest: rd,
+                src1: rs1,
+                src2: rs2,
+            }),
+            (0b000_0001, 0b001) => Ok(Instruction::MULH {
+                dest: rd,
+                src1: rs1,
+                src2: rs2,
+            }),
+            (0b000_0001, 0b010) => Ok(Instruction::MULHSU {
+                dest: rd,
+                src1: rs1,
+                src2: rs2,
+            }),
+            (0b000_0001, 0b011) => Ok(Instruction::MULHU {
+                dest: rd,
+                src1: rs1,
+                src2: rs2,
+            }),
+            (0b000_0001, 0b100) => Ok(Instruction::DIV {
+                dest: rd,
+                src1: rs1,
+                src2: rs2,
+            }),
+            (0b000_0001, 0b101) => Ok(Instruction::DIVU {
+                dest: rd,
+                src1: rs1,
+                src2: rs2,
+            }),
+            (0b000_0001, 0b110) => Ok(Instruction::REM {
+                dest: rd,
+                src1: rs1,
+                src2: rs2,
+            }),
+            (0b000_0001, 0b111) => Ok(Instruction::REMU {
+                dest: rd,
+                src1: rs1,
+                src2: rs2,
+            }),
             _ => Err(format!("unknown Op. func3: {}, func7: {}", func3, func7)),
         },
         Opcode::Op32 => match (func3, func7) {
-            (0b000, 0b000_0000) => Ok(Instruction::ADDW(rd, rs1, rs2)),
-            (0b000, 0b000_0001) => Ok(Instruction::MULW(rd, rs1, rs2)),
-            (0b000, 0b010_0000) => Ok(Instruction::SUBW(rd, rs1, rs2)),
-            (0b001, 0b000_0000) => Ok(Instruction::SLLW(rd, rs1, rs2)),
-            (0b100, 0b0000_001) => Ok(Instruction::DIVW(rd, rs1, rs2)),
-            (0b101, 0b000_0000) => Ok(Instruction::SRLW(rd, rs1, rs2)),
-            (0b101, 0b000_0001) => Ok(Instruction::DIVUW(rd, rs1, rs2)),
-            (0b101, 0b010_0000) => Ok(Instruction::SRAW(rd, rs1, rs2)),
-            (0b110, 0b000_0001) => Ok(Instruction::REMW(rd, rs1, rs2)),
-            (0b111, 0b000_0001) => Ok(Instruction::REMUW(rd, rs1, rs2)),
+            (0b000, 0b000_0000) => Ok(Instruction::ADDW {
+                dest: rd,
+                src1: rs1,
+                src2: rs2,
+            }),
+            (0b000, 0b000_0001) => Ok(Instruction::MULW {
+                dest: rd,
+                src1: rs1,
+                src2: rs2,
+            }),
+            (0b000, 0b010_0000) => Ok(Instruction::SUBW {
+                dest: rd,
+                src1: rs1,
+                src2: rs2,
+            }),
+            (0b001, 0b000_0000) => Ok(Instruction::SLLW {
+                dest: rd,
+                src1: rs1,
+                src2: rs2,
+            }),
+            (0b100, 0b0000_001) => Ok(Instruction::DIVW {
+                dest: rd,
+                src1: rs1,
+                src2: rs2,
+            }),
+            (0b101, 0b000_0000) => Ok(Instruction::SRLW {
+                dest: rd,
+                src1: rs1,
+                src2: rs2,
+            }),
+            (0b101, 0b000_0001) => Ok(Instruction::DIVUW {
+                dest: rd,
+                src1: rs1,
+                src2: rs2,
+            }),
+            (0b101, 0b010_0000) => Ok(Instruction::SRAW {
+                dest: rd,
+                src1: rs1,
+                src2: rs2,
+            }),
+            (0b110, 0b000_0001) => Ok(Instruction::REMW {
+                dest: rd,
+                src1: rs1,
+                src2: rs2,
+            }),
+            (0b111, 0b000_0001) => Ok(Instruction::REMUW {
+                dest: rd,
+                src1: rs1,
+                src2: rs2,
+            }),
             _ => Err(format!("unknown Op32. func3: {}, func7: {}", func3, func7)),
         },
         Opcode::OpImm => match func3 {
-            0b000 => Ok(Instruction::ADDI(rd, rs1, i_immediate)),
+            0b000 => Ok(Instruction::ADDI {
+                dest: rd,
+                src: rs1,
+                imm: i_immediate,
+            }),
             // SLLi requires special handling because shamt uses the bottom bit of func7
             0b001 => match func7 | 0b1 {
-                0b000000_1 => Ok(Instruction::SLLI(rd, rs1, shamt)),
+                0b000000_1 => Ok(Instruction::SLLI {
+                    dest: rd,
+                    src: rs1,
+                    shamt,
+                }),
                 _ => Err(format!("unknown OpImm. func3: {}, func7: {}", func3, func7)),
             },
-            0b010 => Ok(Instruction::SLTI(rd, rs1, i_immediate)),
-            0b011 => Ok(Instruction::SLTIU(rd, rs1, i_immediate)),
-            0b100 => Ok(Instruction::XORI(rd, rs1, i_immediate)),
+            0b010 => Ok(Instruction::SLTI {
+                dest: rd,
+                src: rs1,
+                imm: i_immediate,
+            }),
+            0b011 => Ok(Instruction::SLTIU {
+                dest: rd,
+                src: rs1,
+                imm: i_immediate,
+            }),
+            0b100 => Ok(Instruction::XORI {
+                dest: rd,
+                src: rs1,
+                imm: i_immediate,
+            }),
             // SRLI SRAI require special handling because shamt uses the bottom bit of func7
             0b101 => match func7 | 0b1 {
-                0b000000_1 => Ok(Instruction::SRLI(rd, rs1, shamt)),
-                0b010000_1 => Ok(Instruction::SRAI(rd, rs1, shamt)),
+                0b000000_1 => Ok(Instruction::SRLI {
+                    dest: rd,
+                    src: rs1,
+                    shamt,
+                }),
+                0b010000_1 => Ok(Instruction::SRAI {
+                    dest: rd,
+                    src: rs1,
+                    shamt,
+                }),
                 _ => Err(format!("unknown OpImm. func3: {}, func7: {}", func3, func7)),
             },
-            0b110 => Ok(Instruction::ORI(rd, rs1, i_immediate)),
-            0b111 => Ok(Instruction::ANDI(rd, rs1, i_immediate)),
+            0b110 => Ok(Instruction::ORI {
+                dest: rd,
+                src: rs1,
+                imm: i_immediate,
+            }),
+            0b111 => Ok(Instruction::ANDI {
+                dest: rd,
+                src: rs1,
+                imm: i_immediate,
+            }),
             _ => Err(format!("unknown OpImm. func3: {}, func7: {}", func3, func7)),
         },
         Opcode::OpImm32 => match func3 {
-            0b000 => Ok(Instruction::ADDIW(rd, rs1, i_immediate)),
-            0b001 => Ok(Instruction::SLLIW(rd, rs1, shamtw)),
+            0b000 => Ok(Instruction::ADDIW {
+                dest: rd,
+                src: rs1,
+                imm: i_immediate,
+            }),
+            0b001 => Ok(Instruction::SLLIW {
+                dest: rd,
+                src: rs1,
+                shamt: shamtw,
+            }),
             0b101 => match func7 {
-                0b000_0000 => Ok(Instruction::SRLIW(rd, rs1, shamtw)),
-                0b010_0000 => Ok(Instruction::SRAIW(rd, rs1, shamtw)),
+                0b000_0000 => Ok(Instruction::SRLIW {
+                    dest: rd,
+                    src: rs1,
+                    shamt: shamtw,
+                }),
+                0b010_0000 => Ok(Instruction::SRAIW {
+                    dest: rd,
+                    src: rs1,
+                    shamt: shamtw,
+                }),
                 x => Err(format!("unknown OpImm32(101) func7: {}", x).to_owned()),
             },
             x => Err(format!("unkown OpImm32 func3: {}", x).to_owned()),
         },
-        Opcode::Jalr => Ok(Instruction::JALR(rd, rs1, i_immediate)),
-        Opcode::Jal => Ok(Instruction::JAL(rd, JImmediate::from_u32(instruction))),
+        Opcode::Jalr => Ok(Instruction::JALR {
+            dest: rd,
+            base: rs1,
+            offset: i_immediate,
+        }),
+        Opcode::Jal => Ok(Instruction::JAL {
+            dest: rd,
+            offset: JImmediate::from_u32(instruction),
+        }),
         Opcode::Branch => match func3 {
-            0b000 => Ok(Instruction::BEQ(rs1, rs2, b_immediate)),
-            0b001 => Ok(Instruction::BNE(rs1, rs2, b_immediate)),
-            0b100 => Ok(Instruction::BLT(rs1, rs2, b_immediate)),
-            0b101 => Ok(Instruction::BGE(rs1, rs2, b_immediate)),
-            0b110 => Ok(Instruction::BLTU(rs1, rs2, b_immediate)),
-            0b111 => Ok(Instruction::BGEU(rs1, rs2, b_immediate)),
+            0b000 => Ok(Instruction::BEQ {
+                src1: rs1,
+                src2: rs2,
+                offset: b_immediate,
+            }),
+            0b001 => Ok(Instruction::BNE {
+                src1: rs1,
+                src2: rs2,
+                offset: b_immediate,
+            }),
+            0b100 => Ok(Instruction::BLT {
+                src1: rs1,
+                src2: rs2,
+                offset: b_immediate,
+            }),
+            0b101 => Ok(Instruction::BGE {
+                src1: rs1,
+                src2: rs2,
+                offset: b_immediate,
+            }),
+            0b110 => Ok(Instruction::BLTU {
+                src1: rs1,
+                src2: rs2,
+                offset: b_immediate,
+            }),
+            0b111 => Ok(Instruction::BGEU {
+                src1: rs1,
+                src2: rs2,
+                offset: b_immediate,
+            }),
             x => Err(format!("invalid branch func3: {x}").to_owned()),
         },
         Opcode::MiscMem => match func3 {
@@ -1290,12 +2200,12 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
                     } else if fm == 0b1000 && ((instruction >> 20) & 0xFF) != 0b0011_0011 {
                         Err("fence.tso must be rw,rw".to_owned())
                     } else {
-                        Ok(Instruction::FENCE(
+                        Ok(Instruction::FENCE {
                             rd,
                             rs1,
-                            ((instruction >> 20) & 0xFF) as u8,
-                            ((instruction >> 28) & 0b1111) as u8,
-                        ))
+                            ops: ((instruction >> 20) & 0xFF) as u8,
+                            fm: ((instruction >> 28) & 0b1111) as u8,
+                        })
                     }
                 }
             }
@@ -1319,111 +2229,281 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
                 if rs2 != IRegister::Zero {
                     Err("LR.W expects rs2 to be 0".to_owned())
                 } else {
-                    Ok(Instruction::LRW(rd, rs1, aq, rl))
+                    Ok(Instruction::LRW {
+                        dest: rd,
+                        addr: rs1,
+                        aq,
+                        rl,
+                    })
                 }
             }
             (0b011, 0b00010) => {
                 if rs2 != IRegister::Zero {
                     Err("LR.D expects rs2 to be 0".to_owned())
                 } else {
-                    Ok(Instruction::LRD(rd, rs1, aq, rl))
+                    Ok(Instruction::LRD {
+                        dest: rd,
+                        addr: rs1,
+                        aq,
+                        rl,
+                    })
                 }
             }
-            (0b010, 0b00011) => Ok(Instruction::SCW(rd, rs1, rs2, aq, rl)),
-            (0b011, 0b00011) => Ok(Instruction::SCD(rd, rs1, rs2, aq, rl)),
-            (0b010, 0b00001) => Ok(Instruction::AMOSWAPW(rd, rs1, rs2, aq, rl)),
-            (0b011, 0b00001) => Ok(Instruction::AMOSWAPD(rd, rs1, rs2, aq, rl)),
-            (0b010, 0b00000) => Ok(Instruction::AMOADDW(rd, rs1, rs2, aq, rl)),
-            (0b011, 0b00000) => Ok(Instruction::AMOADDD(rd, rs1, rs2, aq, rl)),
-            (0b010, 0b00100) => Ok(Instruction::AMOXORW(rd, rs1, rs2, aq, rl)),
-            (0b011, 0b00100) => Ok(Instruction::AMOXORD(rd, rs1, rs2, aq, rl)),
-            (0b010, 0b01100) => Ok(Instruction::AMOANDW(rd, rs1, rs2, aq, rl)),
-            (0b011, 0b01100) => Ok(Instruction::AMOANDD(rd, rs1, rs2, aq, rl)),
-            (0b010, 0b01000) => Ok(Instruction::AMOORW(rd, rs1, rs2, aq, rl)),
-            (0b011, 0b01000) => Ok(Instruction::AMOORD(rd, rs1, rs2, aq, rl)),
-            (0b010, 0b10000) => Ok(Instruction::AMOMINW(rd, rs1, rs2, aq, rl)),
-            (0b011, 0b10000) => Ok(Instruction::AMOMIND(rd, rs1, rs2, aq, rl)),
-            (0b010, 0b10100) => Ok(Instruction::AMOMAXW(rd, rs1, rs2, aq, rl)),
-            (0b011, 0b10100) => Ok(Instruction::AMOMAXD(rd, rs1, rs2, aq, rl)),
-            (0b010, 0b11000) => Ok(Instruction::AMOMINUW(rd, rs1, rs2, aq, rl)),
-            (0b011, 0b11000) => Ok(Instruction::AMOMINUD(rd, rs1, rs2, aq, rl)),
-            (0b010, 0b11100) => Ok(Instruction::AMOMAXUW(rd, rs1, rs2, aq, rl)),
-            (0b011, 0b11100) => Ok(Instruction::AMOMAXUD(rd, rs1, rs2, aq, rl)),
+            (0b010, 0b00011) => Ok(Instruction::SCW {
+                dest: rd,
+                addr: rs1,
+                src: rs2,
+                aq,
+                rl,
+            }),
+            (0b011, 0b00011) => Ok(Instruction::SCD {
+                dest: rd,
+                addr: rs1,
+                src: rs2,
+                aq,
+                rl,
+            }),
+            (0b010, 0b00001) => Ok(Instruction::AMOSWAPW {
+                dest: rd,
+                addr: rs1,
+                src: rs2,
+                aq,
+                rl,
+            }),
+            (0b011, 0b00001) => Ok(Instruction::AMOSWAPD {
+                dest: rd,
+                addr: rs1,
+                src: rs2,
+                aq,
+                rl,
+            }),
+            (0b010, 0b00000) => Ok(Instruction::AMOADDW {
+                dest: rd,
+                addr: rs1,
+                src: rs2,
+                aq,
+                rl,
+            }),
+            (0b011, 0b00000) => Ok(Instruction::AMOADDD {
+                dest: rd,
+                addr: rs1,
+                src: rs2,
+                aq,
+                rl,
+            }),
+            (0b010, 0b00100) => Ok(Instruction::AMOXORW {
+                dest: rd,
+                addr: rs1,
+                src: rs2,
+                aq,
+                rl,
+            }),
+            (0b011, 0b00100) => Ok(Instruction::AMOXORD {
+                dest: rd,
+                addr: rs1,
+                src: rs2,
+                aq,
+                rl,
+            }),
+            (0b010, 0b01100) => Ok(Instruction::AMOANDW {
+                dest: rd,
+                addr: rs1,
+                src: rs2,
+                aq,
+                rl,
+            }),
+            (0b011, 0b01100) => Ok(Instruction::AMOANDD {
+                dest: rd,
+                addr: rs1,
+                src: rs2,
+                aq,
+                rl,
+            }),
+            (0b010, 0b01000) => Ok(Instruction::AMOORW {
+                dest: rd,
+                addr: rs1,
+                src: rs2,
+                aq,
+                rl,
+            }),
+            (0b011, 0b01000) => Ok(Instruction::AMOORD {
+                dest: rd,
+                addr: rs1,
+                src: rs2,
+                aq,
+                rl,
+            }),
+            (0b010, 0b10000) => Ok(Instruction::AMOMINW {
+                dest: rd,
+                addr: rs1,
+                src: rs2,
+                aq,
+                rl,
+            }),
+            (0b011, 0b10000) => Ok(Instruction::AMOMIND {
+                dest: rd,
+                addr: rs1,
+                src: rs2,
+                aq,
+                rl,
+            }),
+            (0b010, 0b10100) => Ok(Instruction::AMOMAXW {
+                dest: rd,
+                addr: rs1,
+                src: rs2,
+                aq,
+                rl,
+            }),
+            (0b011, 0b10100) => Ok(Instruction::AMOMAXD {
+                dest: rd,
+                addr: rs1,
+                src: rs2,
+                aq,
+                rl,
+            }),
+            (0b010, 0b11000) => Ok(Instruction::AMOMINUW {
+                dest: rd,
+                addr: rs1,
+                src: rs2,
+                aq,
+                rl,
+            }),
+            (0b011, 0b11000) => Ok(Instruction::AMOMINUD {
+                dest: rd,
+                addr: rs1,
+                src: rs2,
+                aq,
+                rl,
+            }),
+            (0b010, 0b11100) => Ok(Instruction::AMOMAXUW {
+                dest: rd,
+                addr: rs1,
+                src: rs2,
+                aq,
+                rl,
+            }),
+            (0b011, 0b11100) => Ok(Instruction::AMOMAXUD {
+                dest: rd,
+                addr: rs1,
+                src: rs2,
+                aq,
+                rl,
+            }),
             _ => Err(format!("unknown AMO. func3: {func3}, func7: {func7}")),
         },
         Opcode::LoadFp => {
             println!("{i_immediate}, {:b}", instruction);
             if func3 == 0b010 {
-                Ok(Instruction::FLW(frd, rs1, i_immediate))
+                Ok(Instruction::FLW {
+                    dest: frd,
+                    base: rs1,
+                    offset: i_immediate,
+                })
             } else {
                 Err(format!("unknown func3: {func3} in opcode LoadFp"))
             }
         }
         Opcode::StoreFp => {
             if func3 == 0b010 {
-                Ok(Instruction::FSW(rs1, frs2, s_immediate))
+                Ok(Instruction::FSW {
+                    base: rs1,
+                    src: frs2,
+                    offset: s_immediate,
+                })
             } else {
                 Err(format!("unknown func3: {func3} in opcode LoadFp"))
             }
         }
         Opcode::OpFp => match func7 {
-            0b000_0000 => Ok(Instruction::FADDS(
-                frd,
-                frs1,
-                frs2,
-                RoundingMode::from_int(func3)?,
-            )),
-            0b000_0100 => Ok(Instruction::FSUBS(
-                frd,
-                frs1,
-                frs2,
-                RoundingMode::from_int(func3)?,
-            )),
-            0b000_1000 => Ok(Instruction::FMULS(
-                frd,
-                frs1,
-                frs2,
-                RoundingMode::from_int(func3)?,
-            )),
-            0b000_1100 => Ok(Instruction::FDIVS(
-                frd,
-                frs1,
-                frs2,
-                RoundingMode::from_int(func3)?,
-            )),
-            0b010_1100 => Ok(Instruction::FSQRTS(
-                frd,
-                frs1,
-                RoundingMode::from_int(func3)?,
-            )),
+            0b000_0000 => Ok(Instruction::FADDS {
+                dest: frd,
+                src1: frs1,
+                src2: frs2,
+                rm: RoundingMode::from_int(func3)?,
+            }),
+            0b000_0100 => Ok(Instruction::FSUBS {
+                dest: frd,
+                src1: frs1,
+                src2: frs2,
+                rm: RoundingMode::from_int(func3)?,
+            }),
+            0b000_1000 => Ok(Instruction::FMULS {
+                dest: frd,
+                src1: frs1,
+                src2: frs2,
+                rm: RoundingMode::from_int(func3)?,
+            }),
+            0b000_1100 => Ok(Instruction::FDIVS {
+                dest: frd,
+                src1: frs1,
+                src2: frs2,
+                rm: RoundingMode::from_int(func3)?,
+            }),
+            0b010_1100 => Ok(Instruction::FSQRTS {
+                dest: frd,
+                src: frs1,
+                rm: RoundingMode::from_int(func3)?,
+            }),
             0b001_0000 => match func3 {
-                0b000 => Ok(Instruction::FSGNJS(frd, frs1, frs2)),
-                0b001 => Ok(Instruction::FSGNJNS(frd, frs1, frs2)),
-                0b010 => Ok(Instruction::FSGNJXS(frd, frs1, frs2)),
+                0b000 => Ok(Instruction::FSGNJS {
+                    dest: frd,
+                    src1: frs1,
+                    src2: frs2,
+                }),
+                0b001 => Ok(Instruction::FSGNJNS {
+                    dest: frd,
+                    src1: frs1,
+                    src2: frs2,
+                }),
+                0b010 => Ok(Instruction::FSGNJXS {
+                    dest: frd,
+                    src1: frs1,
+                    src2: frs2,
+                }),
                 x => Err(format!("unknown OpFp func7=0b001_0000 func3: {}", x)),
             },
             0b001_0100 => match func3 {
-                0b000 => Ok(Instruction::FMINS(frd, frs1, frs2)),
-                0b001 => Ok(Instruction::FMAXS(frd, frs1, frs2)),
+                0b000 => Ok(Instruction::FMINS {
+                    dest: frd,
+                    src1: frs1,
+                    src2: frs2,
+                }),
+                0b001 => Ok(Instruction::FMAXS {
+                    dest: frd,
+                    src1: frs1,
+                    src2: frs2,
+                }),
                 x => Err(format!("unknown OpFp func7=0b001_0100 func3: {}", x)),
             },
             0b101_0000 => match func3 {
-                0b000 => Ok(Instruction::FLES(rd, frs1, frs2)),
-                0b001 => Ok(Instruction::FLTS(rd, frs1, frs2)),
-                0b010 => Ok(Instruction::FEQS(rd, frs1, frs2)),
+                0b000 => Ok(Instruction::FLES {
+                    dest: rd,
+                    src1: frs1,
+                    src2: frs2,
+                }),
+                0b001 => Ok(Instruction::FLTS {
+                    dest: rd,
+                    src1: frs1,
+                    src2: frs2,
+                }),
+                0b010 => Ok(Instruction::FEQS {
+                    dest: rd,
+                    src1: frs1,
+                    src2: frs2,
+                }),
                 x => Err(format!("unknown OpFp func7=0b101_0000 func3: {}", x)),
             },
             0b110_0000 => match (instruction >> 20) & 0b1_1111 {
-                0b0_0000 => Ok(Instruction::FCVTWS(
-                    rd,
-                    frs1,
-                    RoundingMode::from_int(func3)?,
-                )),
-                0b0_0001 => Ok(Instruction::FCVTWUS(
-                    rd,
-                    frs1,
-                    RoundingMode::from_int(func3)?,
-                )),
+                0b0_0000 => Ok(Instruction::FCVTWS {
+                    dest: rd,
+                    src: frs1,
+                    rm: RoundingMode::from_int(func3)?,
+                }),
+                0b0_0001 => Ok(Instruction::FCVTWUS {
+                    dest: rd,
+                    src: frs1,
+                    rm: RoundingMode::from_int(func3)?,
+                }),
                 0b0_0010 => Ok(Instruction::FCVTLS(
                     rd,
                     frs1,
@@ -1437,16 +2517,16 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
                 x => Err(format!("unknown OpFp func7=0b001_0100 rs2: {}", x)),
             },
             0b110_1000 => match (instruction >> 20) & 0b1_1111 {
-                0b0_0000 => Ok(Instruction::FCVTSW(
-                    frd,
-                    rs1,
-                    RoundingMode::from_int(func3)?,
-                )),
-                0b0_0001 => Ok(Instruction::FCVTSWU(
-                    frd,
-                    rs1,
-                    RoundingMode::from_int(func3)?,
-                )),
+                0b0_0000 => Ok(Instruction::FCVTSW{
+                    dest: frd,
+                    src: rs1,
+                    rm: RoundingMode::from_int(func3)?,
+            }),
+                0b0_0001 => Ok(Instruction::FCVTSWU{
+                    dest: frd,
+                    src: rs1,
+                    rm: RoundingMode::from_int(func3)?,
+            }),
                 0b0_0010 => Ok(Instruction::FCVTSL(
                     frd,
                     rs1,
@@ -1462,9 +2542,9 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
             0b111_0000 => {
                 if (instruction >> 20) & 0b1_1111 == 0 {
                     if func3 == 0 {
-                        Ok(Instruction::FMVXW(rd, frs1))
+                        Ok(Instruction::FMVXW{dest: rd, src: frs1})
                     } else if func3 == 1 {
-                        Ok(Instruction::FCLASSS(rd, frs1))
+                        Ok(Instruction::FCLASSS{dest: rd, src: frs1})
                     } else {
                         Err(format!(
                             "unknown OpFp func7=0b111_0000 rs2=0 func3: {}",
@@ -1482,7 +2562,7 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
             0b111_1000 => {
                 if (instruction >> 20) & 0b1_1111 == 0 {
                     if func3 == 0 {
-                        Ok(Instruction::FMVWX(frd, rs1))
+                        Ok(Instruction::FMVWX{dest: frd, src: rs1})
                     } else {
                         Err(format!(
                             "unknown OpFp func7=0b111_1000 rs2=0 func3: {}",
@@ -1502,13 +2582,13 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
         Opcode::Reserved => Err("instruction uses reserved opcode".to_owned()),
         Opcode::Madd => {
             if func7 & 0b11 == 0 {
-                Ok(Instruction::FMADDS(
-                    frd,
-                    frs1,
-                    frs2,
-                    frs3,
-                    RoundingMode::from_int(func3)?,
-                ))
+                Ok(Instruction::FMADDS{
+                    dest: frd,
+                    src1: frs1,
+                    src2: frs2,
+                    src3: frs3,
+                    rm: RoundingMode::from_int(func3)?,
+            })
             } else {
                 Err(format!(
                     "FMADD unknown lower 2 bits of func7: {}",
@@ -1518,13 +2598,13 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
         }
         Opcode::Msub => {
             if func7 & 0b11 == 0 {
-                Ok(Instruction::FMSUBS(
-                    frd,
-                    frs1,
-                    frs2,
-                    frs3,
-                    RoundingMode::from_int(func3)?,
-                ))
+                Ok(Instruction::FMSUBS{
+                    dest: frd,
+                    src1: frs1,
+                    src2: frs2,
+                    src3: frs3,
+                    rm: RoundingMode::from_int(func3)?,
+            })
             } else {
                 Err(format!(
                     "FMSUB unknown lower 2 bits of func7: {}",
@@ -1534,13 +2614,13 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
         }
         Opcode::Nmsub => {
             if func7 & 0b11 == 0 {
-                Ok(Instruction::FNMSUBS(
-                    frd,
-                    frs1,
-                    frs2,
-                    frs3,
-                    RoundingMode::from_int(func3)?,
-                ))
+                Ok(Instruction::FNMSUBS{
+                    dest: frd,
+                    src1: frs1,
+                    src2: frs2,
+                    src3: frs3,
+                    rm: RoundingMode::from_int(func3)?,
+            })
             } else {
                 Err(format!(
                     "FMNSUB unknown lower 2 bits of func7: {}",
@@ -1550,13 +2630,13 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
         }
         Opcode::Nmadd => {
             if func7 & 0b11 == 0 {
-                Ok(Instruction::FNMADDS(
-                    frd,
-                    frs1,
-                    frs2,
-                    frs3,
-                    RoundingMode::from_int(func3)?,
-                ))
+                Ok(Instruction::FNMADDS{
+                    dest: frd,
+                    src1: frs1,
+                    src2: frs2,
+                    src3: frs3,
+                    rm: RoundingMode::from_int(func3)?,
+            })
             } else {
                 Err(format!(
                     "FNMADD unknown lower 2 bits of func7: {}",

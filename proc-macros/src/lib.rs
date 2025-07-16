@@ -26,11 +26,11 @@ pub fn i_assemble(input: TokenStream) -> TokenStream {
         if operands.len() != 3 {{
             Err(\"{lower} instruction requires 3 operands\".to_owned())
         }} else {{
-            Ok(Instruction::{name}(
-                IRegister::from_string(operands[0])?,
-                IRegister::from_string(operands[1])?,
-                IImmediate::from_val(parse_int(operands[2])?),
-            ))
+            Ok(Instruction::{name}{{
+                dest: IRegister::from_string(operands[0])?,
+                src: IRegister::from_string(operands[1])?,
+                imm: IImmediate::from_val(parse_int(operands[2])?),
+            }})
         }}"
         )
         .parse()
@@ -51,11 +51,11 @@ pub fn r_assemble(input: TokenStream) -> TokenStream {
         if operands.len() != 3 {{
             Err(\"{lower} instruction requires 3 operands\".to_owned())
         }} else {{
-            Ok(Instruction::{name}(
-                IRegister::from_string(operands[0])?,
-                IRegister::from_string(operands[1])?,
-                IRegister::from_string(operands[2])?,
-            ))
+            Ok(Instruction::{name}{{
+                dest: IRegister::from_string(operands[0])?,
+                src1: IRegister::from_string(operands[1])?,
+                src2: IRegister::from_string(operands[2])?,
+            }})
         }}"
         )
         .parse()
@@ -77,11 +77,11 @@ pub fn l_assemble(input: TokenStream) -> TokenStream {
             Err(\"{lower} instruction requires 2 operands\".to_owned())
         }} else {{
             let (base, offset) = parse_address_expression(operands[1])?;
-            Ok(Instruction::{name}(
-                IRegister::from_string(operands[0])?,
+            Ok(Instruction::{name}{{
+                dest: IRegister::from_string(operands[0])?,
                 base,
-                IImmediate::from_val(offset),
-            ))
+                offset: IImmediate::from_val(offset),
+            }})
         }}"
         )
         .parse()
@@ -102,11 +102,11 @@ pub fn s_assemble(input: TokenStream) -> TokenStream {
             Err(\"{lower} instruction requires 2 operands\".to_owned())
         }} else {{
             let (base, offset) = parse_address_expression(operands[1])?;
-            Ok(Instruction::{name}(
+            Ok(Instruction::{name}{{
+                src: IRegister::from_string(operands[0])?,
                 base,
-                IRegister::from_string(operands[0])?,
-                SImmediate::from_val(offset),
-            ))
+                offset: SImmediate::from_val(offset),
+            }})
         }}"
         )
         .parse()
@@ -136,11 +136,11 @@ pub fn b_assemble(input: TokenStream) -> TokenStream {
         if operands.len() != 3 {{
             Err(\"{lower} instruction requires 3 operands\".to_owned())
         }} else {{
-            Ok(Instruction::{name}(
-                IRegister::from_string(operands[0])?,
-                IRegister::from_string(operands[1])?,
-                BImmediate::from_val(parse_int(operands[2])?),
-            ))
+            Ok(Instruction::{name}{{
+                src1: IRegister::from_string(operands[0])?,
+                src2: IRegister::from_string(operands[1])?,
+                offset: BImmediate::from_val(parse_int(operands[2])?),
+            }})
         }}"
         )
         .parse()
@@ -161,11 +161,11 @@ pub fn sh_assemble(input: TokenStream) -> TokenStream {
         if operands.len() != 3 {{
             Err(\"{lower} instruction requires 3 operands\".to_owned())
         }} else {{
-            Ok(Instruction::{name}(
-                IRegister::from_string(operands[0])?,
-                IRegister::from_string(operands[1])?,
-                Shamt::from_val(parse_int(operands[2])?),
-            ))
+            Ok(Instruction::{name}{{
+                dest: IRegister::from_string(operands[0])?,
+                src: IRegister::from_string(operands[1])?,
+                shamt: Shamt::from_val(parse_int(operands[2])?),
+            }})
         }}"
         )
         .parse()
@@ -186,11 +186,11 @@ pub fn shw_assemble(input: TokenStream) -> TokenStream {
         if operands.len() != 3 {{
             Err(\"{lower} instruction requires 3 operands\".to_owned())
         }} else {{
-            Ok(Instruction::{name}(
-                IRegister::from_string(operands[0])?,
-                IRegister::from_string(operands[1])?,
-                ShamtW::from_val(parse_int(operands[2])?),
-            ))
+            Ok(Instruction::{name}{{
+                dest: IRegister::from_string(operands[0])?,
+                src: IRegister::from_string(operands[1])?,
+                shamt: ShamtW::from_val(parse_int(operands[2])?),
+            }})
         }}"
         )
         .parse()
@@ -213,21 +213,21 @@ pub fn amo_assemble(input: TokenStream) -> TokenStream {
                 Err(\"{lower} must have size (w/d)\".to_owned())
             }} else if mnemonics.len() == 2 {{
                 if mnemonics[1] == \"w\" {{
-                    Ok(Instruction::{wname}(
-                        IRegister::from_string(operands[0])?,
-                        IRegister::from_string(operands[1])?,
-                        IRegister::from_string(operands[2])?,
-                        false,
-                        false,
-                    ))
+                    Ok(Instruction::{wname}{{
+                        dest: IRegister::from_string(operands[0])?,
+                        addr: IRegister::from_string(operands[1])?,
+                        src: IRegister::from_string(operands[2])?,
+                        rl: false,
+                        aq: false,
+                }})
                 }} else if mnemonics[1] == \"d\" {{
-                    Ok(Instruction::{dname}(
-                        IRegister::from_string(operands[0])?,
-                        IRegister::from_string(operands[1])?,
-                        IRegister::from_string(operands[2])?,
-                        false,
-                        false,
-                    ))
+                    Ok(Instruction::{dname}{{
+                        dest: IRegister::from_string(operands[0])?,
+                        addr: IRegister::from_string(operands[1])?,
+                        src: IRegister::from_string(operands[2])?,
+                        rl: false,
+                        aq: false,
+                    }})
                 }} else {{
                     Err(\"size of {lower} instruction must be word (w) or doubleword (d)\".to_owned())
                 }}
@@ -240,21 +240,21 @@ pub fn amo_assemble(input: TokenStream) -> TokenStream {
                     _ => return Err(\"ordering should be (aq)(rl)\".to_owned()),
                 }};
                 if mnemonics[1] == \"w\" {{
-                    Ok(Instruction::{wname}(
-                        IRegister::from_string(operands[0])?,
-                        IRegister::from_string(operands[1])?,
-                        IRegister::from_string(operands[2])?,
+                    Ok(Instruction::{wname}{{
+                        dest: IRegister::from_string(operands[0])?,
+                        addr: IRegister::from_string(operands[1])?,
+                        src: IRegister::from_string(operands[2])?,
                         aq,
                         rl,
-                    ))
+                    }})
                 }} else if mnemonics[1] == \"d\" {{
-                    Ok(Instruction::{dname}(
-                        IRegister::from_string(operands[0])?,
-                        IRegister::from_string(operands[1])?,
-                        IRegister::from_string(operands[2])?,
+                    Ok(Instruction::{dname}{{
+                        dest: IRegister::from_string(operands[0])?,
+                        addr: IRegister::from_string(operands[1])?,
+                        src: IRegister::from_string(operands[2])?,
                         aq,
                         rl,
-                    ))
+                    }})
                 }} else {{
                     Err(\"size of {lower} isntruction must be word (w) or doubleword (d)\".to_owned())
                 }}
@@ -286,19 +286,19 @@ pub fn fr_assemble(input: TokenStream) -> TokenStream {
                 Err(\"{lower} instruction requires 3 operands\".to_owned())
         }} else {{
                 if mnemonics.len() == 2 {{
-                    Ok(Instruction::{sname}(
-                        FRegister::from_string(operands[0])?,
-                        FRegister::from_string(operands[1])?,
-                        FRegister::from_string(operands[2])?,
-                        RoundingMode::DYN,
-                    ))
+                    Ok(Instruction::{sname}{{
+                        dest: FRegister::from_string(operands[0])?,
+                        src1: FRegister::from_string(operands[1])?,
+                        src2: FRegister::from_string(operands[2])?,
+                        rm: RoundingMode::DYN,
+                    }})
         }}else if mnemonics.len() == 3 {{
-                    Ok(Instruction::{sname}(
-                        FRegister::from_string(operands[0])?,
-                        FRegister::from_string(operands[1])?,
-                        FRegister::from_string(operands[2])?,
-                        RoundingMode::from_str(mnemonics[2])?, 
-                    ))
+                    Ok(Instruction::{sname}{{
+                        dest: FRegister::from_string(operands[0])?,
+                        src1: FRegister::from_string(operands[1])?,
+                        src2: FRegister::from_string(operands[2])?,
+                        rm: RoundingMode::from_str(mnemonics[2])?, 
+                    }})
         }}else{{
                     Err(\"fadd instruction requires a suffix {{s,d}}\".to_owned())
         }}
