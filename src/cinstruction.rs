@@ -218,10 +218,10 @@ impl Display for CInstruction {
 }
 
 pub fn decode_compressed_instruction(instruction: u16) -> Result<CInstruction, String> {
-    let crs2 = CIRegister::from_int((instruction >> 2) & 0b111);
-    let cfrd = CFRegister::from_int((instruction >> 2) & 0b111);
+    let crs2 = CIRegister::try_from((instruction >> 2) & 0b111).unwrap();
+    let cfrd = CFRegister::try_from((instruction >> 2) & 0b111).unwrap();
 
-    let crs1 = CIRegister::from_int((instruction >> 7) & 0b111);
+    let crs1 = CIRegister::from((instruction >> 7) & 0b111);
     // let frs1 = FRegister::from_int_compressed((instruction >> 7) & 0b111);
 
     let ciimmediate = CIImmediate::from_u16(instruction);
@@ -229,9 +229,9 @@ pub fn decode_compressed_instruction(instruction: u16) -> Result<CInstruction, S
     let cshamt = CShamt::from_u16(instruction);
 
     let rd = IRegister::from_int(((instruction >> 7) & 0b1_1111) as u32);
-    let frd = FRegister::from_int(((instruction >> 7) & 0b1_1111) as u32);
+    let frd = FRegister::try_from(((instruction >> 7) & 0b1_1111) as u32).unwrap();
     let rs2 = IRegister::from_int(((instruction >> 2) & 0b1_1111) as u32);
-    let frs2 = FRegister::from_int(((instruction >> 2) & 0b1_1111) as u32);
+    let frs2 = FRegister::try_from(((instruction >> 2) & 0b1_1111) as u32).unwrap();
 
     match instruction & 0b11 {
         0b00 => match instruction >> 13 {
@@ -425,7 +425,7 @@ impl CInstruction {
                     Err("c.addi4spn requires 2 operands".to_owned())
                 } else {
                     Ok(CInstruction::ADDI4SPN {
-                        dest: CIRegister::from_string(operands[0])?,
+                        dest: CIRegister::try_from(operands[0])?,
                         imm: CWideImmediate::from_val(parse_int(operands[1])?),
                     })
                 }
@@ -436,7 +436,7 @@ impl CInstruction {
                 } else {
                     let (base, imm) = parse_address_expression_compressed(operands[1])?;
                     Ok(CInstruction::FLD {
-                        dest: CFRegister::from_string(operands[0])?,
+                        dest: CFRegister::try_from(operands[0])?,
                         base,
                         offset: CDImmediate::from_val(imm),
                     })
@@ -448,7 +448,7 @@ impl CInstruction {
                 } else {
                     let (base, imm) = parse_address_expression_compressed(operands[1])?;
                     Ok(CInstruction::LW {
-                        dest: CIRegister::from_string(operands[0])?,
+                        dest: CIRegister::try_from(operands[0])?,
                         base,
                         offset: CWImmediate::from_val(imm),
                     })
@@ -460,7 +460,7 @@ impl CInstruction {
                 } else {
                     let (base, imm) = parse_address_expression_compressed(operands[1])?;
                     Ok(CInstruction::LD {
-                        dest: CIRegister::from_string(operands[0])?,
+                        dest: CIRegister::try_from(operands[0])?,
                         base,
                         offset: CDImmediate::from_val(imm),
                     })
@@ -472,7 +472,7 @@ impl CInstruction {
                 } else {
                     let (base, imm) = parse_address_expression_compressed(operands[1])?;
                     Ok(CInstruction::FSD {
-                        src: CFRegister::from_string(operands[0])?,
+                        src: CFRegister::try_from(operands[0])?,
                         base,
                         offset: CDImmediate::from_val(imm),
                     })
@@ -484,7 +484,7 @@ impl CInstruction {
                 } else {
                     let (base, imm) = parse_address_expression_compressed(operands[1])?;
                     Ok(CInstruction::SW {
-                        src: CIRegister::from_string(operands[0])?,
+                        src: CIRegister::try_from(operands[0])?,
                         base,
                         offset: CWImmediate::from_val(imm),
                     })
@@ -496,7 +496,7 @@ impl CInstruction {
                 } else {
                     let (base, imm) = parse_address_expression_compressed(operands[1])?;
                     Ok(CInstruction::SD {
-                        src: CIRegister::from_string(operands[0])?,
+                        src: CIRegister::try_from(operands[0])?,
                         base,
                         offset: CDImmediate::from_val(imm),
                     })
@@ -525,7 +525,7 @@ impl CInstruction {
                     Err("c.srli requires 2 operands".to_owned())
                 } else {
                     Ok(CInstruction::SRLI {
-                        dest: CIRegister::from_string(operands[0])?,
+                        dest: CIRegister::try_from(operands[0])?,
                         shamt: CShamt::from_val(parse_int(operands[1])?),
                     })
                 }
@@ -535,7 +535,7 @@ impl CInstruction {
                     Err("c.srai requires 2 operands".to_owned())
                 } else {
                     Ok(CInstruction::SRAI {
-                        dest: CIRegister::from_string(operands[0])?,
+                        dest: CIRegister::try_from(operands[0])?,
                         shamt: CShamt::from_val(parse_int(operands[1])?),
                     })
                 }
@@ -545,7 +545,7 @@ impl CInstruction {
                     Err("c.andi requires 2 operands".to_owned())
                 } else {
                     Ok(CInstruction::ANDI {
-                        dest: CIRegister::from_string(operands[0])?,
+                        dest: CIRegister::try_from(operands[0])?,
                         imm: CIImmediate::from_val(parse_int(operands[1])?),
                     })
                 }
@@ -570,7 +570,7 @@ impl CInstruction {
                     Err("c.beqz requires 2 operands".to_owned())
                 } else {
                     Ok(CInstruction::BEQZ {
-                        src: CIRegister::from_string(operands[0])?,
+                        src: CIRegister::try_from(operands[0])?,
                         offset: CBImmediate::from_val(parse_int(operands[1])?),
                     })
                 }
@@ -580,7 +580,7 @@ impl CInstruction {
                     Err("c.bne requires 2 operands".to_owned())
                 } else {
                     Ok(CInstruction::BNEZ {
-                        src: CIRegister::from_string(operands[0])?,
+                        src: CIRegister::try_from(operands[0])?,
                         offset: CBImmediate::from_val(parse_int(operands[1])?),
                     })
                 }
@@ -600,7 +600,7 @@ impl CInstruction {
                     Err("c.fldsp requires 2 operands".to_owned())
                 } else {
                     Ok(CInstruction::FLDSP {
-                        dest: FRegister::from_string(operands[0])?,
+                        dest: FRegister::try_from(operands[0])?,
                         offset: CDSPImmediate::from_val(parse_int(operands[1])?),
                     })
                 }
@@ -665,7 +665,7 @@ impl CInstruction {
                     Err("c.fsdsp requires 2 operands".to_owned())
                 } else {
                     Ok(CInstruction::FSDSP {
-                        src: FRegister::from_string(operands[0])?,
+                        src: FRegister::try_from(operands[0])?,
                         offset: CSDSPImmediate::from_val(parse_int(operands[1])?),
                     })
                 }

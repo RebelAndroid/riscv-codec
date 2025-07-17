@@ -238,47 +238,53 @@ impl Display for FRegister {
     }
 }
 
-impl FRegister {
-    pub fn from_int(int: u32) -> Self {
-        match int {
-            0 => Self::FT0,
-            1 => Self::FT1,
-            2 => Self::FT2,
-            3 => Self::FT3,
-            4 => Self::FT4,
-            5 => Self::FT5,
-            6 => Self::FT6,
-            7 => Self::FT7,
-            8 => Self::FS0,
-            9 => Self::FS1,
-            10 => Self::FA0,
-            11 => Self::FA1,
-            12 => Self::FA2,
-            13 => Self::FA3,
-            14 => Self::FA4,
-            15 => Self::FA5,
-            16 => Self::FA6,
-            17 => Self::FA7,
-            18 => Self::FS2,
-            19 => Self::FS3,
-            20 => Self::FS4,
-            21 => Self::FS5,
-            22 => Self::FS6,
-            23 => Self::FS7,
-            24 => Self::FS8,
-            25 => Self::FS9,
-            26 => Self::FS10,
-            27 => Self::FS11,
-            28 => Self::FT8,
-            29 => Self::FT9,
-            30 => Self::FT10,
-            31 => Self::FT11,
-            x => panic!("converted invalid integer to float register {}", x),
+impl TryFrom<u32> for FRegister {
+    type Error = String;
+
+    fn try_from(value: u32) -> Result<Self, Self::Error> {
+        match value {
+            0 => Ok(Self::FT0),
+            1 => Ok(Self::FT1),
+            2 => Ok(Self::FT2),
+            3 => Ok(Self::FT3),
+            4 => Ok(Self::FT4),
+            5 => Ok(Self::FT5),
+            6 => Ok(Self::FT6),
+            7 => Ok(Self::FT7),
+            8 => Ok(Self::FS0),
+            9 => Ok(Self::FS1),
+            10 => Ok(Self::FA0),
+            11 => Ok(Self::FA1),
+            12 => Ok(Self::FA2),
+            13 => Ok(Self::FA3),
+            14 => Ok(Self::FA4),
+            15 => Ok(Self::FA5),
+            16 => Ok(Self::FA6),
+            17 => Ok(Self::FA7),
+            18 => Ok(Self::FS2),
+            19 => Ok(Self::FS3),
+            20 => Ok(Self::FS4),
+            21 => Ok(Self::FS5),
+            22 => Ok(Self::FS6),
+            23 => Ok(Self::FS7),
+            24 => Ok(Self::FS8),
+            25 => Ok(Self::FS9),
+            26 => Ok(Self::FS10),
+            27 => Ok(Self::FS11),
+            28 => Ok(Self::FT8),
+            29 => Ok(Self::FT9),
+            30 => Ok(Self::FT10),
+            31 => Ok(Self::FT11),
+            x => Err(format!("converted invalid integer to float register {}", x)),
         }
     }
+}
 
-    pub fn from_string(str: &str) -> Result<Self, String> {
-        match str {
+impl TryFrom<&str> for FRegister {
+    type Error = String;
+
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        match value {
             "ft0" => Ok(Self::FT0),
             "ft1" => Ok(Self::FT1),
             "ft2" => Ok(Self::FT2),
@@ -329,9 +335,9 @@ pub enum CIRegister {
     A5,
 }
 
-impl CIRegister {
-    pub fn from_int(int: u16) -> Self {
-        match int {
+impl From<u16> for CIRegister {
+    fn from(value: u16) -> Self {
+        match value {
             0 => Self::FramePointer,
             1 => Self::S1,
             2 => Self::A0,
@@ -346,9 +352,13 @@ impl CIRegister {
             ),
         }
     }
+}
 
-    pub fn from_string(str: &str) -> Result<Self, String> {
-        match str {
+impl TryFrom<&str> for CIRegister {
+    type Error = String;
+
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        match value {
             "fp" => Ok(Self::FramePointer),
             "s0" => Ok(Self::FramePointer),
             "s1" => Ok(Self::S1),
@@ -364,7 +374,9 @@ impl CIRegister {
             )),
         }
     }
+}
 
+impl CIRegister {
     pub fn expand(&self) -> IRegister {
         match self {
             CIRegister::FramePointer => IRegister::FramePointer,
@@ -410,26 +422,32 @@ pub enum CFRegister {
     FA5,
 }
 
-impl CFRegister {
-    pub fn from_int(int: u16) -> Self {
-        match int {
-            0 => Self::FS0,
-            1 => Self::FS1,
-            2 => Self::FA0,
-            3 => Self::FA1,
-            4 => Self::FA2,
-            5 => Self::FA3,
-            6 => Self::FA4,
-            7 => Self::FA5,
-            x => panic!(
+impl TryFrom<u16> for CFRegister {
+    type Error = String;
+
+    fn try_from(value: u16) -> Result<Self, Self::Error> {
+        match value {
+            0 => Ok(Self::FS0),
+            1 => Ok(Self::FS1),
+            2 => Ok(Self::FA0),
+            3 => Ok(Self::FA1),
+            4 => Ok(Self::FA2),
+            5 => Ok(Self::FA3),
+            6 => Ok(Self::FA4),
+            7 => Ok(Self::FA5),
+            x => Err(format!(
                 "converted invalid integer to float register in compressed instruction: {}",
                 x
-            ),
+            )),
         }
     }
+}
 
-    pub fn from_string(str: &str) -> Result<Self, String> {
-        match str {
+impl TryFrom<&str> for CFRegister {
+    type Error = String;
+
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        match value {
             "fs0" => Ok(Self::FS0),
             "fs1" => Ok(Self::FS1),
             "fa0" => Ok(Self::FA0),
@@ -444,7 +462,9 @@ impl CFRegister {
             )),
         }
     }
-    
+}
+
+impl CFRegister {
     pub fn expand(&self) -> FRegister {
         match self {
             CFRegister::FS0 => FRegister::FS0,

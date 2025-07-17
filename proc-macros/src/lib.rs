@@ -287,16 +287,16 @@ pub fn fr_assemble(input: TokenStream) -> TokenStream {
         }} else {{
                 if mnemonics.len() == 2 {{
                     Ok(Instruction::{sname}{{
-                        dest: FRegister::from_string(operands[0])?,
-                        src1: FRegister::from_string(operands[1])?,
-                        src2: FRegister::from_string(operands[2])?,
+                        dest: FRegister::try_from(operands[0])?,
+                        src1: FRegister::try_from(operands[1])?,
+                        src2: FRegister::try_from(operands[2])?,
                         rm: RoundingMode::DYN,
                     }})
         }}else if mnemonics.len() == 3 {{
                     Ok(Instruction::{sname}{{
-                        dest: FRegister::from_string(operands[0])?,
-                        src1: FRegister::from_string(operands[1])?,
-                        src2: FRegister::from_string(operands[2])?,
+                        dest: FRegister::try_from(operands[0])?,
+                        src1: FRegister::try_from(operands[1])?,
+                        src2: FRegister::try_from(operands[2])?,
                         rm: RoundingMode::from_str(mnemonics[2])?, 
                     }})
         }}else{{
@@ -348,8 +348,8 @@ pub fn cr_assemble(input: TokenStream) -> TokenStream {
             Err(\"c.{lower} instruction requires 2 operands\".to_owned())
         }} else {{
             Ok(CInstruction::{name}{{
-                dest: CIRegister::from_string(operands[0])?,
-                src: CIRegister::from_string(operands[1])?,
+                dest: CIRegister::try_from(operands[0])?,
+                src: CIRegister::try_from(operands[1])?,
             }})
         }}"
         )

@@ -1213,7 +1213,7 @@ pub fn parse_address_expression_compressed(str: &str) -> Result<(CIRegister, i64
     };
     match register.strip_suffix(")") {
         Some(y) => {
-            let r = CIRegister::from_string(y)?;
+            let r = CIRegister::try_from(y)?;
             let i = parse_int(offset)?;
             Ok((r, i))
         }
@@ -1501,7 +1501,7 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                 } else {
                     let (base, offset) = parse_address_expression(operands[1])?;
                     Ok(Instruction::FLW {
-                        dest: FRegister::from_string(operands[0])?,
+                        dest: FRegister::try_from(operands[0])?,
                         base,
                         offset: IImmediate::from_val(offset),
                     })
@@ -1515,7 +1515,7 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                     let (base, offset) = parse_address_expression(operands[1])?;
                     Ok(Instruction::FSW {
                         base,
-                        src: FRegister::from_string(operands[0])?,
+                        src: FRegister::try_from(operands[0])?,
                         offset: SImmediate::from_val(offset),
                     })
                 }
@@ -1525,14 +1525,14 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                     Err("fsqrt instruction requires 2 operands".to_owned())
                 } else if mnemonics.len() == 2 {
                     Ok(Instruction::FSQRTS {
-                        dest: FRegister::from_string(operands[0])?,
-                        src: FRegister::from_string(operands[1])?,
+                        dest: FRegister::try_from(operands[0])?,
+                        src: FRegister::try_from(operands[1])?,
                         rm: RoundingMode::DYN,
                     })
                 } else if mnemonics.len() == 3 {
                     Ok(Instruction::FSQRTS {
-                        dest: FRegister::from_string(operands[0])?,
-                        src: FRegister::from_string(operands[1])?,
+                        dest: FRegister::try_from(operands[0])?,
+                        src: FRegister::try_from(operands[1])?,
                         rm: RoundingMode::from_str(mnemonics[2])?,
                     })
                 } else {
@@ -1548,9 +1548,9 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                     Err("fmin instruction requires 3 operands".to_owned())
                 } else if mnemonics.len() == 2 {
                     Ok(Instruction::FMINS {
-                        dest: FRegister::from_string(operands[0])?,
-                        src1: FRegister::from_string(operands[1])?,
-                        src2: FRegister::from_string(operands[2])?,
+                        dest: FRegister::try_from(operands[0])?,
+                        src1: FRegister::try_from(operands[1])?,
+                        src2: FRegister::try_from(operands[2])?,
                     })
                 } else {
                     Err("fmin instruction requires a suffix {s,d}".to_owned())
@@ -1561,9 +1561,9 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                     Err("fmax instruction requires 3 operands".to_owned())
                 } else if mnemonics.len() == 2 {
                     Ok(Instruction::FMAXS {
-                        dest: FRegister::from_string(operands[0])?,
-                        src1: FRegister::from_string(operands[1])?,
-                        src2: FRegister::from_string(operands[2])?,
+                        dest: FRegister::try_from(operands[0])?,
+                        src1: FRegister::try_from(operands[1])?,
+                        src2: FRegister::try_from(operands[2])?,
                     })
                 } else {
                     Err("fmax instruction requires a suffix {s,d}".to_owned())
@@ -1577,41 +1577,41 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                     match (mnemonics[1], mnemonics[2]) {
                         ("w", "s") => Ok(Instruction::FCVTWS {
                             dest: IRegister::from_string(operands[0])?,
-                            src: FRegister::from_string(operands[1])?,
+                            src: FRegister::try_from(operands[1])?,
                             rm: RoundingMode::DYN,
                         }),
                         ("wu", "s") => Ok(Instruction::FCVTWUS {
                             dest: IRegister::from_string(operands[0])?,
-                            src: FRegister::from_string(operands[1])?,
+                            src: FRegister::try_from(operands[1])?,
                             rm: RoundingMode::DYN,
                         }),
                         ("s", "w") => Ok(Instruction::FCVTSW {
-                            dest: FRegister::from_string(operands[0])?,
+                            dest: FRegister::try_from(operands[0])?,
                             src: IRegister::from_string(operands[1])?,
                             rm: RoundingMode::DYN,
                         }),
                         ("s", "wu") => Ok(Instruction::FCVTSWU {
-                            dest: FRegister::from_string(operands[0])?,
+                            dest: FRegister::try_from(operands[0])?,
                             src: IRegister::from_string(operands[1])?,
                             rm: RoundingMode::DYN,
                         }),
                         ("l", "s") => Ok(Instruction::FCVTLS {
                             dest: IRegister::from_string(operands[0])?,
-                            src: FRegister::from_string(operands[1])?,
+                            src: FRegister::try_from(operands[1])?,
                             rm: RoundingMode::DYN,
                         }),
                         ("lu", "s") => Ok(Instruction::FCVTLUS {
                             dest: IRegister::from_string(operands[0])?,
-                            src: FRegister::from_string(operands[1])?,
+                            src: FRegister::try_from(operands[1])?,
                             rm: RoundingMode::DYN,
                         }),
                         ("s", "l") => Ok(Instruction::FCVTSL {
-                            dest: FRegister::from_string(operands[0])?,
+                            dest: FRegister::try_from(operands[0])?,
                             src: IRegister::from_string(operands[1])?,
                             rm: RoundingMode::DYN,
                         }),
                         ("s", "lu") => Ok(Instruction::FCVTSLU {
-                            dest: FRegister::from_string(operands[0])?,
+                            dest: FRegister::try_from(operands[0])?,
                             src: IRegister::from_string(operands[1])?,
                             rm: RoundingMode::DYN,
                         }),
@@ -1621,41 +1621,41 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                     match (mnemonics[1], mnemonics[2]) {
                         ("w", "s") => Ok(Instruction::FCVTWS {
                             dest: IRegister::from_string(operands[0])?,
-                            src: FRegister::from_string(operands[1])?,
+                            src: FRegister::try_from(operands[1])?,
                             rm: RoundingMode::from_str(mnemonics[3])?,
                         }),
                         ("wu", "s") => Ok(Instruction::FCVTWUS {
                             dest: IRegister::from_string(operands[0])?,
-                            src: FRegister::from_string(operands[1])?,
+                            src: FRegister::try_from(operands[1])?,
                             rm: RoundingMode::from_str(mnemonics[3])?,
                         }),
                         ("s", "w") => Ok(Instruction::FCVTSW {
-                            dest: FRegister::from_string(operands[0])?,
+                            dest: FRegister::try_from(operands[0])?,
                             src: IRegister::from_string(operands[1])?,
                             rm: RoundingMode::from_str(mnemonics[3])?,
                         }),
                         ("s", "wu") => Ok(Instruction::FCVTSWU {
-                            dest: FRegister::from_string(operands[0])?,
+                            dest: FRegister::try_from(operands[0])?,
                             src: IRegister::from_string(operands[1])?,
                             rm: RoundingMode::from_str(mnemonics[3])?,
                         }),
                         ("l", "s") => Ok(Instruction::FCVTLS {
                             dest: IRegister::from_string(operands[0])?,
-                            src: FRegister::from_string(operands[1])?,
+                            src: FRegister::try_from(operands[1])?,
                             rm: RoundingMode::from_str(mnemonics[3])?,
                         }),
                         ("lu", "s") => Ok(Instruction::FCVTLUS {
                             dest: IRegister::from_string(operands[0])?,
-                            src: FRegister::from_string(operands[1])?,
+                            src: FRegister::try_from(operands[1])?,
                             rm: RoundingMode::from_str(mnemonics[3])?,
                         }),
                         ("s", "l") => Ok(Instruction::FCVTSL {
-                            dest: FRegister::from_string(operands[0])?,
+                            dest: FRegister::try_from(operands[0])?,
                             src: IRegister::from_string(operands[1])?,
                             rm: RoundingMode::from_str(mnemonics[3])?,
                         }),
                         ("s", "lu") => Ok(Instruction::FCVTSLU {
-                            dest: FRegister::from_string(operands[0])?,
+                            dest: FRegister::try_from(operands[0])?,
                             src: IRegister::from_string(operands[1])?,
                             rm: RoundingMode::from_str(mnemonics[3])?,
                         }),
@@ -1672,10 +1672,10 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                     match (mnemonics[1], mnemonics[2]) {
                         ("x", "w") => Ok(Instruction::FMVXW {
                             dest: IRegister::from_string(operands[0])?,
-                            src: FRegister::from_string(operands[1])?,
+                            src: FRegister::try_from(operands[1])?,
                         }),
                         ("w", "x") => Ok(Instruction::FMVWX {
-                            dest: FRegister::from_string(operands[0])?,
+                            dest: FRegister::try_from(operands[0])?,
                             src: IRegister::from_string(operands[1])?,
                         }),
                         _ => Err("invalid fmv suffixes".to_owned()),
@@ -1691,8 +1691,8 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                     match mnemonics[1] {
                         "s" => Ok(Instruction::FEQS {
                             dest: IRegister::from_string(operands[0])?,
-                            src1: FRegister::from_string(operands[1])?,
-                            src2: FRegister::from_string(operands[2])?,
+                            src1: FRegister::try_from(operands[1])?,
+                            src2: FRegister::try_from(operands[2])?,
                         }),
                         "d" => todo!(),
                         "q" => todo!(),
@@ -1710,8 +1710,8 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                     match mnemonics[1] {
                         "s" => Ok(Instruction::FLTS {
                             dest: IRegister::from_string(operands[0])?,
-                            src1: FRegister::from_string(operands[1])?,
-                            src2: FRegister::from_string(operands[2])?,
+                            src1: FRegister::try_from(operands[1])?,
+                            src2: FRegister::try_from(operands[2])?,
                         }),
                         "d" => todo!(),
                         "q" => todo!(),
@@ -1729,8 +1729,8 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                     match mnemonics[1] {
                         "s" => Ok(Instruction::FLES {
                             dest: IRegister::from_string(operands[0])?,
-                            src1: FRegister::from_string(operands[1])?,
-                            src2: FRegister::from_string(operands[2])?,
+                            src1: FRegister::try_from(operands[1])?,
+                            src2: FRegister::try_from(operands[2])?,
                         }),
                         "d" => todo!(),
                         "q" => todo!(),
@@ -1748,7 +1748,7 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                     match mnemonics[1] {
                         "s" => Ok(Instruction::FCLASSS {
                             dest: IRegister::from_string(operands[0])?,
-                            src: FRegister::from_string(operands[1])?,
+                            src: FRegister::try_from(operands[1])?,
                         }),
                         "d" => todo!(),
                         "q" => todo!(),
@@ -1865,10 +1865,10 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
     let rs1 = IRegister::from_int((instruction >> 15) & 0b1_1111);
     let rs2 = IRegister::from_int((instruction >> 20) & 0b1_1111);
 
-    let frd = FRegister::from_int((instruction >> 7) & 0b1_1111);
-    let frs1 = FRegister::from_int((instruction >> 15) & 0b1_1111);
-    let frs2 = FRegister::from_int((instruction >> 20) & 0b1_1111);
-    let frs3 = FRegister::from_int((instruction >> 27) & 0b1_1111);
+    let frd = FRegister::try_from((instruction >> 7) & 0b1_1111).unwrap();
+    let frs1 = FRegister::try_from((instruction >> 15) & 0b1_1111).unwrap();
+    let frs2 = FRegister::try_from((instruction >> 20) & 0b1_1111).unwrap();
+    let frs3 = FRegister::try_from((instruction >> 27) & 0b1_1111).unwrap();
 
     let i_immediate: IImmediate = IImmediate::from_u32(instruction);
 
