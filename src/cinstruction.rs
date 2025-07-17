@@ -713,18 +713,18 @@ impl CInstruction {
             CInstruction::ADDI4SPN { dest, imm } => Instruction::ADDI {
                 dest: dest.expand(),
                 src: IRegister::StackPointer,
-                imm: IImmediate::from_val(imm.val()),
+                imm: IImmediate::try_from(imm.val()).unwrap(),
             },
             CInstruction::FLD { .. } => todo!(), // needs unimplemented double extension
             CInstruction::LW { dest, base, offset } => Instruction::LW {
                 dest: dest.expand(),
                 base: base.expand(),
-                offset: IImmediate::from_val(offset.val()),
+                offset: IImmediate::try_from(offset.val()).unwrap(),
             },
             CInstruction::LD { dest, base, offset } => Instruction::LD {
                 dest: dest.expand(),
                 base: base.expand(),
-                offset: IImmediate::from_val(offset.val()),
+                offset: IImmediate::try_from(offset.val()).unwrap(),
             },
             CInstruction::FSD { .. } => todo!(), // needs unimplemented double extension
             CInstruction::SW { src, base, offset } => Instruction::SW {
@@ -740,27 +740,27 @@ impl CInstruction {
             CInstruction::ADDI { dest, imm } => Instruction::ADDI {
                 dest: *dest,
                 src: *dest,
-                imm: IImmediate::from_val(imm.val()),
+                imm: IImmediate::try_from(imm.val()).unwrap(),
             },
             CInstruction::ADDIW { dest, imm } => Instruction::ADDIW {
                 dest: *dest,
                 src: *dest,
-                imm: IImmediate::from_val(imm.val()),
+                imm: IImmediate::try_from(imm.val()).unwrap(),
             },
             CInstruction::LI { dest, imm } => Instruction::ADDI {
                 dest: *dest,
                 src: IRegister::Zero,
-                imm: IImmediate::from_val(imm.val()),
+                imm: IImmediate::try_from(imm.val()).unwrap(),
             },
             CInstruction::ADDI16SP { imm } => Instruction::ADDI {
                 dest: IRegister::StackPointer,
                 src: IRegister::StackPointer,
-                imm: IImmediate::from_val(*imm as i64),
+                imm: IImmediate::try_from(*imm as i64).unwrap(),
             },
             CInstruction::LUI { dest, imm } => Instruction::ADDI {
                 dest: *dest,
                 src: IRegister::Zero,
-                imm: IImmediate::from_val(imm.val()),
+                imm: IImmediate::try_from(imm.val()).unwrap(),
             },
             CInstruction::SRLI { dest, shamt } => Instruction::SRLI {
                 dest: dest.expand(),
@@ -775,7 +775,7 @@ impl CInstruction {
             CInstruction::ANDI { dest, imm } => Instruction::ANDI {
                 dest: dest.expand(),
                 src: dest.expand(),
-                imm: IImmediate::from_val(imm.val()),
+                imm: IImmediate::try_from(imm.val()).unwrap(),
             },
             CInstruction::SUB { dest, src } => Instruction::SUB {
                 dest: dest.expand(),
@@ -830,17 +830,17 @@ impl CInstruction {
             CInstruction::LWSP { dest, offset } => Instruction::LW {
                 dest: *dest,
                 base: IRegister::StackPointer,
-                offset: IImmediate::from_val(offset.val()),
+                offset: IImmediate::try_from(offset.val()).unwrap(),
             },
             CInstruction::LDSP { dest, offset } => Instruction::LD {
                 dest: *dest,
                 base: IRegister::StackPointer,
-                offset: IImmediate::from_val(offset.val()),
+                offset: IImmediate::try_from(offset.val()).unwrap(),
             },
             CInstruction::JR { src } => Instruction::JALR {
                 dest: IRegister::Zero,
                 base: *src,
-                offset: IImmediate::from_val(0),
+                offset: IImmediate::try_from(0).unwrap(),
             },
             CInstruction::MV { dest, src } => Instruction::ADD {
                 dest: *dest,

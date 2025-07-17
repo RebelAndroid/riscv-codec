@@ -1,38 +1,10 @@
 use std::fmt::{Display, Formatter};
 
-/// The immediate values in I-type instructions (like addi)
-#[derive(Debug, PartialEq)]
-pub struct IImmediate {
-    val: i16,
-}
+use proc_macros::make_immediate;
 
-impl IImmediate {
-    /// Extracts the `IImmediate` from the appropriate position in a 32-bit instruction
-    pub fn from_u32(x: u32) -> Self {
-        let unsigned: u32 = (x >> 20) & 0b1111_1111_1111;
-        // sign extend 12 bit value
-        let y = unsigned.overflowing_shl(20).0 as i32;
-        let val = y.overflowing_shr(20).0 as i16;
-        IImmediate { val }
-    }
 
-    pub fn from_val(val: i64) -> Self {
-        if !(-2048..=2047).contains(&val) {
-            panic!("attempted to construct out of range IImediate")
-        }
-        IImmediate { val: val as i16 }
-    }
 
-    pub fn val(&self) -> i64 {
-        self.val.into()
-    }
-}
-
-impl Display for IImmediate {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
-        write!(f, "{}", self.val)
-    }
-}
+make_immediate!(IImmediate (0 12 20));
 
 /// The immediate values in S-type instructions (like SW)
 #[derive(Debug, PartialEq)]

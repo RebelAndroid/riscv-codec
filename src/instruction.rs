@@ -1343,7 +1343,7 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                     Ok(Instruction::JALR {
                         dest: IRegister::from_string(operands[0])?,
                         base,
-                        offset: IImmediate::from_val(offset),
+                        offset: IImmediate::try_from(offset)?,
                     })
                 }
             }
@@ -1503,7 +1503,7 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                     Ok(Instruction::FLW {
                         dest: FRegister::try_from(operands[0])?,
                         base,
-                        offset: IImmediate::from_val(offset),
+                        offset: IImmediate::try_from(offset)?,
                     })
                 }
             }

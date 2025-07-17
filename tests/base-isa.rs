@@ -56,7 +56,7 @@ fn jump_and_link() {
 fn jump_and_link_register() {
     // check assembler
     let i = assemble_line("jalr a0,-2048(t0)").unwrap().i();
-    let expected = Instruction::JALR{dest: IRegister::A0, base: IRegister::T0, offset: IImmediate::from_val(-2048)};
+    let expected = Instruction::JALR{dest: IRegister::A0, base: IRegister::T0, offset: IImmediate::try_from(-2048).unwrap()};
     assert_eq!(i, expected);
 
     // check decoder
@@ -164,7 +164,7 @@ fn branch_greater_equal_unsigned() {
 #[test]
 fn load_byte() {
     let i = assemble_line("lb t2,8(a0)").unwrap().i();
-    let expected = Instruction::LB{dest: IRegister::T2, base: IRegister::A0, offset: IImmediate::from_val(8)};
+    let expected = Instruction::LB{dest: IRegister::T2, base: IRegister::A0, offset: IImmediate::try_from(8).unwrap()};
     assert_eq!(i, expected);
 
     let i2 = decode_instruction(0x00850383).unwrap();
@@ -177,7 +177,7 @@ fn load_byte() {
 #[test]
 fn load_half() {
     let i = assemble_line("lh s3,-16(sp)").unwrap().i();
-    let expected = Instruction::LH{dest: IRegister::S3, base: IRegister::StackPointer, offset: IImmediate::from_val(-16)};
+    let expected = Instruction::LH{dest: IRegister::S3, base: IRegister::StackPointer, offset: IImmediate::try_from(-16).unwrap()};
     assert_eq!(i, expected);
 
     let i2 = decode_instruction(0xff011983).unwrap();
@@ -190,7 +190,7 @@ fn load_half() {
 #[test]
 fn load_word() {
     let i = assemble_line("lw a4,1024(t5)").unwrap().i();
-    let expected = Instruction::LW{dest: IRegister::A4, base: IRegister::T5, offset: IImmediate::from_val(1024)};
+    let expected = Instruction::LW{dest: IRegister::A4, base: IRegister::T5, offset: IImmediate::try_from(1024).unwrap()};
     assert_eq!(i, expected);
 
     let i2 = decode_instruction(0x400f2703).unwrap();
@@ -203,7 +203,7 @@ fn load_word() {
 #[test]
 fn load_byte_unsigned() {
     let i = assemble_line("lbu s0,63(a6)").unwrap().i();
-    let expected = Instruction::LBU{dest: IRegister::FramePointer, base: IRegister::A6, offset: IImmediate::from_val(63)};
+    let expected = Instruction::LBU{dest: IRegister::FramePointer, base: IRegister::A6, offset: IImmediate::try_from(63).unwrap()};
     assert_eq!(i, expected);
 
     let i2 = decode_instruction(0x03f84403).unwrap();
@@ -216,7 +216,7 @@ fn load_byte_unsigned() {
 #[test]
 fn load_half_unsigned() {
     let i = assemble_line("lhu t4,-2047(a1)").unwrap().i();
-    let expected = Instruction::LHU{dest: IRegister::T4, base: IRegister::A1, offset: IImmediate::from_val(-2047)};
+    let expected = Instruction::LHU{dest: IRegister::T4, base: IRegister::A1, offset: IImmediate::try_from(-2047).unwrap()};
     assert_eq!(i, expected);
 
     let i2 = decode_instruction(0x8015de83).unwrap();
@@ -268,7 +268,7 @@ fn store_word() {
 #[test]
 fn add_immediate() {
     let i = assemble_line("addi t3,s4,99").unwrap().i();
-    let expected = Instruction::ADDI{dest: IRegister::T3, src: IRegister::S4, imm: IImmediate::from_val(99)};
+    let expected = Instruction::ADDI{dest: IRegister::T3, src: IRegister::S4, imm: IImmediate::try_from(99).unwrap()};
     assert_eq!(i, expected);
 
     let i2 = decode_instruction(0x063a0e13).unwrap();
@@ -281,7 +281,7 @@ fn add_immediate() {
 #[test]
 fn set_less_than_immediate() {
     let i = assemble_line("slti a1,t2,-12").unwrap().i();
-    let expected = Instruction::SLTI{dest: IRegister::A1, src: IRegister::T2, imm: IImmediate::from_val(-12)};
+    let expected = Instruction::SLTI{dest: IRegister::A1, src: IRegister::T2, imm: IImmediate::try_from(-12).unwrap()};
     assert_eq!(i, expected);
 
     let i2 = decode_instruction(0xff43a593).unwrap();
@@ -294,7 +294,7 @@ fn set_less_than_immediate() {
 #[test]
 fn set_less_than_immediate_unsigned() {
     let i = assemble_line("sltiu s5,a0,2047").unwrap().i();
-    let expected = Instruction::SLTIU{dest: IRegister::S5, src: IRegister::A0, imm: IImmediate::from_val(2047)};
+    let expected = Instruction::SLTIU{dest: IRegister::S5, src: IRegister::A0, imm: IImmediate::try_from(2047).unwrap()};
     assert_eq!(i, expected);
 
     let i2 = decode_instruction(0x7ff53a93).unwrap();
@@ -307,7 +307,7 @@ fn set_less_than_immediate_unsigned() {
 #[test]
 fn xor_immediate() {
     let i = assemble_line("xori a7,ra,15").unwrap().i();
-    let expected = Instruction::XORI{dest: IRegister::A7, src: IRegister::ReturnAddress, imm: IImmediate::from_val(15)};
+    let expected = Instruction::XORI{dest: IRegister::A7, src: IRegister::ReturnAddress, imm: IImmediate::try_from(15).unwrap()};
     assert_eq!(i, expected);
 
     let i2 = decode_instruction(0x00f0c893).unwrap();
@@ -320,7 +320,7 @@ fn xor_immediate() {
 #[test]
 fn or_immediate() {
     let i = assemble_line("ori t6,gp,31").unwrap().i();
-    let expected = Instruction::ORI{dest: IRegister::T6, src: IRegister::GlobalPointer, imm: IImmediate::from_val(31)};
+    let expected = Instruction::ORI{dest: IRegister::T6, src: IRegister::GlobalPointer, imm: IImmediate::try_from(31).unwrap()};
     assert_eq!(i, expected);
 
     let i2 = decode_instruction(0x01f1ef93).unwrap();
@@ -333,7 +333,7 @@ fn or_immediate() {
 #[test]
 fn and_immediate() {
     let i = assemble_line("andi gp,sp,-256").unwrap().i();
-    let expected = Instruction::ANDI{dest: IRegister::GlobalPointer, src: IRegister::StackPointer, imm: IImmediate::from_val(-256)};
+    let expected = Instruction::ANDI{dest: IRegister::GlobalPointer, src: IRegister::StackPointer, imm: IImmediate::try_from(-256).unwrap()};
     assert_eq!(i, expected);
 
     let i2 = decode_instruction(0xf0017193).unwrap();

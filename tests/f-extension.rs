@@ -11,7 +11,7 @@ fn float_load_word() {
     let expected = Instruction::FLW {
         dest: FRegister::FA0,
         base: IRegister::A0,
-        offset: IImmediate::from_val(64),
+        offset: IImmediate::try_from(64).unwrap(),
     };
     assert_eq!(i, expected);
 
