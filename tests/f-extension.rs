@@ -389,7 +389,11 @@ fn float_move_word_from_x() {
 fn float_convert_long_from_single() {
     // check assembler
     let i = assemble_line("fcvt.l.s s4,fa7").unwrap().i();
-    let expected = Instruction::FCVTLS(IRegister::S4, FRegister::FA7, RoundingMode::DYN);
+    let expected = Instruction::FCVTLS {
+        dest: IRegister::S4,
+        src: FRegister::FA7,
+        rm: RoundingMode::DYN,
+    };
     assert_eq!(i, expected);
 
     // check decoder
@@ -405,7 +409,11 @@ fn float_convert_long_from_single() {
 fn float_convert_unsigned_long_from_single() {
     // check assembler
     let i = assemble_line("fcvt.lu.s t2,ft9").unwrap().i();
-    let expected = Instruction::FCVTLUS(IRegister::T2, FRegister::FT9, RoundingMode::DYN);
+    let expected = Instruction::FCVTLUS {
+        dest: IRegister::T2,
+        src: FRegister::FT9,
+        rm: RoundingMode::DYN,
+    };
     assert_eq!(i, expected);
 
     // check decoder
@@ -421,7 +429,11 @@ fn float_convert_unsigned_long_from_single() {
 fn float_convert_single_from_long() {
     // check assembler
     let i = assemble_line("fcvt.s.l fs8,s2").unwrap().i();
-    let expected = Instruction::FCVTSL(FRegister::FS8, IRegister::S2, RoundingMode::DYN);
+    let expected = Instruction::FCVTSL {
+        dest: FRegister::FS8,
+        src: IRegister::S2,
+        rm: RoundingMode::DYN,
+    };
     assert_eq!(i, expected);
 
     // check decoder
@@ -437,7 +449,11 @@ fn float_convert_single_from_long() {
 fn float_convert_single_from_unsigned_long() {
     // check assembler
     let i = assemble_line("fcvt.s.lu ft7,fp").unwrap().i();
-    let expected = Instruction::FCVTSLU(FRegister::FT7, IRegister::FramePointer, RoundingMode::DYN);
+    let expected = Instruction::FCVTSLU {
+        dest: FRegister::FT7,
+        src: IRegister::FramePointer,
+        rm: RoundingMode::DYN,
+    };
     assert_eq!(i, expected);
 
     // check decoder

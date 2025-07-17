@@ -738,19 +738,59 @@ pub enum Instruction {
     //
     // Instructions in F Extension (RV64)
     //
-    FCVTLS(IRegister, FRegister, RoundingMode),
-    FCVTLUS(IRegister, FRegister, RoundingMode),
-    FCVTSL(FRegister, IRegister, RoundingMode),
-    FCVTSLU(FRegister, IRegister, RoundingMode),
+    FCVTLS {
+        dest: IRegister,
+        src: FRegister,
+        rm: RoundingMode,
+    },
+    FCVTLUS {
+        dest: IRegister,
+        src: FRegister,
+        rm: RoundingMode,
+    },
+    FCVTSL {
+        dest: FRegister,
+        src: IRegister,
+        rm: RoundingMode,
+    },
+    FCVTSLU {
+        dest: FRegister,
+        src: IRegister,
+        rm: RoundingMode,
+    },
     //
     // Instructions in Zicsr Extension
     //
-    CSRRW(IRegister, IRegister, CSR),
-    CSRRS(IRegister, IRegister, CSR),
-    CSRRC(IRegister, IRegister, CSR),
-    CSRRWI(IRegister, CSRImmediate, CSR),
-    CSRRSI(IRegister, CSRImmediate, CSR),
-    CSRRCI(IRegister, CSRImmediate, CSR),
+    CSRRW {
+        dest: IRegister,
+        src: IRegister,
+        csr: CSR,
+    },
+    CSRRS {
+        dest: IRegister,
+        src: IRegister,
+        csr: CSR,
+    },
+    CSRRC {
+        dest: IRegister,
+        src: IRegister,
+        csr: CSR,
+    },
+    CSRRWI {
+        dest: IRegister,
+        imm: CSRImmediate,
+        csr: CSR,
+    },
+    CSRRSI {
+        dest: IRegister,
+        imm: CSRImmediate,
+        csr: CSR,
+    },
+    CSRRCI {
+        dest: IRegister,
+        imm: CSRImmediate,
+        csr: CSR,
+    },
     //
     // Instructions in Zifencei Extension
     //
@@ -835,254 +875,254 @@ impl Display for Instruction {
             Instruction::REMW { dest, src1, src2 } => write!(f, "remw {dest},{src1},{src2}"),
             Instruction::REMUW { dest, src1, src2 } => write!(f, "remuw {dest},{src1},{src2}"),
             Instruction::LRW { dest, addr, aq, rl } => {
-                        write!(f, "lr.w{} {dest},{addr}", aq_rl_suffix(aq, rl))
-                    }
+                write!(f, "lr.w{} {dest},{addr}", aq_rl_suffix(aq, rl))
+            }
             Instruction::SCW {
-                        dest,
-                        addr,
-                        src,
-                        aq,
-                        rl,
-                    } => {
-                        write!(f, "sc.w{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
-                    }
+                dest,
+                addr,
+                src,
+                aq,
+                rl,
+            } => {
+                write!(f, "sc.w{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
+            }
             Instruction::AMOSWAPW {
-                        dest,
-                        addr,
-                        src,
-                        aq,
-                        rl,
-                    } => {
-                        write!(f, "amoswap.w{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
-                    }
+                dest,
+                addr,
+                src,
+                aq,
+                rl,
+            } => {
+                write!(f, "amoswap.w{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
+            }
             Instruction::AMOADDW {
-                        dest,
-                        addr,
-                        src,
-                        aq,
-                        rl,
-                    } => {
-                        write!(f, "amoadd.w{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
-                    }
+                dest,
+                addr,
+                src,
+                aq,
+                rl,
+            } => {
+                write!(f, "amoadd.w{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
+            }
             Instruction::AMOXORW {
-                        dest,
-                        addr,
-                        src,
-                        aq,
-                        rl,
-                    } => {
-                        write!(f, "amoxor.w{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
-                    }
+                dest,
+                addr,
+                src,
+                aq,
+                rl,
+            } => {
+                write!(f, "amoxor.w{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
+            }
             Instruction::AMOANDW {
-                        dest,
-                        addr,
-                        src,
-                        aq,
-                        rl,
-                    } => {
-                        write!(f, "amoand.w{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
-                    }
+                dest,
+                addr,
+                src,
+                aq,
+                rl,
+            } => {
+                write!(f, "amoand.w{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
+            }
             Instruction::AMOORW {
-                        dest,
-                        addr,
-                        src,
-                        aq,
-                        rl,
-                    } => {
-                        write!(f, "amoor.w{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
-                    }
-                    
+                dest,
+                addr,
+                src,
+                aq,
+                rl,
+            } => {
+                write!(f, "amoor.w{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
+            }
+
             Instruction::AMOMINW {
-                        dest,
-                        addr,
-                        src,
-                        aq,
-                        rl,
-                    } => {
-                        write!(f, "amomin.w{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
-                    }
+                dest,
+                addr,
+                src,
+                aq,
+                rl,
+            } => {
+                write!(f, "amomin.w{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
+            }
             Instruction::AMOMAXW {
-                        dest,
-                        addr,
-                        src,
-                        aq,
-                        rl,
-                    } => {
-                        write!(f, "amomax.w{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
-                    }
+                dest,
+                addr,
+                src,
+                aq,
+                rl,
+            } => {
+                write!(f, "amomax.w{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
+            }
             Instruction::AMOMINUW {
-                        dest,
-                        addr,
-                        src,
-                        aq,
-                        rl,
-                    } => {
-                        write!(f, "amominu.w{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
-                    }
+                dest,
+                addr,
+                src,
+                aq,
+                rl,
+            } => {
+                write!(f, "amominu.w{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
+            }
             Instruction::AMOMAXUW {
-                        dest,
-                        addr,
-                        src,
-                        aq,
-                        rl,
-                    } => {
-                        write!(f, "amomaxu.w{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
-                    }
+                dest,
+                addr,
+                src,
+                aq,
+                rl,
+            } => {
+                write!(f, "amomaxu.w{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
+            }
             Instruction::LRD { dest, addr, aq, rl } => {
-                        write!(f, "lr.d{} {dest},{addr}", aq_rl_suffix(aq, rl))
-                    }
+                write!(f, "lr.d{} {dest},{addr}", aq_rl_suffix(aq, rl))
+            }
             Instruction::SCD {
-                        dest,
-                        addr,
-                        src,
-                        aq,
-                        rl,
-                    } => {
-                        write!(f, "sc.d{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
-                    }
+                dest,
+                addr,
+                src,
+                aq,
+                rl,
+            } => {
+                write!(f, "sc.d{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
+            }
             Instruction::AMOSWAPD {
-                        dest,
-                        addr,
-                        src,
-                        aq,
-                        rl,
-                    } => {
-                        write!(f, "amoswap.d{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
-                    }
+                dest,
+                addr,
+                src,
+                aq,
+                rl,
+            } => {
+                write!(f, "amoswap.d{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
+            }
             Instruction::AMOADDD {
-                        dest,
-                        addr,
-                        src,
-                        aq,
-                        rl,
-                    } => {
-                        write!(f, "amoadd.d{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
-                    }
+                dest,
+                addr,
+                src,
+                aq,
+                rl,
+            } => {
+                write!(f, "amoadd.d{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
+            }
             Instruction::AMOXORD {
-                        dest,
-                        addr,
-                        src,
-                        aq,
-                        rl,
-                    } => {
-                        write!(f, "amoxor.d{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
-                    }
+                dest,
+                addr,
+                src,
+                aq,
+                rl,
+            } => {
+                write!(f, "amoxor.d{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
+            }
             Instruction::AMOANDD {
-                        dest,
-                        addr,
-                        src,
-                        aq,
-                        rl,
-                    } => {
-                        write!(f, "amoand.d{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
-                    }
+                dest,
+                addr,
+                src,
+                aq,
+                rl,
+            } => {
+                write!(f, "amoand.d{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
+            }
             Instruction::AMOORD {
-                        dest,
-                        addr,
-                        src,
-                        aq,
-                        rl,
-                    } => {
-                        write!(f, "amoor.d{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
-                    }
+                dest,
+                addr,
+                src,
+                aq,
+                rl,
+            } => {
+                write!(f, "amoor.d{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
+            }
             Instruction::AMOMIND {
-                        dest,
-                        addr,
-                        src,
-                        aq,
-                        rl,
-                    } => {
-                        write!(f, "amomin.d{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
-                    }
+                dest,
+                addr,
+                src,
+                aq,
+                rl,
+            } => {
+                write!(f, "amomin.d{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
+            }
             Instruction::AMOMAXD {
-                        dest,
-                        addr,
-                        src,
-                        aq,
-                        rl,
-                    } => {
-                        write!(f, "amomax.d{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
-                    }
+                dest,
+                addr,
+                src,
+                aq,
+                rl,
+            } => {
+                write!(f, "amomax.d{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
+            }
             Instruction::AMOMINUD {
-                        dest,
-                        addr,
-                        src,
-                        aq,
-                        rl,
-                    } => {
-                        write!(f, "amominu.d{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
-                    }
+                dest,
+                addr,
+                src,
+                aq,
+                rl,
+            } => {
+                write!(f, "amominu.d{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
+            }
             Instruction::AMOMAXUD {
-                        dest,
-                        addr,
-                        src,
-                        aq,
-                        rl,
-                    } => {
-                        write!(f, "amomaxu.d{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
-                    }
+                dest,
+                addr,
+                src,
+                aq,
+                rl,
+            } => {
+                write!(f, "amomaxu.d{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
+            }
             Instruction::FLW { dest, base, offset } => write!(f, "flw {dest},{offset}({base})"),
             Instruction::FSW { base, src, offset } => write!(f, "fsw {src},{offset}({base})"),
             Instruction::FMADDS {
-                        dest,
-                        src1,
-                        src2,
-                        src3,
-                        rm,
-                    } => {
-                        write!(f, "fmadd.s.{rm} {dest},{src1},{src2},{src3}")
-                    }
+                dest,
+                src1,
+                src2,
+                src3,
+                rm,
+            } => {
+                write!(f, "fmadd.s.{rm} {dest},{src1},{src2},{src3}")
+            }
             Instruction::FMSUBS {
-                        dest,
-                        src1,
-                        src2,
-                        src3,
-                        rm,
-                    } => {
-                        write!(f, "fmsub.s.{rm} {dest},{src1},{src2},{src3}")
-                    }
+                dest,
+                src1,
+                src2,
+                src3,
+                rm,
+            } => {
+                write!(f, "fmsub.s.{rm} {dest},{src1},{src2},{src3}")
+            }
             Instruction::FNMSUBS {
-                        dest,
-                        src1,
-                        src2,
-                        src3,
-                        rm,
-                    } => {
-                        write!(f, "fnmsub.s.{rm} {dest},{src1},{src2},{src3}")
-                    }
+                dest,
+                src1,
+                src2,
+                src3,
+                rm,
+            } => {
+                write!(f, "fnmsub.s.{rm} {dest},{src1},{src2},{src3}")
+            }
             Instruction::FNMADDS {
-                        dest,
-                        src1,
-                        src2,
-                        src3,
-                        rm,
-                    } => {
-                        write!(f, "fnmadd.s.{rm} {dest},{src1},{src2},{src3}")
-                    }
+                dest,
+                src1,
+                src2,
+                src3,
+                rm,
+            } => {
+                write!(f, "fnmadd.s.{rm} {dest},{src1},{src2},{src3}")
+            }
             Instruction::FADDS {
-                        dest,
-                        src1,
-                        src2,
-                        rm,
-                    } => write!(f, "fadd.s.{rm} {dest},{src1},{src2}"),
+                dest,
+                src1,
+                src2,
+                rm,
+            } => write!(f, "fadd.s.{rm} {dest},{src1},{src2}"),
             Instruction::FSUBS {
-                        dest,
-                        src1,
-                        src2,
-                        rm,
-                    } => write!(f, "fsub.s.{rm} {dest},{src1},{src2}"),
+                dest,
+                src1,
+                src2,
+                rm,
+            } => write!(f, "fsub.s.{rm} {dest},{src1},{src2}"),
             Instruction::FMULS {
-                        dest,
-                        src1,
-                        src2,
-                        rm,
-                    } => write!(f, "fmul.s.{rm} {dest},{src1},{src2}"),
+                dest,
+                src1,
+                src2,
+                rm,
+            } => write!(f, "fmul.s.{rm} {dest},{src1},{src2}"),
             Instruction::FDIVS {
-                        dest,
-                        src1,
-                        src2,
-                        rm,
-                    } => write!(f, "fdiv.s.{rm} {dest},{src1},{src2}"),
+                dest,
+                src1,
+                src2,
+                rm,
+            } => write!(f, "fdiv.s.{rm} {dest},{src1},{src2}"),
             Instruction::FSQRTS { dest, src, rm } => write!(f, "fsqrt.s.{rm} {dest},{src}"),
             Instruction::FSGNJS { dest, src1, src2 } => write!(f, "fsgnj.s {dest},{src1},{src2}"),
             Instruction::FSGNJNS { dest, src1, src2 } => write!(f, "fsgnjn.s {dest},{src1},{src2}"),
@@ -1099,19 +1139,18 @@ impl Display for Instruction {
             Instruction::FCVTSW { dest, src, rm } => write!(f, "fcvt.s.w.{rm} {dest},{src}"),
             Instruction::FCVTSWU { dest, src, rm } => write!(f, "fcvt.s.wu.{rm} {dest},{src}"),
             Instruction::FMVWX { dest, src } => write!(f, "fmv.w.x {dest},{src}"),
-            Instruction::FCVTLS(rd, rs1, rm) => write!(f, "fcvt.l.s.{rm} {rd},{rs1}"),
-            Instruction::FCVTLUS(rd, rs1, rm) => write!(f, "fcvt.lu.s.{rm} {rd},{rs1}"),
-            Instruction::FCVTSL(rd, rs1, rm) => write!(f, "fcvt.s.l.{rm} {rd},{rs1}"),
-            Instruction::FCVTSLU(rd, rs1, rm) => write!(f, "fcvt.s.lu.{rm} {rd},{rs1}"),
-            Instruction::CSRRW(rd, rs1, csr) => write!(f, "csrrw {rd},{csr},{rs1}"),
-            Instruction::CSRRS(rd, rs1, csr) => write!(f, "csrrs {rd},{csr},{rs1}"),
-            Instruction::CSRRC(rd, rs1, csr) => write!(f, "csrrc {rd},{csr},{rs1}"),
-            Instruction::CSRRWI(rd, imm, csr) => write!(f, "csrrwi {rd},{csr},{imm}"),
-            Instruction::CSRRSI(rd, imm, csr) => write!(f, "csrrsi {rd},{csr},{imm}"),
-            Instruction::CSRRCI(rd, imm, csr) => write!(f, "csrrci {rd},{csr},{imm}"),
+            Instruction::FCVTLS { dest, src, rm } => write!(f, "fcvt.l.s.{rm} {dest},{src}"),
+            Instruction::FCVTLUS { dest, src, rm } => write!(f, "fcvt.lu.s.{rm} {dest},{src}"),
+            Instruction::FCVTSL { dest, src, rm } => write!(f, "fcvt.s.l.{rm} {dest},{src}"),
+            Instruction::FCVTSLU { dest, src, rm } => write!(f, "fcvt.s.lu.{rm} {dest},{src}"),
+            Instruction::CSRRW { dest, src, csr } => write!(f, "csrrw {dest},{csr},{src}"),
+            Instruction::CSRRS { dest, src, csr } => write!(f, "csrrs {dest},{csr},{src}"),
+            Instruction::CSRRC { dest, src, csr } => write!(f, "csrrc {dest},{csr},{src}"),
+            Instruction::CSRRWI { dest, imm, csr } => write!(f, "csrrwi {dest},{csr},{imm}"),
+            Instruction::CSRRSI { dest, imm, csr } => write!(f, "csrrsi {dest},{csr},{imm}"),
+            Instruction::CSRRCI { dest, imm, csr } => write!(f, "csrrci {dest},{csr},{imm}"),
             Instruction::FENCEI => write!(f, "fence.i"),
-            
-                    }
+        }
     }
 }
 
@@ -1397,19 +1436,19 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                     Err("lr must have size (w/d)".to_owned())
                 } else if mnemonics.len() == 2 {
                     if mnemonics[1] == "w" {
-                        Ok(Instruction::LRW{
+                        Ok(Instruction::LRW {
                             dest: IRegister::from_string(operands[0])?,
                             addr: IRegister::from_string(operands[1])?,
                             aq: false,
                             rl: false,
-                    })
+                        })
                     } else if mnemonics[1] == "d" {
-                        Ok(Instruction::LRD{
+                        Ok(Instruction::LRD {
                             dest: IRegister::from_string(operands[0])?,
                             addr: IRegister::from_string(operands[1])?,
                             aq: false,
                             rl: false,
-                    })
+                        })
                     } else {
                         Err("size of lr isntruction must be word (w) or doubleword (d)".to_owned())
                     }
@@ -1422,19 +1461,19 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                         _ => return Err("ordering should be (aq)(rl)".to_owned()),
                     };
                     if mnemonics[1] == "w" {
-                        Ok(Instruction::LRW{
+                        Ok(Instruction::LRW {
                             dest: IRegister::from_string(operands[0])?,
                             addr: IRegister::from_string(operands[1])?,
                             aq,
                             rl,
-                    })
+                        })
                     } else if mnemonics[1] == "d" {
-                        Ok(Instruction::LRD{
+                        Ok(Instruction::LRD {
                             dest: IRegister::from_string(operands[0])?,
                             addr: IRegister::from_string(operands[1])?,
                             aq,
                             rl,
-                    })
+                        })
                     } else {
                         Err("size of lr isntruction must be word (w) or doubleword (d)".to_owned())
                     }
@@ -1556,26 +1595,26 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                             src: IRegister::from_string(operands[1])?,
                             rm: RoundingMode::DYN,
                         }),
-                        ("l", "s") => Ok(Instruction::FCVTLS(
-                            IRegister::from_string(operands[0])?,
-                            FRegister::from_string(operands[1])?,
-                            RoundingMode::DYN,
-                        )),
-                        ("lu", "s") => Ok(Instruction::FCVTLUS(
-                            IRegister::from_string(operands[0])?,
-                            FRegister::from_string(operands[1])?,
-                            RoundingMode::DYN,
-                        )),
-                        ("s", "l") => Ok(Instruction::FCVTSL(
-                            FRegister::from_string(operands[0])?,
-                            IRegister::from_string(operands[1])?,
-                            RoundingMode::DYN,
-                        )),
-                        ("s", "lu") => Ok(Instruction::FCVTSLU(
-                            FRegister::from_string(operands[0])?,
-                            IRegister::from_string(operands[1])?,
-                            RoundingMode::DYN,
-                        )),
+                        ("l", "s") => Ok(Instruction::FCVTLS {
+                            dest: IRegister::from_string(operands[0])?,
+                            src: FRegister::from_string(operands[1])?,
+                            rm: RoundingMode::DYN,
+                        }),
+                        ("lu", "s") => Ok(Instruction::FCVTLUS {
+                            dest: IRegister::from_string(operands[0])?,
+                            src: FRegister::from_string(operands[1])?,
+                            rm: RoundingMode::DYN,
+                        }),
+                        ("s", "l") => Ok(Instruction::FCVTSL {
+                            dest: FRegister::from_string(operands[0])?,
+                            src: IRegister::from_string(operands[1])?,
+                            rm: RoundingMode::DYN,
+                        }),
+                        ("s", "lu") => Ok(Instruction::FCVTSLU {
+                            dest: FRegister::from_string(operands[0])?,
+                            src: IRegister::from_string(operands[1])?,
+                            rm: RoundingMode::DYN,
+                        }),
                         _ => Err("invalid fcvt suffixes".to_owned()),
                     }
                 } else if mnemonics.len() == 4 {
@@ -1600,26 +1639,26 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                             src: IRegister::from_string(operands[1])?,
                             rm: RoundingMode::from_str(mnemonics[3])?,
                         }),
-                        ("l", "s") => Ok(Instruction::FCVTLS(
-                            IRegister::from_string(operands[0])?,
-                            FRegister::from_string(operands[1])?,
-                            RoundingMode::from_str(mnemonics[3])?,
-                        )),
-                        ("lu", "s") => Ok(Instruction::FCVTLUS(
-                            IRegister::from_string(operands[0])?,
-                            FRegister::from_string(operands[1])?,
-                            RoundingMode::from_str(mnemonics[3])?,
-                        )),
-                        ("s", "l") => Ok(Instruction::FCVTSL(
-                            FRegister::from_string(operands[0])?,
-                            IRegister::from_string(operands[1])?,
-                            RoundingMode::from_str(mnemonics[3])?,
-                        )),
-                        ("s", "lu") => Ok(Instruction::FCVTSLU(
-                            FRegister::from_string(operands[0])?,
-                            IRegister::from_string(operands[1])?,
-                            RoundingMode::from_str(mnemonics[3])?,
-                        )),
+                        ("l", "s") => Ok(Instruction::FCVTLS {
+                            dest: IRegister::from_string(operands[0])?,
+                            src: FRegister::from_string(operands[1])?,
+                            rm: RoundingMode::from_str(mnemonics[3])?,
+                        }),
+                        ("lu", "s") => Ok(Instruction::FCVTLUS {
+                            dest: IRegister::from_string(operands[0])?,
+                            src: FRegister::from_string(operands[1])?,
+                            rm: RoundingMode::from_str(mnemonics[3])?,
+                        }),
+                        ("s", "l") => Ok(Instruction::FCVTSL {
+                            dest: FRegister::from_string(operands[0])?,
+                            src: IRegister::from_string(operands[1])?,
+                            rm: RoundingMode::from_str(mnemonics[3])?,
+                        }),
+                        ("s", "lu") => Ok(Instruction::FCVTSLU {
+                            dest: FRegister::from_string(operands[0])?,
+                            src: IRegister::from_string(operands[1])?,
+                            rm: RoundingMode::from_str(mnemonics[3])?,
+                        }),
                         _ => Err("invalid fcvt suffixes".to_owned()),
                     }
                 } else {
@@ -1724,66 +1763,66 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                 if operands.len() != 3 {
                     Err("csrrw requires 3 operands".to_owned())
                 } else {
-                    Ok(Instruction::CSRRW(
-                        IRegister::from_string(operands[0])?,
-                        IRegister::from_string(operands[2])?,
-                        CSR::from_val(parse_int(operands[1])?),
-                    ))
+                    Ok(Instruction::CSRRW {
+                        dest: IRegister::from_string(operands[0])?,
+                        src: IRegister::from_string(operands[2])?,
+                        csr: CSR::from_val(parse_int(operands[1])?),
+                    })
                 }
             }
             "csrrs" => {
                 if operands.len() != 3 {
                     Err("csrrs requires 3 operands".to_owned())
                 } else {
-                    Ok(Instruction::CSRRS(
-                        IRegister::from_string(operands[0])?,
-                        IRegister::from_string(operands[2])?,
-                        CSR::from_val(parse_int(operands[1])?),
-                    ))
+                    Ok(Instruction::CSRRS {
+                        dest: IRegister::from_string(operands[0])?,
+                        src: IRegister::from_string(operands[2])?,
+                        csr: CSR::from_val(parse_int(operands[1])?),
+                    })
                 }
             }
             "csrrc" => {
                 if operands.len() != 3 {
                     Err("csrrc requires 3 operands".to_owned())
                 } else {
-                    Ok(Instruction::CSRRC(
-                        IRegister::from_string(operands[0])?,
-                        IRegister::from_string(operands[2])?,
-                        CSR::from_val(parse_int(operands[1])?),
-                    ))
+                    Ok(Instruction::CSRRC {
+                        dest: IRegister::from_string(operands[0])?,
+                        src: IRegister::from_string(operands[2])?,
+                        csr: CSR::from_val(parse_int(operands[1])?),
+                    })
                 }
             }
             "csrrwi" => {
                 if operands.len() != 3 {
                     Err("csrrwi requires 3 operands".to_owned())
                 } else {
-                    Ok(Instruction::CSRRWI(
-                        IRegister::from_string(operands[0])?,
-                        CSRImmediate::from_val(parse_int(operands[2])?),
-                        CSR::from_val(parse_int(operands[1])?),
-                    ))
+                    Ok(Instruction::CSRRWI {
+                        dest: IRegister::from_string(operands[0])?,
+                        imm: CSRImmediate::from_val(parse_int(operands[2])?),
+                        csr: CSR::from_val(parse_int(operands[1])?),
+                    })
                 }
             }
             "csrrsi" => {
                 if operands.len() != 3 {
                     Err("csrrsi requires 3 operands".to_owned())
                 } else {
-                    Ok(Instruction::CSRRSI(
-                        IRegister::from_string(operands[0])?,
-                        CSRImmediate::from_val(parse_int(operands[2])?),
-                        CSR::from_val(parse_int(operands[1])?),
-                    ))
+                    Ok(Instruction::CSRRSI {
+                        dest: IRegister::from_string(operands[0])?,
+                        imm: CSRImmediate::from_val(parse_int(operands[2])?),
+                        csr: CSR::from_val(parse_int(operands[1])?),
+                    })
                 }
             }
             "csrrci" => {
                 if operands.len() != 3 {
                     Err("csrrci requires 3 operands".to_owned())
                 } else {
-                    Ok(Instruction::CSRRCI(
-                        IRegister::from_string(operands[0])?,
-                        CSRImmediate::from_val(parse_int(operands[2])?),
-                        CSR::from_val(parse_int(operands[1])?),
-                    ))
+                    Ok(Instruction::CSRRCI {
+                        dest: IRegister::from_string(operands[0])?,
+                        imm: CSRImmediate::from_val(parse_int(operands[2])?),
+                        csr: CSR::from_val(parse_int(operands[1])?),
+                    })
                 }
             }
             _ => Err(format!("unknown mnemonic: {}", mnemonic)),
@@ -2504,47 +2543,53 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
                     src: frs1,
                     rm: RoundingMode::from_int(func3)?,
                 }),
-                0b0_0010 => Ok(Instruction::FCVTLS(
-                    rd,
-                    frs1,
-                    RoundingMode::from_int(func3)?,
-                )),
-                0b0_0011 => Ok(Instruction::FCVTLUS(
-                    rd,
-                    frs1,
-                    RoundingMode::from_int(func3)?,
-                )),
+                0b0_0010 => Ok(Instruction::FCVTLS {
+                    dest: rd,
+                    src: frs1,
+                    rm: RoundingMode::from_int(func3)?,
+                }),
+                0b0_0011 => Ok(Instruction::FCVTLUS {
+                    dest: rd,
+                    src: frs1,
+                    rm: RoundingMode::from_int(func3)?,
+                }),
                 x => Err(format!("unknown OpFp func7=0b001_0100 rs2: {}", x)),
             },
             0b110_1000 => match (instruction >> 20) & 0b1_1111 {
-                0b0_0000 => Ok(Instruction::FCVTSW{
+                0b0_0000 => Ok(Instruction::FCVTSW {
                     dest: frd,
                     src: rs1,
                     rm: RoundingMode::from_int(func3)?,
-            }),
-                0b0_0001 => Ok(Instruction::FCVTSWU{
+                }),
+                0b0_0001 => Ok(Instruction::FCVTSWU {
                     dest: frd,
                     src: rs1,
                     rm: RoundingMode::from_int(func3)?,
-            }),
-                0b0_0010 => Ok(Instruction::FCVTSL(
-                    frd,
-                    rs1,
-                    RoundingMode::from_int(func3)?,
-                )),
-                0b0_0011 => Ok(Instruction::FCVTSLU(
-                    frd,
-                    rs1,
-                    RoundingMode::from_int(func3)?,
-                )),
+                }),
+                0b0_0010 => Ok(Instruction::FCVTSL {
+                    dest: frd,
+                    src: rs1,
+                    rm: RoundingMode::from_int(func3)?,
+                }),
+                0b0_0011 => Ok(Instruction::FCVTSLU {
+                    dest: frd,
+                    src: rs1,
+                    rm: RoundingMode::from_int(func3)?,
+                }),
                 x => Err(format!("unknown OpFp func7=0b001_0100 rs2: {}", x)),
             },
             0b111_0000 => {
                 if (instruction >> 20) & 0b1_1111 == 0 {
                     if func3 == 0 {
-                        Ok(Instruction::FMVXW{dest: rd, src: frs1})
+                        Ok(Instruction::FMVXW {
+                            dest: rd,
+                            src: frs1,
+                        })
                     } else if func3 == 1 {
-                        Ok(Instruction::FCLASSS{dest: rd, src: frs1})
+                        Ok(Instruction::FCLASSS {
+                            dest: rd,
+                            src: frs1,
+                        })
                     } else {
                         Err(format!(
                             "unknown OpFp func7=0b111_0000 rs2=0 func3: {}",
@@ -2562,7 +2607,10 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
             0b111_1000 => {
                 if (instruction >> 20) & 0b1_1111 == 0 {
                     if func3 == 0 {
-                        Ok(Instruction::FMVWX{dest: frd, src: rs1})
+                        Ok(Instruction::FMVWX {
+                            dest: frd,
+                            src: rs1,
+                        })
                     } else {
                         Err(format!(
                             "unknown OpFp func7=0b111_1000 rs2=0 func3: {}",
@@ -2582,13 +2630,13 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
         Opcode::Reserved => Err("instruction uses reserved opcode".to_owned()),
         Opcode::Madd => {
             if func7 & 0b11 == 0 {
-                Ok(Instruction::FMADDS{
+                Ok(Instruction::FMADDS {
                     dest: frd,
                     src1: frs1,
                     src2: frs2,
                     src3: frs3,
                     rm: RoundingMode::from_int(func3)?,
-            })
+                })
             } else {
                 Err(format!(
                     "FMADD unknown lower 2 bits of func7: {}",
@@ -2598,13 +2646,13 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
         }
         Opcode::Msub => {
             if func7 & 0b11 == 0 {
-                Ok(Instruction::FMSUBS{
+                Ok(Instruction::FMSUBS {
                     dest: frd,
                     src1: frs1,
                     src2: frs2,
                     src3: frs3,
                     rm: RoundingMode::from_int(func3)?,
-            })
+                })
             } else {
                 Err(format!(
                     "FMSUB unknown lower 2 bits of func7: {}",
@@ -2614,13 +2662,13 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
         }
         Opcode::Nmsub => {
             if func7 & 0b11 == 0 {
-                Ok(Instruction::FNMSUBS{
+                Ok(Instruction::FNMSUBS {
                     dest: frd,
                     src1: frs1,
                     src2: frs2,
                     src3: frs3,
                     rm: RoundingMode::from_int(func3)?,
-            })
+                })
             } else {
                 Err(format!(
                     "FMNSUB unknown lower 2 bits of func7: {}",
@@ -2630,13 +2678,13 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
         }
         Opcode::Nmadd => {
             if func7 & 0b11 == 0 {
-                Ok(Instruction::FNMADDS{
+                Ok(Instruction::FNMADDS {
                     dest: frd,
                     src1: frs1,
                     src2: frs2,
                     src3: frs3,
                     rm: RoundingMode::from_int(func3)?,
-            })
+                })
             } else {
                 Err(format!(
                     "FNMADD unknown lower 2 bits of func7: {}",
@@ -2646,25 +2694,37 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
         }
         Opcode::System => match func3 {
             0b000 => Err("Reserved func3 in Opcode SYSTEM".to_owned()),
-            0b001 => Ok(Instruction::CSRRW(rd, rs1, CSR::from_u32(instruction))),
-            0b010 => Ok(Instruction::CSRRS(rd, rs1, CSR::from_u32(instruction))),
-            0b011 => Ok(Instruction::CSRRC(rd, rs1, CSR::from_u32(instruction))),
+            0b001 => Ok(Instruction::CSRRW {
+                dest: rd,
+                src: rs1,
+                csr: CSR::from_u32(instruction),
+            }),
+            0b010 => Ok(Instruction::CSRRS {
+                dest: rd,
+                src: rs1,
+                csr: CSR::from_u32(instruction),
+            }),
+            0b011 => Ok(Instruction::CSRRC {
+                dest: rd,
+                src: rs1,
+                csr: CSR::from_u32(instruction),
+            }),
             0b100 => Err("Reserved func3 in Opcode SYSTEM".to_owned()),
-            0b101 => Ok(Instruction::CSRRWI(
-                rd,
-                CSRImmediate::from_u32(instruction),
-                CSR::from_u32(instruction),
-            )),
-            0b110 => Ok(Instruction::CSRRSI(
-                rd,
-                CSRImmediate::from_u32(instruction),
-                CSR::from_u32(instruction),
-            )),
-            0b111 => Ok(Instruction::CSRRCI(
-                rd,
-                CSRImmediate::from_u32(instruction),
-                CSR::from_u32(instruction),
-            )),
+            0b101 => Ok(Instruction::CSRRWI {
+                dest: rd,
+                imm: CSRImmediate::from_u32(instruction),
+                csr: CSR::from_u32(instruction),
+            }),
+            0b110 => Ok(Instruction::CSRRSI {
+                dest: rd,
+                imm: CSRImmediate::from_u32(instruction),
+                csr: CSR::from_u32(instruction),
+            }),
+            0b111 => Ok(Instruction::CSRRCI {
+                dest: rd,
+                imm: CSRImmediate::from_u32(instruction),
+                csr: CSR::from_u32(instruction),
+            }),
             _ => unreachable!(),
         },
     }
