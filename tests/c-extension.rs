@@ -12,7 +12,7 @@ fn add_4_immediate_stack_pointer() {
     let i = assemble_line("c.addi4spn a0,280").unwrap().c();
     let expected = CInstruction::ADDI4SPN {
         dest: CIRegister::A0,
-        imm: CWideImmediate::from_val(280),
+        imm: CWideImmediate::try_from(280).unwrap(),
     };
     assert_eq!(i, expected);
 
@@ -33,7 +33,7 @@ fn float_load_double() {
     let expected = CInstruction::FLD {
         dest: CFRegister::FA0,
         base: CIRegister::A1,
-        offset: CDImmediate::from_val(152),
+        offset: CDImmediate::try_from(152).unwrap(),
     };
     assert_eq!(i, expected);
 
@@ -54,7 +54,7 @@ fn load_word() {
     let expected = CInstruction::LW {
         dest: CIRegister::A2,
         base: CIRegister::FramePointer,
-        offset: CWImmediate::from_val(0),
+        offset: CWImmediate::try_from(0).unwrap(),
     };
     assert_eq!(i, expected);
 
@@ -75,7 +75,7 @@ fn load_doubleword() {
     let expected = CInstruction::LD {
         dest: CIRegister::A3,
         base: CIRegister::A4,
-        offset: CDImmediate::from_val(248),
+        offset: CDImmediate::try_from(248).unwrap(),
     };
     assert_eq!(i, expected);
 
@@ -96,7 +96,7 @@ fn float_store_double() {
     let expected = CInstruction::FSD {
         src: CFRegister::FS0,
         base: CIRegister::A5,
-        offset: CDImmediate::from_val(8),
+        offset: CDImmediate::try_from(8).unwrap(),
     };
     assert_eq!(i, expected);
 
@@ -117,7 +117,7 @@ fn store_word() {
     let expected = CInstruction::SW {
         src: CIRegister::A2,
         base: CIRegister::A2,
-        offset: CWImmediate::from_val(124),
+        offset: CWImmediate::try_from(124).unwrap(),
     };
     assert_eq!(i, expected);
 
@@ -138,7 +138,7 @@ fn store_double() {
     let expected = CInstruction::SD {
         src: CIRegister::A4,
         base: CIRegister::A3,
-        offset: CDImmediate::from_val(248),
+        offset: CDImmediate::try_from(248).unwrap(),
     };
     assert_eq!(i, expected);
 
@@ -158,7 +158,7 @@ fn add_immediate() {
     let i = assemble_line("c.addi t1,12").unwrap().c();
     let expected = CInstruction::ADDI {
         dest: IRegister::T1,
-        imm: CIImmediate::from_val(12),
+        imm: CIImmediate::try_from(12).unwrap(),
     };
     assert_eq!(i, expected);
 
@@ -178,7 +178,7 @@ fn add_immediate_word() {
     let i = assemble_line("c.addiw s6,31").unwrap().c();
     let expected = CInstruction::ADDIW {
         dest: IRegister::S6,
-        imm: CIImmediate::from_val(31),
+        imm: CIImmediate::try_from(31).unwrap(),
     };
     assert_eq!(i, expected);
 
@@ -198,7 +198,7 @@ fn load_immediate() {
     let i = assemble_line("c.li t4,-32").unwrap().c();
     let expected = CInstruction::LI {
         dest: IRegister::T4,
-        imm: CIImmediate::from_val(-32),
+        imm: CIImmediate::try_from(-32).unwrap(),
     };
     assert_eq!(i, expected);
 
@@ -235,7 +235,7 @@ fn load_upper_immediate() {
     let i = assemble_line("c.lui s9,24").unwrap().c();
     let expected = CInstruction::LUI {
         dest: IRegister::S9,
-        imm: CIImmediate::from_val(24),
+        imm: CIImmediate::try_from(24).unwrap(),
     };
     assert_eq!(i, expected);
 
@@ -255,7 +255,7 @@ fn shift_right_logical_immediate() {
     let i = assemble_line("c.srli a2,35").unwrap().c();
     let expected = CInstruction::SRLI {
         dest: CIRegister::A2,
-        shamt: CShamt::from_val(35),
+        shamt: CShamt::try_from(35).unwrap(),
     };
     assert_eq!(i, expected);
 
@@ -275,7 +275,7 @@ fn shift_right_arithmetic_immediate() {
     let i = assemble_line("c.srai fp,63").unwrap().c();
     let expected = CInstruction::SRAI {
         dest: CIRegister::FramePointer,
-        shamt: CShamt::from_val(63),
+        shamt: CShamt::try_from(63).unwrap(),
     };
     assert_eq!(i, expected);
 
@@ -295,7 +295,7 @@ fn and_immediate() {
     let i = assemble_line("c.andi s1,-1").unwrap().c();
     let expected = CInstruction::ANDI {
         dest: CIRegister::S1,
-        imm: CIImmediate::from_val(-1),
+        imm: CIImmediate::try_from(-1).unwrap(),
     };
     assert_eq!(i, expected);
 
@@ -434,7 +434,7 @@ fn jump() {
     // check assembler
     let i = assemble_line("c.j 72").unwrap().c();
     let expected = CInstruction::J {
-        offset: CJImmediate::from_val(72),
+        offset: CJImmediate::try_from(72).unwrap(),
     };
     assert_eq!(i, expected);
 
@@ -454,7 +454,7 @@ fn jump2() {
     // check assembler
     let i = assemble_line("c.j 1538").unwrap().c();
     let expected = CInstruction::J {
-        offset: CJImmediate::from_val(1538),
+        offset: CJImmediate::try_from(1538).unwrap(),
     };
     assert_eq!(i, expected);
 
@@ -473,7 +473,7 @@ fn jump3() {
     // check assembler
     let i = assemble_line("c.j -2").unwrap().c();
     let expected = CInstruction::J {
-        offset: CJImmediate::from_val(-2),
+        offset: CJImmediate::try_from(-2).unwrap(),
     };
     assert_eq!(i, expected);
 
@@ -492,7 +492,7 @@ fn jump4() {
     // check assembler
     let i = assemble_line("c.j -216").unwrap().c();
     let expected = CInstruction::J {
-        offset: CJImmediate::from_val(-216),
+        offset: CJImmediate::try_from(-216).unwrap(),
     };
     assert_eq!(i, expected);
 
@@ -512,7 +512,7 @@ fn branch_equal_zero() {
     let i = assemble_line("c.beqz a5, 72").unwrap().c();
     let expected = CInstruction::BEQZ {
         src: CIRegister::A5,
-        offset: CBImmediate::from_val(72),
+        offset: CBImmediate::try_from(72).unwrap(),
     };
     assert_eq!(i, expected);
 
@@ -532,7 +532,7 @@ fn branch_not_equal_zero() {
     let i = assemble_line("c.bnez a5, -2").unwrap().c();
     let expected = CInstruction::BNEZ {
         src: CIRegister::A5,
-        offset: CBImmediate::from_val(-2),
+        offset: CBImmediate::try_from(-2).unwrap(),
     };
     assert_eq!(i, expected);
 
@@ -552,7 +552,7 @@ fn shfit_left_logical_immediate() {
     let i = assemble_line("c.slli t6, 19").unwrap().c();
     let expected = CInstruction::SLLI {
         dest: IRegister::T6,
-        shamt: CShamt::from_val(19),
+        shamt: CShamt::try_from(19).unwrap(),
     };
     assert_eq!(i, expected);
 
@@ -570,7 +570,7 @@ fn shfit_left_logical_immediate() {
 fn float_load_double_stack_pointer() {
     // check assembler
     let i = assemble_line("c.fldsp ft8, 504").unwrap().c();
-    let expected = CInstruction::FLDSP{dest: FRegister::FT8, offset: CDSPImmediate::from_val(504)};
+    let expected = CInstruction::FLDSP{dest: FRegister::FT8, offset: CDSPImmediate::try_from(504).unwrap()};
     assert_eq!(i, expected);
 
     // check decoder
@@ -587,7 +587,7 @@ fn float_load_double_stack_pointer() {
 fn load_word_stack_pointer() {
     // check assembler
     let i = assemble_line("c.lwsp s1, 200").unwrap().c();
-    let expected = CInstruction::LWSP{dest: IRegister::S1, offset: CWSPImmediate::from_val(200)};
+    let expected = CInstruction::LWSP{dest: IRegister::S1, offset: CWSPImmediate::try_from(200).unwrap()};
     assert_eq!(i, expected);
 
     // check decoder
@@ -604,7 +604,7 @@ fn load_word_stack_pointer() {
 fn load_double_stack_pointer() {
     // check assembler
     let i = assemble_line("c.ldsp fp, 400").unwrap().c();
-    let expected = CInstruction::LDSP{dest: IRegister::FramePointer, offset: CDSPImmediate::from_val(400)};
+    let expected = CInstruction::LDSP{dest: IRegister::FramePointer, offset: CDSPImmediate::try_from(400).unwrap()};
     assert_eq!(i, expected);
 
     // check decoder
@@ -715,7 +715,7 @@ fn float_store_double_stack_pointer() {
     let i = assemble_line("c.fsdsp fa2, 136").unwrap().c();
     let expected = CInstruction::FSDSP {
         src: FRegister::FA2,
-        offset: CSDSPImmediate::from_val(136),
+        offset: CSDSPImmediate::try_from(136).unwrap(),
     };
     assert_eq!(i, expected);
 
@@ -735,7 +735,7 @@ fn store_word_stack_pointer() {
     let i = assemble_line("c.swsp s7, 56").unwrap().c();
     let expected = CInstruction::SWSP {
         src: IRegister::S7,
-        offset: CSWSPImmediate::from_val(56),
+        offset: CSWSPImmediate::try_from(56).unwrap(),
     };
     assert_eq!(i, expected);
 
@@ -755,7 +755,7 @@ fn store_double_stack_pointer() {
     let i = assemble_line("c.sdsp gp, 112").unwrap().c();
     let expected = CInstruction::SDSP {
         src: IRegister::GlobalPointer,
-        offset: CSDSPImmediate::from_val(112),
+        offset: CSDSPImmediate::try_from(112).unwrap(),
     };
     assert_eq!(i, expected);
 

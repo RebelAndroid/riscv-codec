@@ -1766,7 +1766,7 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                     Ok(Instruction::CSRRW {
                         dest: IRegister::from_string(operands[0])?,
                         src: IRegister::from_string(operands[2])?,
-                        csr: CSR::from_val(parse_int(operands[1])?),
+                        csr: CSR::try_from(parse_int(operands[1])?)?,
                     })
                 }
             }
@@ -1777,7 +1777,7 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                     Ok(Instruction::CSRRS {
                         dest: IRegister::from_string(operands[0])?,
                         src: IRegister::from_string(operands[2])?,
-                        csr: CSR::from_val(parse_int(operands[1])?),
+                        csr: CSR::try_from(parse_int(operands[1])?)?,
                     })
                 }
             }
@@ -1788,7 +1788,7 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                     Ok(Instruction::CSRRC {
                         dest: IRegister::from_string(operands[0])?,
                         src: IRegister::from_string(operands[2])?,
-                        csr: CSR::from_val(parse_int(operands[1])?),
+                        csr: CSR::try_from(parse_int(operands[1])?)?,
                     })
                 }
             }
@@ -1798,8 +1798,8 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                 } else {
                     Ok(Instruction::CSRRWI {
                         dest: IRegister::from_string(operands[0])?,
-                        imm: CSRImmediate::from_val(parse_int(operands[2])?),
-                        csr: CSR::from_val(parse_int(operands[1])?),
+                        imm: CSRImmediate::try_from(parse_int(operands[2])?)?,
+                        csr: CSR::try_from(parse_int(operands[1])?)?,
                     })
                 }
             }
@@ -1809,8 +1809,8 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                 } else {
                     Ok(Instruction::CSRRSI {
                         dest: IRegister::from_string(operands[0])?,
-                        imm: CSRImmediate::from_val(parse_int(operands[2])?),
-                        csr: CSR::from_val(parse_int(operands[1])?),
+                        imm: CSRImmediate::try_from(parse_int(operands[2])?)?,
+                        csr: CSR::try_from(parse_int(operands[1])?)?,
                     })
                 }
             }
@@ -1820,8 +1820,8 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                 } else {
                     Ok(Instruction::CSRRCI {
                         dest: IRegister::from_string(operands[0])?,
-                        imm: CSRImmediate::from_val(parse_int(operands[2])?),
-                        csr: CSR::from_val(parse_int(operands[1])?),
+                        imm: CSRImmediate::try_from(parse_int(operands[2])?)?,
+                        csr: CSR::try_from(parse_int(operands[1])?)?,
                     })
                 }
             }

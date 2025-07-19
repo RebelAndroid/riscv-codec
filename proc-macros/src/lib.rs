@@ -312,7 +312,7 @@ pub fn ci_assemble(input: TokenStream) -> TokenStream {
         }} else {{
             Ok(CInstruction::{name}{{
                 dest: IRegister::from_string(operands[0])?,
-                imm: CIImmediate::from_val(parse_int(operands[1])?),
+                imm: CIImmediate::try_from(parse_int(operands[1])?)?,
             }})
         }}"
         )
@@ -400,11 +400,13 @@ impl ImmPart {
 #[proc_macro]
 pub fn make_immediate(input: TokenStream) -> TokenStream {
     let mut i = input.into_iter();
-    if let TokenTree::Ident(ident) = i.next().unwrap()
+    if let TokenTree::Ident(name) = i.next().unwrap()
         && let Ok(signed) = BoolLit::try_from(i.next().unwrap())
+        && let Ok(compressed) = BoolLit::try_from(i.next().unwrap())
     {
-        let name = ident.to_string();
+        let name = name.to_string();
         let signed = signed.value();
+        let compressed = compressed.value();
 
         let parts: Vec<ImmPart> = i.map(|t| ImmPart::from_token_tree(t)).collect();
 
@@ -420,7 +422,7 @@ pub fn make_immediate(input: TokenStream) -> TokenStream {
 
         let struct_string = format!(
             "
-            #[derive(Debug, PartialEq)]
+            #[derive(Debug, PartialEq, Copy, Clone)]
             pub struct {name} {{
                 val: {typ},
             }}
@@ -458,6 +460,13 @@ pub fn make_immediate(input: TokenStream) -> TokenStream {
                 self.val.into()
             }}
         }}
+
+        impl {name} {{
+            pub fn val(self) -> i64 {{
+                return self.into()
+            }}
+        }}
+
         "
         );
 
@@ -484,8 +493,22 @@ pub fn make_immediate(input: TokenStream) -> TokenStream {
 
             let ret = format!("{name} {{ val: i2}}");
 
-            format!(
-                "
+            if compressed {
+                format!(
+                    "
+            impl {name} {{
+                pub fn from_u16(x: u16) -> Self {{
+                    {extractions}
+                    {insert}
+                    {sign_extension}
+                    {ret}
+                }}
+            }}
+            "
+                )
+            } else {
+                format!(
+                    "
             impl {name} {{
                 pub fn from_u32(x: u32) -> Self {{
                     {extractions}
@@ -495,7 +518,8 @@ pub fn make_immediate(input: TokenStream) -> TokenStream {
                 }}
             }}
             "
-            )
+                )
+            }
         };
 
         let display_string = format!(

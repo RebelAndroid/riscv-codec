@@ -426,7 +426,7 @@ impl CInstruction {
                 } else {
                     Ok(CInstruction::ADDI4SPN {
                         dest: CIRegister::try_from(operands[0])?,
-                        imm: CWideImmediate::from_val(parse_int(operands[1])?),
+                        imm: CWideImmediate::try_from(parse_int(operands[1])?)?,
                     })
                 }
             }
@@ -438,7 +438,7 @@ impl CInstruction {
                     Ok(CInstruction::FLD {
                         dest: CFRegister::try_from(operands[0])?,
                         base,
-                        offset: CDImmediate::from_val(imm),
+                        offset: CDImmediate::try_from(imm)?,
                     })
                 }
             }
@@ -450,7 +450,7 @@ impl CInstruction {
                     Ok(CInstruction::LW {
                         dest: CIRegister::try_from(operands[0])?,
                         base,
-                        offset: CWImmediate::from_val(imm),
+                        offset: CWImmediate::try_from(imm)?,
                     })
                 }
             }
@@ -462,7 +462,7 @@ impl CInstruction {
                     Ok(CInstruction::LD {
                         dest: CIRegister::try_from(operands[0])?,
                         base,
-                        offset: CDImmediate::from_val(imm),
+                        offset: CDImmediate::try_from(imm)?,
                     })
                 }
             }
@@ -474,7 +474,7 @@ impl CInstruction {
                     Ok(CInstruction::FSD {
                         src: CFRegister::try_from(operands[0])?,
                         base,
-                        offset: CDImmediate::from_val(imm),
+                        offset: CDImmediate::try_from(imm)?,
                     })
                 }
             }
@@ -486,7 +486,7 @@ impl CInstruction {
                     Ok(CInstruction::SW {
                         src: CIRegister::try_from(operands[0])?,
                         base,
-                        offset: CWImmediate::from_val(imm),
+                        offset: CWImmediate::try_from(imm)?,
                     })
                 }
             }
@@ -498,7 +498,7 @@ impl CInstruction {
                     Ok(CInstruction::SD {
                         src: CIRegister::try_from(operands[0])?,
                         base,
-                        offset: CDImmediate::from_val(imm),
+                        offset: CDImmediate::try_from(imm)?,
                     })
                 }
             }
@@ -526,7 +526,7 @@ impl CInstruction {
                 } else {
                     Ok(CInstruction::SRLI {
                         dest: CIRegister::try_from(operands[0])?,
-                        shamt: CShamt::from_val(parse_int(operands[1])?),
+                        shamt: CShamt::try_from(parse_int(operands[1])?)?,
                     })
                 }
             }
@@ -536,7 +536,7 @@ impl CInstruction {
                 } else {
                     Ok(CInstruction::SRAI {
                         dest: CIRegister::try_from(operands[0])?,
-                        shamt: CShamt::from_val(parse_int(operands[1])?),
+                        shamt: CShamt::try_from(parse_int(operands[1])?)?,
                     })
                 }
             }
@@ -546,7 +546,7 @@ impl CInstruction {
                 } else {
                     Ok(CInstruction::ANDI {
                         dest: CIRegister::try_from(operands[0])?,
-                        imm: CIImmediate::from_val(parse_int(operands[1])?),
+                        imm: CIImmediate::try_from(parse_int(operands[1])?)?,
                     })
                 }
             }
@@ -561,7 +561,7 @@ impl CInstruction {
                     Err("c.j requires 1 operand".to_owned())
                 } else {
                     Ok(CInstruction::J {
-                        offset: CJImmediate::from_val(parse_int(operands[0])?),
+                        offset: CJImmediate::try_from(parse_int(operands[0])?)?,
                     })
                 }
             }
@@ -571,7 +571,7 @@ impl CInstruction {
                 } else {
                     Ok(CInstruction::BEQZ {
                         src: CIRegister::try_from(operands[0])?,
-                        offset: CBImmediate::from_val(parse_int(operands[1])?),
+                        offset: CBImmediate::try_from(parse_int(operands[1])?)?,
                     })
                 }
             }
@@ -581,7 +581,7 @@ impl CInstruction {
                 } else {
                     Ok(CInstruction::BNEZ {
                         src: CIRegister::try_from(operands[0])?,
-                        offset: CBImmediate::from_val(parse_int(operands[1])?),
+                        offset: CBImmediate::try_from(parse_int(operands[1])?)?,
                     })
                 }
             }
@@ -591,7 +591,7 @@ impl CInstruction {
                 } else {
                     Ok(CInstruction::SLLI {
                         dest: IRegister::from_string(operands[0])?,
-                        shamt: CShamt::from_val(parse_int(operands[1])?),
+                        shamt: CShamt::try_from(parse_int(operands[1])?)?,
                     })
                 }
             }
@@ -601,7 +601,7 @@ impl CInstruction {
                 } else {
                     Ok(CInstruction::FLDSP {
                         dest: FRegister::try_from(operands[0])?,
-                        offset: CDSPImmediate::from_val(parse_int(operands[1])?),
+                        offset: CDSPImmediate::try_from(parse_int(operands[1])?)?,
                     })
                 }
             }
@@ -611,7 +611,7 @@ impl CInstruction {
                 } else {
                     Ok(CInstruction::LDSP {
                         dest: IRegister::from_string(operands[0])?,
-                        offset: CDSPImmediate::from_val(parse_int(operands[1])?),
+                        offset: CDSPImmediate::try_from(parse_int(operands[1])?)?,
                     })
                 }
             }
@@ -621,7 +621,7 @@ impl CInstruction {
                 } else {
                     Ok(CInstruction::LWSP {
                         dest: IRegister::from_string(operands[0])?,
-                        offset: CWSPImmediate::from_val(parse_int(operands[1])?),
+                        offset: CWSPImmediate::try_from(parse_int(operands[1])?)?,
                     })
                 }
             }
@@ -666,7 +666,7 @@ impl CInstruction {
                 } else {
                     Ok(CInstruction::FSDSP {
                         src: FRegister::try_from(operands[0])?,
-                        offset: CSDSPImmediate::from_val(parse_int(operands[1])?),
+                        offset: CSDSPImmediate::try_from(parse_int(operands[1])?)?,
                     })
                 }
             }
@@ -676,7 +676,7 @@ impl CInstruction {
                 } else {
                     Ok(CInstruction::SWSP {
                         src: IRegister::from_string(operands[0])?,
-                        offset: CSWSPImmediate::from_val(parse_int(operands[1])?),
+                        offset: CSWSPImmediate::try_from(parse_int(operands[1])?)?,
                     })
                 }
             }
@@ -686,7 +686,7 @@ impl CInstruction {
                 } else {
                     Ok(CInstruction::SDSP {
                         src: IRegister::from_string(operands[0])?,
-                        offset: CSDSPImmediate::from_val(parse_int(operands[1])?),
+                        offset: CSDSPImmediate::try_from(parse_int(operands[1])?)?,
                     })
                 }
             }
