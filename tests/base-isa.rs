@@ -8,7 +8,7 @@ use riscv_disassembler::{
 fn load_upper_immediate() {
     // check assembler
     let i = assemble_line("lui s2,400").unwrap().i();
-    let expected = Instruction::LUI{dest: IRegister::S2, imm: UImmediate::from_val(400)};
+    let expected = Instruction::LUI{dest: IRegister::S2, imm: UImmediate::try_from(400).unwrap()};
     assert_eq!(i, expected);
 
     // check decoder
@@ -24,7 +24,7 @@ fn load_upper_immediate() {
 fn add_upper_immediate_to_program_counter() {
     // check assembler
     let i = assemble_line("auipc a3,-1").unwrap().i();
-    let expected = Instruction::AUIPC{dest: IRegister::A3, imm: UImmediate::from_val(-1)};
+    let expected = Instruction::AUIPC{dest: IRegister::A3, imm: UImmediate::try_from(-1).unwrap()};
     assert_eq!(i, expected);
 
     // check decoder
@@ -40,7 +40,7 @@ fn add_upper_immediate_to_program_counter() {
 fn jump_and_link() {
     // check assembler
     let i = assemble_line("jal zero,-1016708").unwrap().i();
-    let expected = Instruction::JAL{dest: IRegister::Zero, offset: JImmediate::from_val(-1016708)};
+    let expected = Instruction::JAL{dest: IRegister::Zero, offset: JImmediate::try_from(-1016708).unwrap()};
     assert_eq!(i, expected);
 
     // check decoder
@@ -72,7 +72,7 @@ fn jump_and_link_register() {
 fn branch_equal() {
     // check assembler
     let i = assemble_line("beq t2,sp,2").unwrap().i();
-    let expected = Instruction::BEQ{src1: IRegister::T2, src2: IRegister::StackPointer, offset: BImmediate::from_val(2)};
+    let expected = Instruction::BEQ{src1: IRegister::T2, src2: IRegister::StackPointer, offset: BImmediate::try_from(2).unwrap()};
     assert_eq!(i, expected);
 
     // check decoder
@@ -88,7 +88,7 @@ fn branch_equal() {
 fn branch_not_equal() {
     // check assembler
     let i = assemble_line("bne tp,a4,4094").unwrap().i();
-    let expected = Instruction::BNE{src1: IRegister::ThreadPointer, src2: IRegister::A4, offset: BImmediate::from_val(4094)};
+    let expected = Instruction::BNE{src1: IRegister::ThreadPointer, src2: IRegister::A4, offset: BImmediate::try_from(4094).unwrap()};
     assert_eq!(i, expected);
 
     // check decoder
@@ -104,7 +104,7 @@ fn branch_not_equal() {
 fn branch_less_than() {
     // check assembler
     let i = assemble_line("blt a1,t6,-4096").unwrap().i();
-    let expected = Instruction::BLT{src1: IRegister::A1, src2: IRegister::T6, offset: BImmediate::from_val(-4096)};
+    let expected = Instruction::BLT{src1: IRegister::A1, src2: IRegister::T6, offset: BImmediate::try_from(-4096).unwrap()};
     assert_eq!(i, expected);
 
     // check decoder
@@ -120,7 +120,7 @@ fn branch_less_than() {
 fn branch_greater_equal() {
     // check assembler
     let i = assemble_line("bge a1,t6,-2030").unwrap().i();
-    let expected = Instruction::BGE{src1: IRegister::A1, src2: IRegister::T6, offset: BImmediate::from_val(-2030)};
+    let expected = Instruction::BGE{src1: IRegister::A1, src2: IRegister::T6, offset: BImmediate::try_from(-2030).unwrap()};
     assert_eq!(i, expected);
 
     // check decoder
@@ -136,7 +136,7 @@ fn branch_greater_equal() {
 fn branch_less_than_unsigned() {
     // check assembler
     let i = assemble_line("bltu t0,s2,512").unwrap().i();
-    let expected = Instruction::BLTU{src1: IRegister::T0, src2: IRegister::S2, offset: BImmediate::from_val(512)};
+    let expected = Instruction::BLTU{src1: IRegister::T0, src2: IRegister::S2, offset: BImmediate::try_from(512).unwrap()};
     assert_eq!(i, expected);
 
     // check decoder
@@ -151,7 +151,7 @@ fn branch_less_than_unsigned() {
 #[test]
 fn branch_greater_equal_unsigned() {
     let i = assemble_line("bgeu s1,a3,-128").unwrap().i();
-    let expected = Instruction::BGEU{src1: IRegister::S1, src2: IRegister::A3, offset: BImmediate::from_val(-128)};
+    let expected = Instruction::BGEU{src1: IRegister::S1, src2: IRegister::A3, offset: BImmediate::try_from(-128).unwrap()};
     assert_eq!(i, expected);
 
     let i2 = decode_instruction(0xf8d4f0e3).unwrap();
@@ -229,7 +229,7 @@ fn load_half_unsigned() {
 #[test]
 fn store_byte() {
     let i = assemble_line("sb t1,127(a2)").unwrap().i();
-    let expected = Instruction::SB{base: IRegister::A2, src: IRegister::T1, offset: SImmediate::from_val(127)};
+    let expected = Instruction::SB{base: IRegister::A2, src: IRegister::T1, offset: SImmediate::try_from(127).unwrap()};
     assert_eq!(i, expected);
 
     let i2 = decode_instruction(0x06660fa3).unwrap();
@@ -242,7 +242,7 @@ fn store_byte() {
 #[test]
 fn store_half() {
     let i = assemble_line("sh a5,-32(s2)").unwrap().i();
-    let expected = Instruction::SH{base: IRegister::S2, src: IRegister::A5, offset: SImmediate::from_val(-32)};
+    let expected = Instruction::SH{base: IRegister::S2, src: IRegister::A5, offset: SImmediate::try_from(-32).unwrap()};
     assert_eq!(i, expected);
 
     let i2 = decode_instruction(0xfef91023).unwrap();
@@ -255,7 +255,7 @@ fn store_half() {
 #[test]
 fn store_word() {
     let i = assemble_line("sw s7,2046(t6)").unwrap().i();
-    let expected = Instruction::SW{base: IRegister::T6, src: IRegister::S7, offset: SImmediate::from_val(2046)};
+    let expected = Instruction::SW{base: IRegister::T6, src: IRegister::S7, offset: SImmediate::try_from(2046).unwrap()};
     assert_eq!(i, expected);
 
     let i2 = decode_instruction(0x7f7faf23).unwrap();
@@ -346,7 +346,7 @@ fn and_immediate() {
 #[test]
 fn shift_left_logical_immediate() {
     let i = assemble_line("slli t1,s0,13").unwrap().i();
-    let expected = Instruction::SLLI{dest: IRegister::T1, src: IRegister::FramePointer, shamt: Shamt::from_val(13)};
+    let expected = Instruction::SLLI{dest: IRegister::T1, src: IRegister::FramePointer, shamt: Shamt::try_from(13).unwrap()};
     assert_eq!(i, expected);
 
     let i2 = decode_instruction(0x00d41313).unwrap();
@@ -359,7 +359,7 @@ fn shift_left_logical_immediate() {
 #[test]
 fn shift_right_logical_immediate() {
     let i = assemble_line("srli s2,a6,9").unwrap().i();
-    let expected = Instruction::SRLI{dest: IRegister::S2, src: IRegister::A6, shamt: Shamt::from_val(9)};
+    let expected = Instruction::SRLI{dest: IRegister::S2, src: IRegister::A6, shamt: Shamt::try_from(9).unwrap()};
     assert_eq!(i, expected);
 
     let i2 = decode_instruction(0x00985913).unwrap();
@@ -372,7 +372,7 @@ fn shift_right_logical_immediate() {
 #[test]
 fn shift_right_arithmetic_immediate() {
     let i = assemble_line("srai s1,s3,17").unwrap().i();
-    let expected = Instruction::SRAI{dest: IRegister::S1, src: IRegister::S3, shamt: Shamt::from_val(17)};
+    let expected = Instruction::SRAI{dest: IRegister::S1, src: IRegister::S3, shamt: Shamt::try_from(17).unwrap()};
     assert_eq!(i, expected);
 
     let i2 = decode_instruction(0x4119d493).unwrap();

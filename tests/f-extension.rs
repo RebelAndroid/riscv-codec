@@ -31,7 +31,7 @@ fn float_store_word() {
     let expected = Instruction::FSW {
         base: IRegister::A5,
         src: FRegister::FS1,
-        offset: SImmediate::from_val(-1),
+        offset: SImmediate::try_from(-1).unwrap(),
     };
     assert_eq!(i, expected);
 

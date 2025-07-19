@@ -1353,7 +1353,7 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                 } else {
                     Ok(Instruction::JAL {
                         dest: IRegister::from_string(operands[0])?,
-                        offset: JImmediate::from_val(parse_int(operands[1])?),
+                        offset: JImmediate::try_from(parse_int(operands[1])?)?,
                     })
                 }
             }
@@ -1367,7 +1367,7 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                     } else {
                         Ok(Instruction::LUI {
                             dest: IRegister::from_string(operands[0])?,
-                            imm: UImmediate::from_val(int),
+                            imm: UImmediate::try_from(int)?,
                         })
                     }
                 }
@@ -1382,7 +1382,7 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                     } else {
                         Ok(Instruction::AUIPC {
                             dest: IRegister::from_string(operands[0])?,
-                            imm: UImmediate::from_val(int),
+                            imm: UImmediate::try_from(int)?,
                         })
                     }
                 }
@@ -1516,7 +1516,7 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                     Ok(Instruction::FSW {
                         base,
                         src: FRegister::try_from(operands[0])?,
-                        offset: SImmediate::from_val(offset),
+                        offset: SImmediate::try_from(offset)?,
                     })
                 }
             }

@@ -1,5 +1,5 @@
 extern crate proc_macro;
-use litrs::{IntegerLit};
+use litrs::{BoolLit, IntegerLit};
 use proc_macro::{Delimiter, TokenStream, TokenTree};
 
 /// Assembles an i-type instruction
@@ -92,7 +92,7 @@ pub fn s_assemble(input: TokenStream) -> TokenStream {
             Ok(Instruction::{name}{{
                 src: IRegister::from_string(operands[0])?,
                 base,
-                offset: SImmediate::from_val(offset),
+                offset: SImmediate::try_from(offset)?,
             }})
         }}"
         )
@@ -126,7 +126,7 @@ pub fn b_assemble(input: TokenStream) -> TokenStream {
             Ok(Instruction::{name}{{
                 src1: IRegister::from_string(operands[0])?,
                 src2: IRegister::from_string(operands[1])?,
-                offset: BImmediate::from_val(parse_int(operands[2])?),
+                offset: BImmediate::try_from(parse_int(operands[2])?)?,
             }})
         }}"
         )
@@ -151,7 +151,7 @@ pub fn sh_assemble(input: TokenStream) -> TokenStream {
             Ok(Instruction::{name}{{
                 dest: IRegister::from_string(operands[0])?,
                 src: IRegister::from_string(operands[1])?,
-                shamt: Shamt::from_val(parse_int(operands[2])?),
+                shamt: Shamt::try_from(parse_int(operands[2])?)?,
             }})
         }}"
         )
@@ -176,7 +176,7 @@ pub fn shw_assemble(input: TokenStream) -> TokenStream {
             Ok(Instruction::{name}{{
                 dest: IRegister::from_string(operands[0])?,
                 src: IRegister::from_string(operands[1])?,
-                shamt: ShamtW::from_val(parse_int(operands[2])?),
+                shamt: ShamtW::try_from(parse_int(operands[2])?)?,
             }})
         }}"
         )
@@ -400,17 +400,42 @@ impl ImmPart {
 #[proc_macro]
 pub fn make_immediate(input: TokenStream) -> TokenStream {
     let mut i = input.into_iter();
-    if let TokenTree::Ident(ident) = i.next().unwrap() {
+    if let TokenTree::Ident(ident) = i.next().unwrap()
+        && let Ok(signed) = BoolLit::try_from(i.next().unwrap())
+    {
         let name = ident.to_string();
+        let signed = signed.value();
+
         let parts: Vec<ImmPart> = i.map(|t| ImmPart::from_token_tree(t)).collect();
+
+        let align: u8 = parts.iter().map(|part| part.base).min().unwrap();
+        let align_pattern = (1 << align) - 1;
+        let size: u8 = parts
+            .iter()
+            .map(|part| part.base + part.size)
+            .max()
+            .unwrap();
+
+        let typ = if signed { "i32" } else { "u32" };
+
         let struct_string = format!(
             "
             #[derive(Debug, PartialEq)]
             pub struct {name} {{
-                val: i32,
+                val: {typ},
             }}
         "
         );
+
+        let bounds_condition = if signed {
+            format!(
+                "value > 2i64.pow({}) - 1 || value < -2i64.pow({})",
+                size - 1,
+                size - 1
+            )
+        } else {
+            format!("value > 2i64.pow({}) - 1 || value < 0", size)
+        };
 
         let impl_string = format!(
             "
@@ -418,10 +443,12 @@ pub fn make_immediate(input: TokenStream) -> TokenStream {
             type Error = String;
 
             fn try_from(value: i64) -> Result<Self, Self::Error> {{
-                if value > 2i64.pow(11) - 1 || value < -2i64.pow(11) {{
+                if {bounds_condition} {{
                     Err(format!(\"attempted to construct out of range {name}\"))
+                }}else if value & {align_pattern} != 0 {{
+                    Err(format!(\"attempted to construct unaligned {name}\"))
                 }}else {{
-                    Ok({name} {{ val: value as i32 }})
+                    Ok({name} {{ val: value as {typ} }})
                 }}
             }}
         }}
@@ -433,17 +460,6 @@ pub fn make_immediate(input: TokenStream) -> TokenStream {
         }}
         "
         );
-
-        //     pub fn from_u32(x: u32) -> Self {
-        //         let a = (x >> 12) & 0b1111_1111;
-        //         let b = (x >> 20) & 0b1;
-        //         let c = (x >> 21) & 0b11_1111_1111;
-        //         let d = x >> 31;
-        //         let i: i32 = ((c << 1) | (b << 11) | (a << 12) | (d << 20)) as i32;
-        //         // sign extend 21 bit value
-        //         let i2: i32 = (i << 11) >> 11;
-        //         JImmediate { val: i2 }
-        //     }
 
         let extract_fn = {
             let extractions: String = parts
@@ -460,16 +476,11 @@ pub fn make_immediate(input: TokenStream) -> TokenStream {
 
             let insert = format!("let i: i32 = ({insertions}) as i32;");
 
-            let total_size: u8 = parts
-                .iter()
-                .map(|part| part.size)
-                .reduce(|acc, e| acc + e)
-                .unwrap();
-            let sign_extension = format!(
-                "let i2: i32 = (i << {}) >> {};",
-                32 - total_size,
-                32 - total_size
-            );
+            let sign_extension = if signed {
+                format!("let i2: i32 = (i << {}) >> {};", 32 - size, 32 - size)
+            } else {
+                "let i2: u32 = i as u32;".to_owned()
+            };
 
             let ret = format!("{name} {{ val: i2}}");
 
@@ -504,8 +515,6 @@ pub fn make_immediate(input: TokenStream) -> TokenStream {
             {display_string}
             "
         );
-
-
         // println!("{}", final_str);
 
         final_str.parse().unwrap()

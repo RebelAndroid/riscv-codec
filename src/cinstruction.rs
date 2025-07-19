@@ -730,12 +730,12 @@ impl CInstruction {
             CInstruction::SW { src, base, offset } => Instruction::SW {
                 src: src.expand(),
                 base: base.expand(),
-                offset: SImmediate::from_val(offset.val()),
+                offset: SImmediate::try_from(offset.val()).unwrap(),
             },
             CInstruction::SD { src, base, offset } => Instruction::SD {
                 src: src.expand(),
                 base: base.expand(),
-                offset: SImmediate::from_val(offset.val()),
+                offset: SImmediate::try_from(offset.val()).unwrap(),
             },
             CInstruction::ADDI { dest, imm } => Instruction::ADDI {
                 dest: *dest,
@@ -765,12 +765,12 @@ impl CInstruction {
             CInstruction::SRLI { dest, shamt } => Instruction::SRLI {
                 dest: dest.expand(),
                 src: dest.expand(),
-                shamt: Shamt::from_val(shamt.val()),
+                shamt: Shamt::try_from(shamt.val()).unwrap(),
             },
             CInstruction::SRAI { dest, shamt } => Instruction::SRAI {
                 dest: dest.expand(),
                 src: dest.expand(),
-                shamt: Shamt::from_val(shamt.val()),
+                shamt: Shamt::try_from(shamt.val()).unwrap(),
             },
             CInstruction::ANDI { dest, imm } => Instruction::ANDI {
                 dest: dest.expand(),
@@ -809,22 +809,22 @@ impl CInstruction {
             },
             CInstruction::J { offset } => Instruction::JAL {
                 dest: IRegister::Zero,
-                offset: JImmediate::from_val(offset.val()),
+                offset: JImmediate::try_from(offset.val()).unwrap(),
             },
             CInstruction::BEQZ { src, offset } => Instruction::BEQ {
                 src1: src.expand(),
                 src2: IRegister::Zero,
-                offset: BImmediate::from_val(offset.val()),
+                offset: BImmediate::try_from(offset.val()).unwrap(),
             },
             CInstruction::BNEZ { src, offset } => Instruction::BNE {
                 src1: src.expand(),
                 src2: IRegister::Zero,
-                offset: BImmediate::from_val(offset.val()),
+                offset: BImmediate::try_from(offset.val()).unwrap(),
             },
             CInstruction::SLLI { dest, shamt } => Instruction::SLLI {
                 dest: *dest,
                 src: *dest,
-                shamt: Shamt::from_val(shamt.val()),
+                shamt: Shamt::try_from(shamt.val()).unwrap(),
             },
             CInstruction::FLDSP { .. } => todo!(), // needs unimplemented double extension
             CInstruction::LWSP { dest, offset } => Instruction::LW {
@@ -859,12 +859,12 @@ impl CInstruction {
             CInstruction::SWSP { src, offset } => Instruction::SW {
                 src: *src,
                 base: IRegister::StackPointer,
-                offset: SImmediate::from_val(offset.val()),
+                offset: SImmediate::try_from(offset.val()).unwrap(),
             },
             CInstruction::SDSP { src, offset } => Instruction::SD {
                 src: *src,
                 base: IRegister::StackPointer,
-                offset: SImmediate::from_val(offset.val()),
+                offset: SImmediate::try_from(offset.val()).unwrap(),
             },
         }
     }
