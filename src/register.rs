@@ -80,6 +80,45 @@ impl Display for IRegister {
     }
 }
 
+impl Into<u32> for IRegister {
+    fn into(self) -> u32 {
+        match self {
+            Self::Zero => 0,
+            Self::ReturnAddress => 1,
+            Self::StackPointer => 2,
+            Self::GlobalPointer => 3,
+            Self::ThreadPointer => 4,
+            Self::T0 => 5,
+            Self::T1 => 6,
+            Self::T2 => 7,
+            Self::FramePointer => 8,
+            Self::S1 => 9,
+            Self::A0 => 10,
+            Self::A1 => 11,
+            Self::A2 => 12,
+            Self::A3 => 13,
+            Self::A4 => 14,
+            Self::A5 => 15,
+            Self::A6 => 16,
+            Self::A7 => 17,
+            Self::S2 => 18,
+            Self::S3 => 19,
+            Self::S4 => 20,
+            Self::S5 => 21,
+            Self::S6 => 22,
+            Self::S7 => 23,
+            Self::S8 => 24,
+            Self::S9 => 25,
+            Self::S10 => 26,
+            Self::S11 => 27,
+            Self::T3 => 28,
+            Self::T4 => 29,
+            Self::T5 => 30,
+            Self::T6 => 31,
+        }
+    }
+}
+
 impl IRegister {
     pub fn from_int(int: u32) -> Self {
         match int {
@@ -157,6 +196,20 @@ impl IRegister {
             x => Err(format!("converted invalid str to integer register {}", x)),
         }
     }
+
+    pub fn rd(self) -> u32 {
+        let v: u32 = self.into();
+        return v << 7;
+    }
+    pub fn rs1(self) -> u32 {
+        let v: u32 = self.into();
+        return v << 15;
+    }
+    pub fn rs2(self) -> u32 {
+        let v: u32 = self.into();
+        return v << 20;
+    }
+    
 }
 
 #[derive(Debug, PartialEq, Clone, Copy)]

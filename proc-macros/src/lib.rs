@@ -381,18 +381,37 @@ impl ImmPart {
         }
     }
 
-    pub fn extract(&self, index: usize, input: &str) -> String {
+    /// generates the code to extract this immediate part from an instruction
+    pub fn extract_instruction(&self, index: usize, input: &str) -> String {
         format!(
             "let part{index} = ({input} >> {}) & ((1 << {}) - 1);\n",
             self.location, self.size
         )
     }
 
-    pub fn insert(&self, index: usize) -> String {
+    /// generates the code to insert this immediate part into an immediate value
+    pub fn insert_immediate(&self, index: usize) -> String {
         if index == 0 {
             format!("(part{index} << {})", self.base)
         } else {
             format!(" | (part{index} << {})", self.base)
+        }
+    }
+
+    /// generates the code to extract this immediate part from an immediate value
+    pub fn extract_immediate(&self, index: usize, input: &str) -> String {
+        format!(
+            "let part{index} = ({input} >> {}) & ((1 << {}) - 1);\n",
+            self.base, self.size
+        )
+    }
+
+    /// generates the code to insert this immediate part into an instruction value
+    pub fn insert_instruction(&self, index: usize) -> String {
+        if index == 0 {
+            format!("(part{index} << {})", self.location)
+        } else {
+            format!(" | (part{index} << {})", self.location)
         }
     }
 }
@@ -418,7 +437,10 @@ pub fn make_immediate(input: TokenStream) -> TokenStream {
             .max()
             .unwrap();
 
+        // the type to use for the immediate
         let typ = if signed { "i32" } else { "u32" };
+        // the type to use for the instruction
+        let instr_typ = if compressed { "u16" } else { "u32" };
 
         let struct_string = format!(
             "
@@ -474,13 +496,13 @@ pub fn make_immediate(input: TokenStream) -> TokenStream {
             let extractions: String = parts
                 .iter()
                 .enumerate()
-                .map(|(i, part)| part.extract(i, "x"))
+                .map(|(i, part)| part.extract_instruction(i, "x"))
                 .collect();
 
             let insertions: String = parts
                 .iter()
                 .enumerate()
-                .map(|(i, part)| part.insert(i))
+                .map(|(i, part)| part.insert_immediate(i))
                 .collect();
 
             let insert = format!("let i: i32 = ({insertions}) as i32;");
@@ -522,6 +544,34 @@ pub fn make_immediate(input: TokenStream) -> TokenStream {
             }
         };
 
+        let insert_fn = {
+            let extractions: String = parts
+                .iter()
+                .enumerate()
+                .map(|(i, part)| part.extract_immediate(i, "x"))
+                .collect();
+
+            let insertions: String = parts
+                .iter()
+                .enumerate()
+                .map(|(i, part)| part.insert_instruction(i))
+                .collect();
+
+            let ret = format!("return ({insertions}) as {instr_typ};");
+
+            format!(
+                "
+            impl {name} {{
+                pub fn to_{instr_typ}(&self) -> {instr_typ} {{
+                    let x: {instr_typ} = (self.val() & ((1 << {size}) - 1)) as {instr_typ};
+                    {extractions}
+                    {ret}
+                }}
+            }}
+            "
+            )
+        };
+
         let display_string = format!(
             "
             impl Display for {name} {{
@@ -536,6 +586,7 @@ pub fn make_immediate(input: TokenStream) -> TokenStream {
             {struct_string}
             {impl_string}
             {extract_fn}
+            {insert_fn}
             {display_string}
             "
         );

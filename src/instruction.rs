@@ -2729,3 +2729,352 @@ pub fn decode_instruction(instruction: u32) -> Result<Instruction, String> {
         },
     }
 }
+
+pub fn encode_instruction(instruction: &Instruction) -> u32 {
+    match instruction {
+        Instruction::LUI { dest, imm } => imm.to_u32() | dest.rd() | 0b0110111,
+        Instruction::AUIPC { dest, imm } => imm.to_u32() | dest.rd() | 0b0010111,
+        Instruction::JAL { dest, offset } => offset.to_u32() | dest.rd() | 0b1101111,
+        Instruction::JALR { dest, base, offset } => {
+            offset.to_u32() | base.rs1() | dest.rd() | 0b1100111
+        }
+        Instruction::BEQ { src1, src2, offset } => {
+            offset.to_u32() | src2.rs2() | src1.rs1() | 0b000 << 12 | 0b1100011
+        }
+        Instruction::BNE { src1, src2, offset } => {
+            offset.to_u32() | src2.rs2() | src1.rs1() | 0b001 << 12 | 0b1100011
+        }
+        Instruction::BLT { src1, src2, offset } => {
+            offset.to_u32() | src2.rs2() | src1.rs1() | 0b100 << 12 | 0b1100011
+        }
+        Instruction::BGE { src1, src2, offset } => {
+            offset.to_u32() | src2.rs2() | src1.rs1() | 0b101 << 12 | 0b1100011
+        }
+        Instruction::BLTU { src1, src2, offset } => {
+            offset.to_u32() | src2.rs2() | src1.rs1() | 0b110 << 12 | 0b1100011
+        }
+        Instruction::BGEU { src1, src2, offset } => {
+            offset.to_u32() | src2.rs2() | src1.rs1() | 0b111 << 12 | 0b1100011
+        }
+        Instruction::LB { dest, base, offset } => {
+            offset.to_u32() | base.rs1() | 0b000 << 12 | dest.rd() | 0b0000011
+        }
+        Instruction::LH { dest, base, offset } => {
+            offset.to_u32() | base.rs1() | 0b001 << 12 | dest.rd() | 0b0000011
+        }
+        Instruction::LW { dest, base, offset } => {
+            offset.to_u32() | base.rs1() | 0b010 << 12 | dest.rd() | 0b0000011
+        }
+        Instruction::LBU { dest, base, offset } => {
+            offset.to_u32() | base.rs1() | 0b100 << 12 | dest.rd() | 0b0000011
+        }
+        Instruction::LHU { dest, base, offset } => {
+            offset.to_u32() | base.rs1() | 0b101 << 12 | dest.rd() | 0b0000011
+        }
+        Instruction::SB { src, base, offset } => {
+            offset.to_u32() | src.rs2() | base.rs1() | 0b000 << 12 | 0b0100011
+        }
+        Instruction::SH { src, base, offset } => {
+            offset.to_u32() | src.rs2() | base.rs1() | 0b001 << 12 | 0b0100011
+        }
+        Instruction::SW { src, base, offset } => {
+            offset.to_u32() | src.rs2() | base.rs1() | 0b010 << 12 | 0b0100011
+        }
+        Instruction::ADDI { dest, src, imm } => {
+            imm.to_u32() | src.rs1() | 0b000 << 12 | dest.rd() | 0b0010011
+        }
+        Instruction::SLTI { dest, src, imm } => {
+            imm.to_u32() | src.rs1() | 0b010 << 12 | dest.rd() | 0b0010011
+        }
+        Instruction::SLTIU { dest, src, imm } => {
+            imm.to_u32() | src.rs1() | 0b011 << 12 | dest.rd() | 0b0010011
+        }
+        Instruction::XORI { dest, src, imm } => {
+            imm.to_u32() | src.rs1() | 0b100 << 12 | dest.rd() | 0b0010011
+        }
+        Instruction::ORI { dest, src, imm } => {
+            imm.to_u32() | src.rs1() | 0b110 << 12 | dest.rd() | 0b0010011
+        }
+        Instruction::ANDI { dest, src, imm } => {
+            imm.to_u32() | src.rs1() | 0b111 << 12 | dest.rd() | 0b0010011
+        }
+        Instruction::SLLI { dest, src, shamt } => {
+            shamt.to_u32() | src.rs1() | 0b001 << 12 | dest.rd() | 0b0010011
+        }
+        Instruction::SRLI { dest, src, shamt } => {
+            shamt.to_u32() | src.rs1() | 0b101 << 12 | dest.rd() | 0b0010011
+        }
+        Instruction::SRAI { dest, src, shamt } => {
+            0b0100000 << 25 | shamt.to_u32() | src.rs1() | 0b101 << 12 | dest.rd() | 0b0010011
+        }
+        Instruction::ADD { dest, src1, src2 } => {
+            src2.rs2() | src1.rs1() | 0b000 << 12 | dest.rd() | 0b0110011
+        }
+        Instruction::SUB { dest, src1, src2 } => {
+            0b0100000 << 25 | src2.rs2() | src1.rs1() | 0b000 << 12 | dest.rd() | 0b0110011
+        }
+        Instruction::SLL { dest, src1, src2 } => {
+            src2.rs2() | src1.rs1() | 0b001 << 12 | dest.rd() | 0b0110011
+        }
+        Instruction::SLT { dest, src1, src2 } => {
+            src2.rs2() | src1.rs1() | 0b010 << 12 | dest.rd() | 0b0110011
+        }
+        Instruction::SLTU { dest, src1, src2 } => src2.rs2() | src1.rs1() | 0b011 << 12 | dest.rd() | 0b0110011,
+        Instruction::XOR { dest, src1, src2 } => src2.rs2() | src1.rs1() | 0b100 << 12 | dest.rd() | 0b0110011,
+        Instruction::SRL { dest, src1, src2 } => src2.rs2() | src1.rs1() | 0b101 << 12 | dest.rd() | 0b0110011,
+        Instruction::SRA { dest, src1, src2 } => 0b0100000 << 25 | src2.rs2() | src1.rs1() | 0b0101 << 12 | dest.rd() | 0b0110011,
+        Instruction::OR { dest, src1, src2 } => src2.rs2() | src1.rs1() | 0b110 << 12 | dest.rd() | 0b0110011,
+        Instruction::AND { dest, src1, src2 } => src2.rs2() | src1.rs1() | 0b111 << 12 | dest.rd() | 0b0110011,
+        Instruction::FENCE { rd, rs1, ops, fm } => todo!(),
+        Instruction::ECALL => todo!(),
+        Instruction::EBREAK => todo!(),
+        Instruction::LWU { dest, base, offset } => todo!(),
+        Instruction::LD { dest, base, offset } => todo!(),
+        Instruction::SD { src, base, offset } => todo!(),
+        Instruction::ADDIW { dest, src, imm } => todo!(),
+        Instruction::SLLIW { dest, src, shamt } => todo!(),
+        Instruction::SRLIW { dest, src, shamt } => todo!(),
+        Instruction::SRAIW { dest, src, shamt } => todo!(),
+        Instruction::ADDW { dest, src1, src2 } => todo!(),
+        Instruction::SUBW { dest, src1, src2 } => todo!(),
+        Instruction::SLLW { dest, src1, src2 } => todo!(),
+        Instruction::SRLW { dest, src1, src2 } => todo!(),
+        Instruction::SRAW { dest, src1, src2 } => todo!(),
+        Instruction::MUL { dest, src1, src2 } => todo!(),
+        Instruction::MULH { dest, src1, src2 } => todo!(),
+        Instruction::MULHSU { dest, src1, src2 } => todo!(),
+        Instruction::MULHU { dest, src1, src2 } => todo!(),
+        Instruction::DIV { dest, src1, src2 } => todo!(),
+        Instruction::DIVU { dest, src1, src2 } => todo!(),
+        Instruction::REM { dest, src1, src2 } => todo!(),
+        Instruction::REMU { dest, src1, src2 } => todo!(),
+        Instruction::MULW { dest, src1, src2 } => todo!(),
+        Instruction::DIVW { dest, src1, src2 } => todo!(),
+        Instruction::DIVUW { dest, src1, src2 } => todo!(),
+        Instruction::REMW { dest, src1, src2 } => todo!(),
+        Instruction::REMUW { dest, src1, src2 } => todo!(),
+        Instruction::LRW { dest, addr, aq, rl } => todo!(),
+        Instruction::SCW {
+            dest,
+            addr,
+            src,
+            aq,
+            rl,
+        } => todo!(),
+        Instruction::AMOSWAPW {
+            dest,
+            addr,
+            src,
+            aq,
+            rl,
+        } => todo!(),
+        Instruction::AMOADDW {
+            dest,
+            addr,
+            src,
+            aq,
+            rl,
+        } => todo!(),
+        Instruction::AMOXORW {
+            dest,
+            addr,
+            src,
+            aq,
+            rl,
+        } => todo!(),
+        Instruction::AMOANDW {
+            dest,
+            addr,
+            src,
+            aq,
+            rl,
+        } => todo!(),
+        Instruction::AMOORW {
+            dest,
+            addr,
+            src,
+            aq,
+            rl,
+        } => todo!(),
+        Instruction::AMOMINW {
+            dest,
+            addr,
+            src,
+            aq,
+            rl,
+        } => todo!(),
+        Instruction::AMOMAXW {
+            dest,
+            addr,
+            src,
+            aq,
+            rl,
+        } => todo!(),
+        Instruction::AMOMINUW {
+            dest,
+            addr,
+            src,
+            aq,
+            rl,
+        } => todo!(),
+        Instruction::AMOMAXUW {
+            dest,
+            addr,
+            src,
+            aq,
+            rl,
+        } => todo!(),
+        Instruction::LRD { dest, addr, aq, rl } => todo!(),
+        Instruction::SCD {
+            dest,
+            addr,
+            src,
+            aq,
+            rl,
+        } => todo!(),
+        Instruction::AMOSWAPD {
+            dest,
+            addr,
+            src,
+            aq,
+            rl,
+        } => todo!(),
+        Instruction::AMOADDD {
+            dest,
+            addr,
+            src,
+            aq,
+            rl,
+        } => todo!(),
+        Instruction::AMOXORD {
+            dest,
+            addr,
+            src,
+            aq,
+            rl,
+        } => todo!(),
+        Instruction::AMOANDD {
+            dest,
+            addr,
+            src,
+            aq,
+            rl,
+        } => todo!(),
+        Instruction::AMOORD {
+            dest,
+            addr,
+            src,
+            aq,
+            rl,
+        } => todo!(),
+        Instruction::AMOMIND {
+            dest,
+            addr,
+            src,
+            aq,
+            rl,
+        } => todo!(),
+        Instruction::AMOMAXD {
+            dest,
+            addr,
+            src,
+            aq,
+            rl,
+        } => todo!(),
+        Instruction::AMOMINUD {
+            dest,
+            addr,
+            src,
+            aq,
+            rl,
+        } => todo!(),
+        Instruction::AMOMAXUD {
+            dest,
+            addr,
+            src,
+            aq,
+            rl,
+        } => todo!(),
+        Instruction::FLW { dest, base, offset } => todo!(),
+        Instruction::FSW { base, src, offset } => todo!(),
+        Instruction::FMADDS {
+            dest,
+            src1,
+            src2,
+            src3,
+            rm,
+        } => todo!(),
+        Instruction::FMSUBS {
+            dest,
+            src1,
+            src2,
+            src3,
+            rm,
+        } => todo!(),
+        Instruction::FNMSUBS {
+            dest,
+            src1,
+            src2,
+            src3,
+            rm,
+        } => todo!(),
+        Instruction::FNMADDS {
+            dest,
+            src1,
+            src2,
+            src3,
+            rm,
+        } => todo!(),
+        Instruction::FADDS {
+            dest,
+            src1,
+            src2,
+            rm,
+        } => todo!(),
+        Instruction::FSUBS {
+            dest,
+            src1,
+            src2,
+            rm,
+        } => todo!(),
+        Instruction::FMULS {
+            dest,
+            src1,
+            src2,
+            rm,
+        } => todo!(),
+        Instruction::FDIVS {
+            dest,
+            src1,
+            src2,
+            rm,
+        } => todo!(),
+        Instruction::FSQRTS { dest, src, rm } => todo!(),
+        Instruction::FSGNJS { dest, src1, src2 } => todo!(),
+        Instruction::FSGNJNS { dest, src1, src2 } => todo!(),
+        Instruction::FSGNJXS { dest, src1, src2 } => todo!(),
+        Instruction::FMINS { dest, src1, src2 } => todo!(),
+        Instruction::FMAXS { dest, src1, src2 } => todo!(),
+        Instruction::FCVTWS { dest, src, rm } => todo!(),
+        Instruction::FCVTWUS { dest, src, rm } => todo!(),
+        Instruction::FMVXW { dest, src } => todo!(),
+        Instruction::FEQS { dest, src1, src2 } => todo!(),
+        Instruction::FLTS { dest, src1, src2 } => todo!(),
+        Instruction::FLES { dest, src1, src2 } => todo!(),
+        Instruction::FCLASSS { dest, src } => todo!(),
+        Instruction::FCVTSW { dest, src, rm } => todo!(),
+        Instruction::FCVTSWU { dest, src, rm } => todo!(),
+        Instruction::FMVWX { dest, src } => todo!(),
+        Instruction::FCVTLS { dest, src, rm } => todo!(),
+        Instruction::FCVTLUS { dest, src, rm } => todo!(),
+        Instruction::FCVTSL { dest, src, rm } => todo!(),
+        Instruction::FCVTSLU { dest, src, rm } => todo!(),
+        Instruction::CSRRW { dest, src, csr } => todo!(),
+        Instruction::CSRRS { dest, src, csr } => todo!(),
+        Instruction::CSRRC { dest, src, csr } => todo!(),
+        Instruction::CSRRWI { dest, imm, csr } => todo!(),
+        Instruction::CSRRSI { dest, imm, csr } => todo!(),
+        Instruction::CSRRCI { dest, imm, csr } => todo!(),
+        Instruction::FENCEI => todo!(),
+    }
+}
