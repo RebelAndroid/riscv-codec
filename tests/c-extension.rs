@@ -1,11 +1,11 @@
-use riscv_disassembler::cinstruction::{
+use riscv_codec::cinstruction::{
     CInstruction, decode_compressed_instruction, encode_compressed_instruction,
 };
-use riscv_disassembler::immediates::{
+use riscv_codec::immediates::{
     C16SPImmediate, CBImmediate, CDImmediate, CDSPImmediate, CIImmediate, CJImmediate, CSDSPImmediate, CSWSPImmediate, CShamt, CWImmediate, CWSPImmediate, CWideImmediate
 };
-use riscv_disassembler::instruction::assemble_line;
-use riscv_disassembler::register::{CFRegister, CIRegister, FRegister, IRegister};
+use riscv_codec::instruction::assemble_line;
+use riscv_codec::register::{CFRegister, CIRegister, FRegister, IRegister};
 
 #[test]
 fn add_4_immediate_stack_pointer() {

@@ -1,4 +1,4 @@
-use riscv_disassembler::instruction::Instruction;
+use riscv_codec::instruction::Instruction;
 fn main() {
     println!(
         "Instruction size: {} bytes",

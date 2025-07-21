@@ -1,8 +1,8 @@
-use riscv_disassembler::immediates::{IImmediate, SImmediate};
-use riscv_disassembler::instruction::{
+use riscv_codec::immediates::{IImmediate, SImmediate};
+use riscv_codec::instruction::{
     Instruction, RoundingMode, assemble_line, decode_instruction, disassemble_instruction, encode_instruction,
 };
-use riscv_disassembler::register::{FRegister, IRegister};
+use riscv_codec::register::{FRegister, IRegister};
 
 #[test]
 fn float_load_word() {

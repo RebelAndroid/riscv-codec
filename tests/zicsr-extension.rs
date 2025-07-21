@@ -1,4 +1,4 @@
-use riscv_disassembler::{
+use riscv_codec::{
     immediates::{CSRImmediate, CSR},
     instruction::{assemble_line, decode_instruction, disassemble_instruction, encode_instruction, Instruction},
     register::IRegister

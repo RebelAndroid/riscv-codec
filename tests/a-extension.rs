@@ -1,7 +1,7 @@
-use riscv_disassembler::instruction::{
+use riscv_codec::instruction::{
     Instruction, assemble_line, decode_instruction, disassemble_instruction, encode_instruction,
 };
-use riscv_disassembler::register::IRegister;
+use riscv_codec::register::IRegister;
 
 #[test]
 fn load_reserved_word() {
