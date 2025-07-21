@@ -2,6 +2,9 @@
 name = "riscv-codec-proc-macros"
 version = "0.1.0"
 edition = "2024"
+description = "INTERNAL USE ONLY macros for riscv-codec"
+repository = "https://github.com/RebelAndroid/riscv-disassembler"
+readme = "README.md"
 
 [dependencies]
 litrs = "0.4.1"
