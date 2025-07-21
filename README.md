@@ -13,6 +13,8 @@ fn main() {
 }
 ```
 
+This crate is (somewhat) well tested. If you find any problems, or think some part of the API could be improved, please make an issue in the github repository.
+
 # Supported Instructions
 - [x] RV64I
 - [x] M
