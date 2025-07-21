@@ -2,7 +2,7 @@
 name = "riscv-codec"
 version = "0.1.0"
 edition = "2024"
-licenes = "AGPL-3.0-only"
+license = "AGPL-3.0-only"
 description = "Decode/Encode and Assemble/Disassemble RISC-V instructions"
 repository = "https://github.com/RebelAndroid/riscv-disassembler"
 readme = "README.md"
@@ -11,3 +11,4 @@ readme = "README.md"
 
 [dependencies.proc-macros]
 path = "proc-macros"
+version = "0.1.0"
