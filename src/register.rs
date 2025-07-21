@@ -209,7 +209,6 @@ impl IRegister {
         let v: u32 = self.into();
         return v << 20;
     }
-    
 }
 
 #[derive(Debug, PartialEq, Clone, Copy)]
@@ -372,6 +371,64 @@ impl TryFrom<&str> for FRegister {
             "ft11" => Ok(Self::FT11),
             x => Err(format!("converted invalid str to float register {}", x)),
         }
+    }
+}
+
+impl Into<u32> for FRegister {
+    fn into(self) -> u32 {
+        match self {
+            FRegister::FT0 => 0,
+            FRegister::FT1 => 1,
+            FRegister::FT2 => 2,
+            FRegister::FT3 => 3,
+            FRegister::FT4 => 4,
+            FRegister::FT5 => 5,
+            FRegister::FT6 => 6,
+            FRegister::FT7 => 7,
+            FRegister::FS0 => 8,
+            FRegister::FS1 => 9,
+            FRegister::FA0 => 10,
+            FRegister::FA1 => 11,
+            FRegister::FA2 => 12,
+            FRegister::FA3 => 13,
+            FRegister::FA4 => 14,
+            FRegister::FA5 => 15,
+            FRegister::FA6 => 16,
+            FRegister::FA7 => 17,
+            FRegister::FS2 => 18,
+            FRegister::FS3 => 19,
+            FRegister::FS4 => 20,
+            FRegister::FS5 => 21,
+            FRegister::FS6 => 22,
+            FRegister::FS7 => 23,
+            FRegister::FS8 => 24,
+            FRegister::FS9 => 25,
+            FRegister::FS10 => 26,
+            FRegister::FS11 => 27,
+            FRegister::FT8 => 28,
+            FRegister::FT9 => 29,
+            FRegister::FT10 => 30,
+            FRegister::FT11 => 31,
+        }
+    }
+}
+
+impl FRegister {
+    pub fn rd(self) -> u32 {
+        let v: u32 = self.into();
+        return v << 7;
+    }
+    pub fn rs1(self) -> u32 {
+        let v: u32 = self.into();
+        return v << 15;
+    }
+    pub fn rs2(self) -> u32 {
+        let v: u32 = self.into();
+        return v << 20;
+    }
+     pub fn rs3(self) -> u32 {
+        let v: u32 = self.into();
+        return v << 27;
     }
 }
 

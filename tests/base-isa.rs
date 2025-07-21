@@ -1,12 +1,17 @@
 use riscv_disassembler::{
     immediates::{BImmediate, IImmediate, JImmediate, SImmediate, Shamt, UImmediate},
-    instruction::{assemble_line, decode_instruction, disassemble_instruction, encode_instruction, Instruction},
+    instruction::{
+        Instruction, assemble_line, decode_instruction, disassemble_instruction, encode_instruction,
+    },
     register::IRegister,
 };
 
 #[test]
 fn load_upper_immediate() {
-    let expected = Instruction::LUI{dest: IRegister::S2, imm: UImmediate::try_from(400).unwrap()};
+    let expected = Instruction::LUI {
+        dest: IRegister::S2,
+        imm: UImmediate::try_from(400).unwrap(),
+    };
     let bin = 0x00190937;
     // check assembler
     let i = assemble_line("lui s2,400").unwrap().i();
@@ -27,7 +32,10 @@ fn load_upper_immediate() {
 
 #[test]
 fn add_upper_immediate_to_program_counter() {
-    let expected = Instruction::AUIPC{dest: IRegister::A3, imm: UImmediate::try_from(-1).unwrap()};
+    let expected = Instruction::AUIPC {
+        dest: IRegister::A3,
+        imm: UImmediate::try_from(-1).unwrap(),
+    };
     let bin = 0xfffff697;
 
     // check assembler
@@ -49,7 +57,10 @@ fn add_upper_immediate_to_program_counter() {
 
 #[test]
 fn jump_and_link() {
-    let expected = Instruction::JAL{dest: IRegister::Zero, offset: JImmediate::try_from(-1016708).unwrap()};
+    let expected = Instruction::JAL {
+        dest: IRegister::Zero,
+        offset: JImmediate::try_from(-1016708).unwrap(),
+    };
     let bin = 0xc7d0706f;
 
     // check assembler
@@ -71,7 +82,11 @@ fn jump_and_link() {
 
 #[test]
 fn jump_and_link_register() {
-    let expected = Instruction::JALR{dest: IRegister::A0, base: IRegister::T0, offset: IImmediate::try_from(-2048).unwrap()};
+    let expected = Instruction::JALR {
+        dest: IRegister::A0,
+        base: IRegister::T0,
+        offset: IImmediate::try_from(-2048).unwrap(),
+    };
     let bin = 0x80028567;
 
     // check assembler
@@ -93,7 +108,11 @@ fn jump_and_link_register() {
 
 #[test]
 fn branch_equal() {
-    let expected = Instruction::BEQ{src1: IRegister::T2, src2: IRegister::StackPointer, offset: BImmediate::try_from(2).unwrap()};
+    let expected = Instruction::BEQ {
+        src1: IRegister::T2,
+        src2: IRegister::StackPointer,
+        offset: BImmediate::try_from(2).unwrap(),
+    };
     let bin = 0x00238163;
 
     // check assembler
@@ -115,7 +134,11 @@ fn branch_equal() {
 
 #[test]
 fn branch_not_equal() {
-    let expected = Instruction::BNE{src1: IRegister::ThreadPointer, src2: IRegister::A4, offset: BImmediate::try_from(4094).unwrap()};
+    let expected = Instruction::BNE {
+        src1: IRegister::ThreadPointer,
+        src2: IRegister::A4,
+        offset: BImmediate::try_from(4094).unwrap(),
+    };
     let bin = 0x7ee21fe3;
 
     // check assembler
@@ -137,7 +160,11 @@ fn branch_not_equal() {
 
 #[test]
 fn branch_less_than() {
-    let expected = Instruction::BLT{src1: IRegister::A1, src2: IRegister::T6, offset: BImmediate::try_from(-4096).unwrap()};
+    let expected = Instruction::BLT {
+        src1: IRegister::A1,
+        src2: IRegister::T6,
+        offset: BImmediate::try_from(-4096).unwrap(),
+    };
     let bin = 0x81f5c063;
 
     // check assembler
@@ -159,7 +186,11 @@ fn branch_less_than() {
 
 #[test]
 fn branch_greater_equal() {
-    let expected = Instruction::BGE{src1: IRegister::A1, src2: IRegister::T6, offset: BImmediate::try_from(-2030).unwrap()};
+    let expected = Instruction::BGE {
+        src1: IRegister::A1,
+        src2: IRegister::T6,
+        offset: BImmediate::try_from(-2030).unwrap(),
+    };
     let bin = 0x81f5d9e3;
 
     // check assembler
@@ -181,7 +212,11 @@ fn branch_greater_equal() {
 
 #[test]
 fn branch_less_than_unsigned() {
-    let expected = Instruction::BLTU{src1: IRegister::T0, src2: IRegister::S2, offset: BImmediate::try_from(512).unwrap()};
+    let expected = Instruction::BLTU {
+        src1: IRegister::T0,
+        src2: IRegister::S2,
+        offset: BImmediate::try_from(512).unwrap(),
+    };
     let bin = 0x2122e063;
 
     // check assembler
@@ -203,7 +238,11 @@ fn branch_less_than_unsigned() {
 
 #[test]
 fn branch_greater_equal_unsigned() {
-    let expected = Instruction::BGEU{src1: IRegister::S1, src2: IRegister::A3, offset: BImmediate::try_from(-128).unwrap()};
+    let expected = Instruction::BGEU {
+        src1: IRegister::S1,
+        src2: IRegister::A3,
+        offset: BImmediate::try_from(-128).unwrap(),
+    };
     let bin = 0xf8d4f0e3;
 
     // check assembler
@@ -225,7 +264,11 @@ fn branch_greater_equal_unsigned() {
 
 #[test]
 fn load_byte() {
-    let expected = Instruction::LB{dest: IRegister::T2, base: IRegister::A0, offset: IImmediate::try_from(8).unwrap()};
+    let expected = Instruction::LB {
+        dest: IRegister::T2,
+        base: IRegister::A0,
+        offset: IImmediate::try_from(8).unwrap(),
+    };
     let bin = 0x00850383;
 
     // check assembler
@@ -247,7 +290,11 @@ fn load_byte() {
 
 #[test]
 fn load_half() {
-    let expected = Instruction::LH{dest: IRegister::S3, base: IRegister::StackPointer, offset: IImmediate::try_from(-16).unwrap()};
+    let expected = Instruction::LH {
+        dest: IRegister::S3,
+        base: IRegister::StackPointer,
+        offset: IImmediate::try_from(-16).unwrap(),
+    };
     let bin = 0xff011983;
 
     // check assembler
@@ -269,7 +316,11 @@ fn load_half() {
 
 #[test]
 fn load_word() {
-    let expected = Instruction::LW{dest: IRegister::A4, base: IRegister::T5, offset: IImmediate::try_from(1024).unwrap()};
+    let expected = Instruction::LW {
+        dest: IRegister::A4,
+        base: IRegister::T5,
+        offset: IImmediate::try_from(1024).unwrap(),
+    };
     let bin = 0x400f2703;
 
     // check assembler
@@ -291,7 +342,11 @@ fn load_word() {
 
 #[test]
 fn load_byte_unsigned() {
-    let expected = Instruction::LBU{dest: IRegister::FramePointer, base: IRegister::A6, offset: IImmediate::try_from(63).unwrap()};
+    let expected = Instruction::LBU {
+        dest: IRegister::FramePointer,
+        base: IRegister::A6,
+        offset: IImmediate::try_from(63).unwrap(),
+    };
     let bin = 0x03f84403;
 
     // check assembler
@@ -313,7 +368,11 @@ fn load_byte_unsigned() {
 
 #[test]
 fn load_half_unsigned() {
-    let expected = Instruction::LHU{dest: IRegister::T4, base: IRegister::A1, offset: IImmediate::try_from(-2047).unwrap()};
+    let expected = Instruction::LHU {
+        dest: IRegister::T4,
+        base: IRegister::A1,
+        offset: IImmediate::try_from(-2047).unwrap(),
+    };
     let bin = 0x8015de83;
 
     // check assembler
@@ -335,7 +394,11 @@ fn load_half_unsigned() {
 
 #[test]
 fn store_byte() {
-    let expected = Instruction::SB{base: IRegister::A2, src: IRegister::T1, offset: SImmediate::try_from(127).unwrap()};
+    let expected = Instruction::SB {
+        base: IRegister::A2,
+        src: IRegister::T1,
+        offset: SImmediate::try_from(127).unwrap(),
+    };
     let bin = 0x06660fa3;
 
     // check assembler
@@ -357,7 +420,11 @@ fn store_byte() {
 
 #[test]
 fn store_half() {
-    let expected = Instruction::SH{base: IRegister::S2, src: IRegister::A5, offset: SImmediate::try_from(-32).unwrap()};
+    let expected = Instruction::SH {
+        base: IRegister::S2,
+        src: IRegister::A5,
+        offset: SImmediate::try_from(-32).unwrap(),
+    };
     let bin = 0xfef91023;
 
     // check assembler
@@ -379,7 +446,11 @@ fn store_half() {
 
 #[test]
 fn store_word() {
-    let expected = Instruction::SW{base: IRegister::T6, src: IRegister::S7, offset: SImmediate::try_from(2046).unwrap()};
+    let expected = Instruction::SW {
+        base: IRegister::T6,
+        src: IRegister::S7,
+        offset: SImmediate::try_from(2046).unwrap(),
+    };
     let bin = 0x7f7faf23;
 
     // check assembler
@@ -401,7 +472,11 @@ fn store_word() {
 
 #[test]
 fn add_immediate() {
-    let expected = Instruction::ADDI{dest: IRegister::T3, src: IRegister::S4, imm: IImmediate::try_from(99).unwrap()};
+    let expected = Instruction::ADDI {
+        dest: IRegister::T3,
+        src: IRegister::S4,
+        imm: IImmediate::try_from(99).unwrap(),
+    };
     let bin = 0x063a0e13;
 
     // check assembler
@@ -423,7 +498,11 @@ fn add_immediate() {
 
 #[test]
 fn set_less_than_immediate() {
-    let expected = Instruction::SLTI{dest: IRegister::A1, src: IRegister::T2, imm: IImmediate::try_from(-12).unwrap()};
+    let expected = Instruction::SLTI {
+        dest: IRegister::A1,
+        src: IRegister::T2,
+        imm: IImmediate::try_from(-12).unwrap(),
+    };
     let bin = 0xff43a593;
 
     // check assembler
@@ -445,7 +524,11 @@ fn set_less_than_immediate() {
 
 #[test]
 fn set_less_than_immediate_unsigned() {
-    let expected = Instruction::SLTIU{dest: IRegister::S5, src: IRegister::A0, imm: IImmediate::try_from(2047).unwrap()};
+    let expected = Instruction::SLTIU {
+        dest: IRegister::S5,
+        src: IRegister::A0,
+        imm: IImmediate::try_from(2047).unwrap(),
+    };
     let bin = 0x7ff53a93;
 
     // check assembler
@@ -467,7 +550,11 @@ fn set_less_than_immediate_unsigned() {
 
 #[test]
 fn xor_immediate() {
-    let expected = Instruction::XORI{dest: IRegister::A7, src: IRegister::ReturnAddress, imm: IImmediate::try_from(15).unwrap()};
+    let expected = Instruction::XORI {
+        dest: IRegister::A7,
+        src: IRegister::ReturnAddress,
+        imm: IImmediate::try_from(15).unwrap(),
+    };
     let bin = 0x00f0c893;
 
     // check assembler
@@ -489,7 +576,11 @@ fn xor_immediate() {
 
 #[test]
 fn or_immediate() {
-    let expected = Instruction::ORI{dest: IRegister::T6, src: IRegister::GlobalPointer, imm: IImmediate::try_from(31).unwrap()};
+    let expected = Instruction::ORI {
+        dest: IRegister::T6,
+        src: IRegister::GlobalPointer,
+        imm: IImmediate::try_from(31).unwrap(),
+    };
     let bin = 0x01f1ef93;
 
     // check assembler
@@ -511,7 +602,11 @@ fn or_immediate() {
 
 #[test]
 fn and_immediate() {
-    let expected = Instruction::ANDI{dest: IRegister::GlobalPointer, src: IRegister::StackPointer, imm: IImmediate::try_from(-256).unwrap()};
+    let expected = Instruction::ANDI {
+        dest: IRegister::GlobalPointer,
+        src: IRegister::StackPointer,
+        imm: IImmediate::try_from(-256).unwrap(),
+    };
     let bin = 0xf0017193;
 
     // check assembler
@@ -533,7 +628,11 @@ fn and_immediate() {
 
 #[test]
 fn shift_left_logical_immediate() {
-    let expected = Instruction::SLLI{dest: IRegister::T1, src: IRegister::FramePointer, shamt: Shamt::try_from(13).unwrap()};
+    let expected = Instruction::SLLI {
+        dest: IRegister::T1,
+        src: IRegister::FramePointer,
+        shamt: Shamt::try_from(13).unwrap(),
+    };
     let bin = 0x00d41313;
 
     // check assembler
@@ -555,7 +654,11 @@ fn shift_left_logical_immediate() {
 
 #[test]
 fn shift_right_logical_immediate() {
-    let expected = Instruction::SRLI{dest: IRegister::S2, src: IRegister::A6, shamt: Shamt::try_from(9).unwrap()};
+    let expected = Instruction::SRLI {
+        dest: IRegister::S2,
+        src: IRegister::A6,
+        shamt: Shamt::try_from(9).unwrap(),
+    };
     let bin = 0x00985913;
 
     // check assembler
@@ -577,7 +680,11 @@ fn shift_right_logical_immediate() {
 
 #[test]
 fn shift_right_arithmetic_immediate() {
-    let expected = Instruction::SRAI{dest: IRegister::S1, src: IRegister::S3, shamt: Shamt::try_from(17).unwrap()};
+    let expected = Instruction::SRAI {
+        dest: IRegister::S1,
+        src: IRegister::S3,
+        shamt: Shamt::try_from(17).unwrap(),
+    };
     let bin = 0x4119d493;
 
     // check assembler
@@ -599,7 +706,11 @@ fn shift_right_arithmetic_immediate() {
 
 #[test]
 fn add() {
-    let expected = Instruction::ADD{dest: IRegister::T0, src1: IRegister::T1, src2: IRegister::T2};
+    let expected = Instruction::ADD {
+        dest: IRegister::T0,
+        src1: IRegister::T1,
+        src2: IRegister::T2,
+    };
     let bin = 0x007302b3;
 
     // check assembler
@@ -621,7 +732,11 @@ fn add() {
 
 #[test]
 fn sub() {
-    let expected = Instruction::SUB{dest: IRegister::S4, src1: IRegister::S5, src2: IRegister::S6};
+    let expected = Instruction::SUB {
+        dest: IRegister::S4,
+        src1: IRegister::S5,
+        src2: IRegister::S6,
+    };
     let bin = 0x416a8a33;
 
     // check assembler
@@ -643,7 +758,11 @@ fn sub() {
 
 #[test]
 fn shift_left_logical() {
-    let expected = Instruction::SLL{dest: IRegister::A2, src1: IRegister::A3, src2: IRegister::A4};
+    let expected = Instruction::SLL {
+        dest: IRegister::A2,
+        src1: IRegister::A3,
+        src2: IRegister::A4,
+    };
     let bin = 0x00e69633;
 
     // check assembler
@@ -665,7 +784,11 @@ fn shift_left_logical() {
 
 #[test]
 fn set_less_than() {
-    let expected = Instruction::SLT{dest: IRegister::T3, src1: IRegister::T4, src2: IRegister::T5};
+    let expected = Instruction::SLT {
+        dest: IRegister::T3,
+        src1: IRegister::T4,
+        src2: IRegister::T5,
+    };
     let bin = 0x01eeae33;
 
     // check assembler
@@ -687,7 +810,11 @@ fn set_less_than() {
 
 #[test]
 fn set_less_than_unsigned() {
-    let expected = Instruction::SLTU{dest: IRegister::S6, src1: IRegister::S7, src2: IRegister::Zero};
+    let expected = Instruction::SLTU {
+        dest: IRegister::S6,
+        src1: IRegister::S7,
+        src2: IRegister::Zero,
+    };
     let bin = 0x000bbb33;
 
     // check assembler
@@ -709,7 +836,11 @@ fn set_less_than_unsigned() {
 
 #[test]
 fn xor() {
-    let expected = Instruction::XOR{dest: IRegister::A5, src1: IRegister::A6, src2: IRegister::A7};
+    let expected = Instruction::XOR {
+        dest: IRegister::A5,
+        src1: IRegister::A6,
+        src2: IRegister::A7,
+    };
     let bin = 0x011847b3;
 
     // check assembler
@@ -731,7 +862,11 @@ fn xor() {
 
 #[test]
 fn shift_right_logical() {
-    let expected = Instruction::SRL{dest: IRegister::T1, src1: IRegister::T2, src2: IRegister::T3};
+    let expected = Instruction::SRL {
+        dest: IRegister::T1,
+        src1: IRegister::T2,
+        src2: IRegister::T3,
+    };
     let bin = 0x01c3d333;
 
     // check assembler
@@ -753,7 +888,11 @@ fn shift_right_logical() {
 
 #[test]
 fn shift_right_arithmetic() {
-    let expected = Instruction::SRA{dest: IRegister::FramePointer, src1: IRegister::S1, src2: IRegister::S2};
+    let expected = Instruction::SRA {
+        dest: IRegister::FramePointer,
+        src1: IRegister::S1,
+        src2: IRegister::S2,
+    };
     let bin = 0x4124d433;
 
     // check assembler
@@ -775,7 +914,11 @@ fn shift_right_arithmetic() {
 
 #[test]
 fn or() {
-    let expected = Instruction::OR{dest: IRegister::T4, src1: IRegister::T5, src2: IRegister::T6};
+    let expected = Instruction::OR {
+        dest: IRegister::T4,
+        src1: IRegister::T5,
+        src2: IRegister::T6,
+    };
     let bin = 0x01ff6eb3;
 
     // check assembler
@@ -797,7 +940,11 @@ fn or() {
 
 #[test]
 fn and() {
-    let expected = Instruction::AND{dest: IRegister::S1, src1: IRegister::S2, src2: IRegister::S3};
+    let expected = Instruction::AND {
+        dest: IRegister::S1,
+        src1: IRegister::S2,
+        src2: IRegister::S3,
+    };
     let bin = 0x013974b3;
 
     // check assembler
