@@ -4,11 +4,9 @@ use proc_macros::{ci_assemble, cr_assemble};
 
 use crate::{
     immediates::{
-        BImmediate, CBImmediate, CDImmediate, CDSPImmediate, CIImmediate, CJImmediate,
-        CSDSPImmediate, CSWSPImmediate, CShamt, CWImmediate, CWSPImmediate, CWideImmediate,
-        IImmediate, JImmediate, SImmediate, Shamt,
+        BImmediate, C16SPImmediate, CBImmediate, CDImmediate, CDSPImmediate, CIImmediate, CJImmediate, CSDSPImmediate, CSWSPImmediate, CShamt, CWImmediate, CWSPImmediate, CWideImmediate, IImmediate, JImmediate, SImmediate, Shamt
     },
-    instruction::{Instruction, parse_address_expression_compressed, parse_int},
+    instruction::{parse_address_expression_compressed, parse_int, Instruction},
     register::{CFRegister, CIRegister, FRegister, IRegister},
 };
 
@@ -64,7 +62,7 @@ pub enum CInstruction {
         imm: CIImmediate,
     },
     ADDI16SP {
-        imm: i16,
+        imm: C16SPImmediate,
     },
     LUI {
         dest: IRegister,
@@ -291,16 +289,7 @@ pub fn decode_compressed_instruction(instruction: u16) -> Result<CInstruction, S
             }),
             0b011 => {
                 if (instruction >> 7) & 0b111 == 2 {
-                    let a = (instruction >> 2) & 0b1;
-                    let b = (instruction >> 3) & 0b11;
-                    let c = (instruction >> 5) & 0b1;
-                    let d = (instruction >> 6) & 0b1;
-                    let e = (instruction >> 12) & 0b1;
-                    println!("a: {a}, b: {b}, c: {c}, d: {d}, e: {e}");
-                    let i = ((d << 4) | (a << 5) | (c << 6) | (b << 7) | (e << 9)) as i16;
-                    println!("i: {i}");
-                    let i2 = (i << 6) >> 6;
-                    Ok(CInstruction::ADDI16SP { imm: i2 })
+                    Ok(CInstruction::ADDI16SP { imm: C16SPImmediate::from_u16(instruction) })
                 } else {
                     Ok(CInstruction::LUI {
                         dest: rd,
@@ -510,13 +499,8 @@ impl CInstruction {
                     Err("c.addi16sp requires 1 operands".to_owned())
                 } else {
                     let i = parse_int(operands[0])?;
-                    if i > 2i64.pow(9) - 1 || i < -2i64.pow(9) {
-                        panic!("attempted to construct out of range CWImmediate")
-                    }
-                    if i % 16 != 0 {
-                        panic!("attempted to construct non multiple of 4 CWImmediate")
-                    }
-                    Ok(CInstruction::ADDI16SP { imm: i as i16 })
+                    
+                    Ok(CInstruction::ADDI16SP { imm: C16SPImmediate::try_from(i)? })
                 }
             }
             "lui" => ci_assemble!(LUI),
@@ -755,7 +739,7 @@ impl CInstruction {
             CInstruction::ADDI16SP { imm } => Instruction::ADDI {
                 dest: IRegister::StackPointer,
                 src: IRegister::StackPointer,
-                imm: IImmediate::try_from(*imm as i64).unwrap(),
+                imm: IImmediate::try_from(imm.val()).unwrap(),
             },
             CInstruction::LUI { dest, imm } => Instruction::ADDI {
                 dest: *dest,
@@ -867,5 +851,76 @@ impl CInstruction {
                 offset: SImmediate::try_from(offset.val()).unwrap(),
             },
         }
+    }
+}
+
+pub fn encode_compressed_instruction(instruction: &CInstruction) -> u16 {
+    match instruction {
+        CInstruction::ADDI4SPN { dest, imm } => 0b000 << 13 | imm.to_u16() | dest.rs2(),
+        CInstruction::FLD { dest, base, offset } => {
+            0b001 << 13 | offset.to_u16() | base.rs1() | dest.rs2()
+        }
+        CInstruction::LW { dest, base, offset } => {
+            0b010 << 13 | offset.to_u16() | base.rs1() | dest.rs2()
+        }
+        CInstruction::LD { dest, base, offset } => {
+            0b011 << 13 | offset.to_u16() | base.rs1() | dest.rs2()
+        }
+        CInstruction::FSD { src, base, offset } => {
+            0b101 << 13 | offset.to_u16() | base.rs1() | src.rs2()
+        }
+        CInstruction::SW { src, base, offset } => {
+            0b0110 << 13 | offset.to_u16() | base.rs1() | src.rs2()
+        }
+        CInstruction::SD { src, base, offset } => {
+            0b111 << 13 | offset.to_u16() | base.rs1() | src.rs2()
+        }
+        CInstruction::ADDI { dest, imm } => 0b000 << 13 | imm.to_u16() | dest.rd() as u16 | 0b01,
+        CInstruction::ADDIW { dest, imm } => 0b001 << 13 | imm.to_u16() | dest.rd() as u16 | 0b01,
+        CInstruction::LI { dest, imm } => 0b010 << 13 | imm.to_u16() | dest.rd() as u16 | 0b01,
+        CInstruction::ADDI16SP { imm } => 0b011 << 13 | imm.to_u16() | 0b10 << 7 | 0b01,
+        CInstruction::LUI { dest, imm } => 0b011 << 13 | imm.to_u16() | dest.rd() as u16 | 0b01,
+        CInstruction::SRLI { dest, shamt } => {
+            0b100 << 13 | shamt.to_u16() | 0b00 << 10 | dest.rs1() | 0b01
+        }
+        CInstruction::SRAI { dest, shamt } => {
+            0b100 << 13 | shamt.to_u16() | 0b01 << 10 | dest.rs1() | 0b01
+        }
+        CInstruction::ANDI { dest, imm } => {
+            0b100 << 13 | imm.to_u16() | 0b10 << 10 | dest.rs1() | 0b01
+        }
+        CInstruction::SUB { dest, src } => {
+            0b100 << 13 | 0b11 << 10 | dest.rs1() | 0b00 << 5 | src.rs2() | 0b01
+        }
+        CInstruction::XOR { dest, src } => {
+            0b100 << 13 | 0b11 << 10 | dest.rs1() | 0b01 << 5 | src.rs2() | 0b01
+        }
+        CInstruction::OR { dest, src } => {
+            0b100 << 13 | 0b11 << 10 | dest.rs1() | 0b10 << 5 | src.rs2() | 0b01
+        }
+        CInstruction::AND { dest, src } => {
+            0b100 << 13 | 0b11 << 10 | dest.rs1() | 0b11 << 5 | src.rs2() | 0b01
+        }
+        CInstruction::SUBW { dest, src } => {
+            0b100 << 13 | 1 << 12 | 0b11 << 10 | dest.rs1() | 0b00 << 5 | src.rs2() | 0b01
+        }
+        CInstruction::ADDW { dest, src } => {
+            0b100 << 13 | 1 << 12 | 0b11 << 10 | dest.rs1() | 0b01 << 5 | src.rs2() | 0b01
+        }
+        CInstruction::J { offset } => 0b101 << 13 | offset.to_u16() | 0b01,
+        CInstruction::BEQZ { src, offset } => 0b110 << 13 | offset.to_u16() | src.rs1() | 0b01,
+        CInstruction::BNEZ { src, offset } => 0b111 << 13 | offset.to_u16() | src.rs1() | 0b01,
+        CInstruction::SLLI { dest, shamt } => 0b000 << 13 | shamt.to_u16() | dest.rd() as u16 | 0b10,
+        CInstruction::FLDSP { dest, offset } => 0b001 << 13| offset.to_u16() | dest.rd() as u16 | 0b10,
+        CInstruction::LWSP { dest, offset } => 0b010 << 13| offset.to_u16() | dest.rd() as u16 | 0b10,
+        CInstruction::LDSP { dest, offset } => 0b011 << 13 | offset.to_u16() | dest.rd() as u16 | 0b10,
+        CInstruction::JR { src } => 0b100 << 13 | src.rd() as u16 | 0b10,
+        CInstruction::MV { dest, src } => 0b100 << 13 | dest.rd() as u16| (src.rd() >> 5) as u16 | 0b10,
+        CInstruction::EBREAK => 0b100 << 13 | 0b1 << 12 | 0b10,
+        CInstruction::JALR { src } => 0b100 << 13 | 0b1 << 12 | src.rd() as u16 | 0b10,
+        CInstruction::ADD { dest, src } => 0b100 << 13 | 0b1 << 12 | dest.rd() as u16 | (src.rd() >> 5) as u16 | 0b10,
+        CInstruction::FSDSP { src, offset } => 0b101 << 13 | offset.to_u16() | (src.rd() >> 5) as u16 | 0b10,
+        CInstruction::SWSP { src, offset } => 0b110 << 13 | offset.to_u16() | (src.rd() >> 5) as u16 | 0b10,
+        CInstruction::SDSP { src, offset } => 0b111 << 13 | offset.to_u16() | (src.rd() >> 5) as u16 | 0b10,
     }
 }

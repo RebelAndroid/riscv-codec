@@ -499,6 +499,14 @@ impl CIRegister {
             CIRegister::A5 => IRegister::A5,
         }
     }
+
+    pub fn rs2(&self) -> u16 {
+        return (*self as u16) << 2;
+    }
+
+    pub fn rs1(&self) -> u16 {
+        return (*self as u16) << 7;
+    }
 }
 
 impl Display for CIRegister {
@@ -586,6 +594,14 @@ impl CFRegister {
             CFRegister::FA4 => FRegister::FA4,
             CFRegister::FA5 => FRegister::FA5,
         }
+    }
+
+    pub fn rs2(&self) -> u16 {
+        return (*self as u16) << 2;
+    }
+
+    pub fn rs1(&self) -> u16 {
+        return (*self as u16) << 7;
     }
 }
 

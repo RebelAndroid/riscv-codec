@@ -21,6 +21,7 @@ make_immediate!(CDSPImmediate false true (6 3 2) (3 2 5) (5 1 12));
 make_immediate!(CWSPImmediate false true (6 2 2) (2 3 4) (5 1 12));
 make_immediate!(CSDSPImmediate false true (6 3 7) (3 3 10));
 make_immediate!(CSWSPImmediate false true (6 2 7) (2 4 9));
+make_immediate!(C16SPImmediate true true (5 1 2) (7 2 3) (6 1 5) (4 1 6) (9 1 12));
 
 make_immediate!(CSR false false (0 12 20));
 make_immediate!(CSRImmediate false false (0 5 15));
