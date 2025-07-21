@@ -1275,9 +1275,6 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
         .map(|operand| operand.to_owned().trim())
         .collect();
 
-    println!("operands: {:?}", operands);
-    println!("mnemonics: {:?}", mnemonics);
-
     if mnemonics[0] == "c" {
         if mnemonics.len() == 1 {
             Err("compressed instruction must be specified".to_owned())
