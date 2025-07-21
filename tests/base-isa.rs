@@ -1275,3 +1275,25 @@ fn shift_right_arithmetic_word() {
     let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
     assert_eq!(i, i3);
 }
+
+#[test]
+fn fence() {
+    let expected = Instruction::FENCE { rd: IRegister::Zero, rs1: IRegister::Zero, ops: 0b1010_0101, fm: 0 };
+    let bin = 0x0a50000f;
+
+    // check assembler
+    let i = assemble_line("fence ir,ow").unwrap().i();
+    assert_eq!(i, expected);
+
+    // check decoder
+    let i2 = decode_instruction(bin).unwrap();
+    assert_eq!(i2, expected);
+
+    // check encoder
+    let b = encode_instruction(&i);
+    assert_eq!(b, bin);
+
+    // check disassembler
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
+    assert_eq!(i, i3);
+}

@@ -2851,7 +2851,9 @@ pub fn encode_instruction(instruction: &Instruction) -> u32 {
         Instruction::AND { dest, src1, src2 } => {
             src2.rs2() | src1.rs1() | 0b111 << 12 | dest.rd() | 0b0110011
         }
-        Instruction::FENCE { rd, rs1, ops, fm } => todo!(),
+        Instruction::FENCE { rd, rs1, ops, fm } => {
+            (*fm as u32) << 28 | (*ops as u32) << 20 | rs1.rs1() | rd.rd() | 0b0001111
+        }
         Instruction::ECALL => 0b1110011,
         Instruction::EBREAK => 0b1 << 20 | 0b1110011,
         Instruction::LWU { dest, base, offset } => {
