@@ -364,7 +364,7 @@ fn float_less_than_single() {
 
     // check encoder
     let b = encode_instruction(&i);
-    assert_eq!(b, bin, "\ngot: {:b} \nexp: {:b}", b, bin);
+    assert_eq!(b, bin);
 
     // check disassembler
     let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();

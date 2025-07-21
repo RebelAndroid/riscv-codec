@@ -1,7 +1,7 @@
 use riscv_disassembler::{
-    immediates::{BImmediate, IImmediate, JImmediate, SImmediate, Shamt, UImmediate},
+    immediates::{BImmediate, IImmediate, JImmediate, SImmediate, Shamt, ShamtW, UImmediate},
     instruction::{
-        Instruction, assemble_line, decode_instruction, disassemble_instruction, encode_instruction,
+        assemble_line, decode_instruction, disassemble_instruction, encode_instruction, Instruction
     },
     register::IRegister,
 };
@@ -949,6 +949,318 @@ fn and() {
 
     // check assembler
     let i = assemble_line("and s1,s2,s3").unwrap().i();
+    assert_eq!(i, expected);
+
+    // check decoder
+    let i2 = decode_instruction(bin).unwrap();
+    assert_eq!(i2, expected);
+
+    // check encoder
+    let b = encode_instruction(&i);
+    assert_eq!(b, bin);
+
+    // check disassembler
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
+    assert_eq!(i, i3);
+}
+
+#[test]
+fn load_word_unsigned() {
+    let expected = Instruction::LWU {
+        dest: IRegister::A0,
+        base: IRegister::A1,
+        offset: IImmediate::try_from(100).unwrap(),
+    };
+    let bin = 0x0645e503;
+
+    // check assembler
+    let i = assemble_line("lwu a0,100(a1)").unwrap().i();
+    assert_eq!(i, expected);
+
+    // check decoder
+    let i2 = decode_instruction(bin).unwrap();
+    assert_eq!(i2, expected);
+
+    // check encoder
+    let b = encode_instruction(&i);
+    assert_eq!(b, bin);
+
+    // check disassembler
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
+    assert_eq!(i, i3);
+}
+
+#[test]
+fn load_doubleword() {
+    let expected = Instruction::LD {
+        dest: IRegister::A2,
+        base: IRegister::A3,
+        offset: IImmediate::try_from(200).unwrap(),
+    };
+    let bin = 0x0c86b603;
+
+    // check assembler
+    let i = assemble_line("ld a2,200(a3)").unwrap().i();
+    assert_eq!(i, expected);
+
+    // check decoder
+    let i2 = decode_instruction(bin).unwrap();
+    assert_eq!(i2, expected);
+
+    // check encoder
+    let b = encode_instruction(&i);
+    assert_eq!(b, bin);
+
+    // check disassembler
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
+    assert_eq!(i, i3);
+}
+
+#[test]
+fn store_doubleword() {
+    let expected = Instruction::SD {
+        base: IRegister::A4,
+        src: IRegister::A5,
+        offset: SImmediate::try_from(300).unwrap(),
+    };
+    let bin = 0x12f73623;
+
+    // check assembler
+    let i = assemble_line("sd a5,300(a4)").unwrap().i();
+    assert_eq!(i, expected);
+
+    // check decoder
+    let i2 = decode_instruction(bin).unwrap();
+    assert_eq!(i2, expected);
+
+    // check encoder
+    let b = encode_instruction(&i);
+    assert_eq!(b, bin);
+
+    // check disassembler
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
+    assert_eq!(i, i3);
+}
+
+#[test]
+fn add_immediate_word() {
+    let expected = Instruction::ADDIW {
+        dest: IRegister::A6,
+        src: IRegister::A7,
+        imm: IImmediate::try_from(123).unwrap(),
+    };
+    let bin = 0x07b8881b;
+
+    // check assembler
+    let i = assemble_line("addiw a6,a7,123").unwrap().i();
+    assert_eq!(i, expected);
+
+    // check decoder
+    let i2 = decode_instruction(bin).unwrap();
+    assert_eq!(i2, expected);
+
+    // check encoder
+    let b = encode_instruction(&i);
+    assert_eq!(b, bin);
+
+    // check disassembler
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
+    assert_eq!(i, i3);
+}
+
+#[test]
+fn shift_left_logical_immediate_word() {
+    let expected = Instruction::SLLIW {
+        dest: IRegister::FramePointer,
+        src: IRegister::S1,
+        shamt: ShamtW::try_from(5).unwrap(),
+    };
+    let bin = 0x0054941b;
+
+    // check assembler
+    let i = assemble_line("slliw fp,s1,5").unwrap().i();
+    assert_eq!(i, expected);
+
+    // check decoder
+    let i2 = decode_instruction(bin).unwrap();
+    assert_eq!(i2, expected);
+
+    // check encoder
+    let b = encode_instruction(&i);
+    assert_eq!(b, bin);
+
+    // check disassembler
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
+    assert_eq!(i, i3);
+}
+
+#[test]
+fn shift_right_logical_immediate_word() {
+    let expected = Instruction::SRLIW {
+        dest: IRegister::S2,
+        src: IRegister::S3,
+        shamt: ShamtW::try_from(10).unwrap(),
+    };
+    let bin = 0x00a9d91b;
+
+    // check assembler
+    let i = assemble_line("srliw s2,s3,10").unwrap().i();
+    assert_eq!(i, expected);
+
+    // check decoder
+    let i2 = decode_instruction(bin).unwrap();
+    assert_eq!(i2, expected);
+
+    // check encoder
+    let b = encode_instruction(&i);
+    assert_eq!(b, bin);
+
+    // check disassembler
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
+    assert_eq!(i, i3);
+}
+
+#[test]
+fn shift_right_arithmetic_immediate_word() {
+    let expected = Instruction::SRAIW {
+        dest: IRegister::S4,
+        src: IRegister::S5,
+        shamt: ShamtW::try_from(15).unwrap(),
+    };
+    let bin = 0x40fada1b;
+
+    // check assembler
+    let i = assemble_line("sraiw s4,s5,15").unwrap().i();
+    assert_eq!(i, expected);
+
+    // check decoder
+    let i2 = decode_instruction(bin).unwrap();
+    assert_eq!(i2, expected);
+
+    // check encoder
+    let b = encode_instruction(&i);
+    assert_eq!(b, bin);
+
+    // check disassembler
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
+    assert_eq!(i, i3);
+}
+
+#[test]
+fn add_word() {
+    let expected = Instruction::ADDW {
+        dest: IRegister::S6,
+        src1: IRegister::S7,
+        src2: IRegister::T0,
+    };
+    let bin = 0x005b8b3b;
+
+    // check assembler
+    let i = assemble_line("addw s6,s7,t0").unwrap().i();
+    assert_eq!(i, expected);
+
+    // check decoder
+    let i2 = decode_instruction(bin).unwrap();
+    assert_eq!(i2, expected);
+
+    // check encoder
+    let b = encode_instruction(&i);
+    assert_eq!(b, bin);
+
+    // check disassembler
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
+    assert_eq!(i, i3);
+}
+
+#[test]
+fn subtract_word() {
+    let expected = Instruction::SUBW {
+        dest: IRegister::T1,
+        src1: IRegister::T2,
+        src2: IRegister::T3,
+    };
+    let bin = 0x41c3833b;
+
+    // check assembler
+    let i = assemble_line("subw t1,t2,t3").unwrap().i();
+    assert_eq!(i, expected);
+
+    // check decoder
+    let i2 = decode_instruction(bin).unwrap();
+    assert_eq!(i2, expected);
+
+    // check encoder
+    let b = encode_instruction(&i);
+    assert_eq!(b, bin);
+
+    // check disassembler
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
+    assert_eq!(i, i3);
+}
+
+#[test]
+fn shift_left_logical_word() {
+    let expected = Instruction::SLLW {
+        dest: IRegister::T4,
+        src1: IRegister::T5,
+        src2: IRegister::T6,
+    };
+    let bin = 0x01ff1ebb;
+
+    // check assembler
+    let i = assemble_line("sllw t4,t5,t6").unwrap().i();
+    assert_eq!(i, expected);
+
+    // check decoder
+    let i2 = decode_instruction(bin).unwrap();
+    assert_eq!(i2, expected);
+
+    // check encoder
+    let b = encode_instruction(&i);
+    assert_eq!(b, bin);
+
+    // check disassembler
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
+    assert_eq!(i, i3);
+}
+
+#[test]
+fn shift_right_logical_word() {
+    let expected = Instruction::SRLW {
+        dest: IRegister::A0,
+        src1: IRegister::A1,
+        src2: IRegister::A2,
+    };
+    let bin = 0x00c5d53b;
+
+    // check assembler
+    let i = assemble_line("srlw a0,a1,a2").unwrap().i();
+    assert_eq!(i, expected);
+
+    // check decoder
+    let i2 = decode_instruction(bin).unwrap();
+    assert_eq!(i2, expected);
+
+    // check encoder
+    let b = encode_instruction(&i);
+    assert_eq!(b, bin);
+
+    // check disassembler
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
+    assert_eq!(i, i3);
+}
+
+#[test]
+fn shift_right_arithmetic_word() {
+    let expected = Instruction::SRAW {
+        dest: IRegister::A3,
+        src1: IRegister::A4,
+        src2: IRegister::A5,
+    };
+    let bin = 0x40f756bb;
+
+    // check assembler
+    let i = assemble_line("sraw a3,a4,a5").unwrap().i();
     assert_eq!(i, expected);
 
     // check decoder

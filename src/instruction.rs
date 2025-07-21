@@ -2852,20 +2852,44 @@ pub fn encode_instruction(instruction: &Instruction) -> u32 {
             src2.rs2() | src1.rs1() | 0b111 << 12 | dest.rd() | 0b0110011
         }
         Instruction::FENCE { rd, rs1, ops, fm } => todo!(),
-        Instruction::ECALL => todo!(),
-        Instruction::EBREAK => todo!(),
-        Instruction::LWU { dest, base, offset } => todo!(),
-        Instruction::LD { dest, base, offset } => todo!(),
-        Instruction::SD { src, base, offset } => todo!(),
-        Instruction::ADDIW { dest, src, imm } => todo!(),
-        Instruction::SLLIW { dest, src, shamt } => todo!(),
-        Instruction::SRLIW { dest, src, shamt } => todo!(),
-        Instruction::SRAIW { dest, src, shamt } => todo!(),
-        Instruction::ADDW { dest, src1, src2 } => todo!(),
-        Instruction::SUBW { dest, src1, src2 } => todo!(),
-        Instruction::SLLW { dest, src1, src2 } => todo!(),
-        Instruction::SRLW { dest, src1, src2 } => todo!(),
-        Instruction::SRAW { dest, src1, src2 } => todo!(),
+        Instruction::ECALL => 0b1110011,
+        Instruction::EBREAK => 0b1 << 20 | 0b1110011,
+        Instruction::LWU { dest, base, offset } => {
+            offset.to_u32() | base.rs1() | 0b110 << 12 | dest.rd() | 0b0000011
+        }
+        Instruction::LD { dest, base, offset } => {
+            offset.to_u32() | base.rs1() | 0b011 << 12 | dest.rd() | 0b0000011
+        }
+        Instruction::SD { src, base, offset } => {
+            offset.to_u32() | src.rs2() | base.rs1() | 0b011 << 12 | 0b0100011
+        }
+        Instruction::ADDIW { dest, src, imm } => {
+            imm.to_u32() | src.rs1() | 0b000 << 12 | dest.rd() | 0b0011011
+        }
+        Instruction::SLLIW { dest, src, shamt } => {
+            shamt.to_u32() | src.rs1() | 0b001 << 12 | dest.rd() | 0b0011011
+        }
+        Instruction::SRLIW { dest, src, shamt } => {
+            shamt.to_u32() | src.rs1() | 0b101 << 12 | dest.rd() | 0b0011011
+        }
+        Instruction::SRAIW { dest, src, shamt } => {
+            0b0100000 << 25 | shamt.to_u32() | src.rs1() | 0b101 << 12 | dest.rd() | 0b0011011
+        }
+        Instruction::ADDW { dest, src1, src2 } => {
+            src2.rs2() | src1.rs1() | 0b000 << 12 | dest.rd() | 0b0111011
+        }
+        Instruction::SUBW { dest, src1, src2 } => {
+            0b0100000 << 25 | src2.rs2() | src1.rs1() | 0b000 << 12 | dest.rd() | 0b0111011
+        }
+        Instruction::SLLW { dest, src1, src2 } => {
+            src2.rs2() | src1.rs1() | 0b001 << 12 | dest.rd() | 0b0111011
+        }
+        Instruction::SRLW { dest, src1, src2 } => {
+            src2.rs2() | src1.rs1() | 0b101 << 12 | dest.rd() | 0b0111011
+        }
+        Instruction::SRAW { dest, src1, src2 } => {
+            0b0100000 << 25 | src2.rs2() | src1.rs1() | 0b101 << 12 | dest.rd() | 0b0111011
+        }
         Instruction::MUL { dest, src1, src2 } => {
             0b0000001 << 25 | src2.rs2() | src1.rs1() | 0b000 << 12 | dest.rd() | 0b0110011
         }
@@ -3346,12 +3370,24 @@ pub fn encode_instruction(instruction: &Instruction) -> u32 {
         Instruction::FCVTSLU { dest, src, rm } => {
             0b1101000 << 25 | 0b00011 << 20 | src.rs1() | rm.to_u32() | dest.rd() | 0b1010011
         }
-        Instruction::CSRRW { dest, src, csr } => todo!(),
-        Instruction::CSRRS { dest, src, csr } => todo!(),
-        Instruction::CSRRC { dest, src, csr } => todo!(),
-        Instruction::CSRRWI { dest, imm, csr } => todo!(),
-        Instruction::CSRRSI { dest, imm, csr } => todo!(),
-        Instruction::CSRRCI { dest, imm, csr } => todo!(),
-        Instruction::FENCEI => todo!(),
+        Instruction::CSRRW { dest, src, csr } => {
+            csr.to_u32() | src.rs1() | 0b001 << 12 | dest.rd() | 0b1110011
+        }
+        Instruction::CSRRS { dest, src, csr } => {
+            csr.to_u32() | src.rs1() | 0b010 << 12 | dest.rd() | 0b1110011
+        }
+        Instruction::CSRRC { dest, src, csr } => {
+            csr.to_u32() | src.rs1() | 0b011 << 12 | dest.rd() | 0b1110011
+        }
+        Instruction::CSRRWI { dest, imm, csr } => {
+            csr.to_u32() | imm.to_u32() | 0b101 << 12 | dest.rd() | 0b1110011
+        }
+        Instruction::CSRRSI { dest, imm, csr } => {
+            csr.to_u32() | imm.to_u32() | 0b110 << 12 | dest.rd() | 0b1110011
+        }
+        Instruction::CSRRCI { dest, imm, csr } => {
+            csr.to_u32() | imm.to_u32() | 0b111 << 12 | dest.rd() | 0b1110011
+        }
+        Instruction::FENCEI => 0b001 << 12 | 0b0001111,
     }
 }
