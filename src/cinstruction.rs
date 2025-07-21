@@ -1,6 +1,6 @@
 use std::fmt::{Display, Formatter};
 
-use proc_macros::{ci_assemble, cr_assemble};
+use riscv_codec_proc_macros::{ci_assemble, cr_assemble};
 
 use crate::{
     immediates::{

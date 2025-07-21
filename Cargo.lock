@@ -21,17 +21,17 @@ dependencies = [
 ]
 
 [[package]]
-name = "proc-macros"
-version = "0.1.0"
-dependencies = [
- "litrs",
-]
-
-[[package]]
 name = "riscv-codec"
 version = "0.1.0"
 dependencies = [
- "proc-macros",
+ "riscv-codec-proc-macros",
+]
+
+[[package]]
+name = "riscv-codec-proc-macros"
+version = "0.1.0"
+dependencies = [
+ "litrs",
 ]
 
 [[package]]

@@ -6,7 +6,7 @@ use crate::register::{CIRegister, FRegister, IRegister};
 use crate::{immediates::IImmediate, opcode::Opcode};
 use std::fmt::{Display, Formatter};
 
-use proc_macros::{
+use riscv_codec_proc_macros::{
     amo_assemble, b_assemble, fr_assemble, i_assemble, l_assemble, r_assemble, s_assemble,
     sh_assemble, shw_assemble,
 };
