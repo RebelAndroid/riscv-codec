@@ -1,6 +1,5 @@
-use riscv_codec::instruction::{
-    Instruction, assemble_line, decode_instruction, disassemble_instruction, encode_instruction,
-};
+use riscv_codec::assembly::assemble_line;
+use riscv_codec::instruction::{Instruction, disassemble_instruction};
 use riscv_codec::register::IRegister;
 
 #[test]
@@ -18,11 +17,11 @@ fn load_reserved_word() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -46,11 +45,11 @@ fn store_conditional_word() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -74,11 +73,11 @@ fn amo_swap_word() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -102,11 +101,11 @@ fn amo_add_word() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -130,11 +129,11 @@ fn amo_xor_word() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -158,11 +157,11 @@ fn amo_and_word() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -186,11 +185,11 @@ fn amo_or_word() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -214,11 +213,11 @@ fn amo_min_word() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -242,11 +241,11 @@ fn amo_max_word() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -270,11 +269,11 @@ fn amo_min_unsigned_word() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -298,11 +297,11 @@ fn amo_max_unsigned_word() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -325,11 +324,11 @@ fn load_reserved_doubleword() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -353,11 +352,11 @@ fn store_conditional_doubleword() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -381,11 +380,11 @@ fn amo_swap_doubleword() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -409,11 +408,11 @@ fn amo_add_doubleword() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -437,11 +436,11 @@ fn amo_xor_doubleword() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -465,11 +464,11 @@ fn amo_and_doubleword() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -493,11 +492,11 @@ fn amo_or_doubleword() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -521,11 +520,11 @@ fn amo_min_doubleword() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -549,11 +548,11 @@ fn amo_max_doubleword() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -577,11 +576,11 @@ fn amo_min_unsigned_doubleword() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -605,11 +604,11 @@ fn amo_max_unsigned_doubleword() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler

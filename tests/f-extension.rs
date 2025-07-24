@@ -1,7 +1,6 @@
+use riscv_codec::assembly::assemble_line;
 use riscv_codec::immediates::{IImmediate, SImmediate};
-use riscv_codec::instruction::{
-    Instruction, RoundingMode, assemble_line, decode_instruction, disassemble_instruction, encode_instruction,
-};
+use riscv_codec::instruction::{Instruction, RoundingMode, disassemble_instruction};
 use riscv_codec::register::{FRegister, IRegister};
 
 #[test]
@@ -18,11 +17,11 @@ fn float_load_word() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -44,11 +43,11 @@ fn float_store_word() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -71,11 +70,11 @@ fn float_add() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -98,11 +97,11 @@ fn float_subtract() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -125,11 +124,11 @@ fn float_multiply() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -152,11 +151,11 @@ fn float_divide() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -178,11 +177,11 @@ fn float_sqrt() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -204,11 +203,11 @@ fn float_minimum() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -230,11 +229,11 @@ fn float_maximum() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -256,11 +255,11 @@ fn float_convert_word_from_single() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -282,11 +281,11 @@ fn float_convert_unsigned_word_from_single() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -307,11 +306,11 @@ fn float_move_x_from_word() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -333,11 +332,11 @@ fn float_equal_single() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -359,11 +358,11 @@ fn float_less_than_single() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -385,11 +384,11 @@ fn float_less_equal_single() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -410,11 +409,11 @@ fn float_class_single() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -436,11 +435,11 @@ fn float_convert_single_from_word() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -462,11 +461,11 @@ fn float_convert_single_from_unsigned_word() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -487,11 +486,11 @@ fn float_move_word_from_x() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -513,11 +512,11 @@ fn float_convert_long_from_single() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -539,11 +538,11 @@ fn float_convert_unsigned_long_from_single() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -565,11 +564,11 @@ fn float_convert_single_from_long() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -591,11 +590,11 @@ fn float_convert_single_from_unsigned_long() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler

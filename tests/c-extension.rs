@@ -1,10 +1,10 @@
+use riscv_codec::assembly::assemble_line;
 use riscv_codec::cinstruction::{
-    CInstruction, decode_compressed_instruction, encode_compressed_instruction,
+    CInstruction,
 };
 use riscv_codec::immediates::{
     C16SPImmediate, CBImmediate, CDImmediate, CDSPImmediate, CIImmediate, CJImmediate, CSDSPImmediate, CSWSPImmediate, CShamt, CWImmediate, CWSPImmediate, CWideImmediate
 };
-use riscv_codec::instruction::assemble_line;
 use riscv_codec::register::{CFRegister, CIRegister, FRegister, IRegister};
 
 #[test]
@@ -20,11 +20,11 @@ fn add_4_immediate_stack_pointer() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_compressed_instruction(bin).unwrap();
+    let i2 = CInstruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_compressed_instruction(&i);
+    let b = CInstruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -47,11 +47,11 @@ fn float_load_double() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_compressed_instruction(bin).unwrap();
+    let i2 = CInstruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_compressed_instruction(&i);
+    let b = CInstruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -74,11 +74,11 @@ fn load_word() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_compressed_instruction(bin).unwrap();
+    let i2 = CInstruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_compressed_instruction(&i);
+    let b = CInstruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -101,11 +101,11 @@ fn load_doubleword() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_compressed_instruction(bin).unwrap();
+    let i2 = CInstruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_compressed_instruction(&i);
+    let b = CInstruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -128,11 +128,11 @@ fn float_store_double() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_compressed_instruction(bin).unwrap();
+    let i2 = CInstruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_compressed_instruction(&i);
+    let b = CInstruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -155,11 +155,11 @@ fn store_word() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_compressed_instruction(bin).unwrap();
+    let i2 = CInstruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_compressed_instruction(&i);
+    let b = CInstruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -182,11 +182,11 @@ fn store_double() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_compressed_instruction(bin).unwrap();
+    let i2 = CInstruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_compressed_instruction(&i);
+    let b = CInstruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -207,11 +207,11 @@ fn add_immediate() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_compressed_instruction(bin).unwrap();
+    let i2 = CInstruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_compressed_instruction(&i);
+    let b = CInstruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -233,11 +233,11 @@ fn add_immediate_word() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_compressed_instruction(bin).unwrap();
+    let i2 = CInstruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_compressed_instruction(&i);
+    let b = CInstruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -259,11 +259,11 @@ fn load_immediate() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_compressed_instruction(bin).unwrap();
+    let i2 = CInstruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_compressed_instruction(&i);
+    let b = CInstruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -282,11 +282,11 @@ fn add_16_immediate_stack_pointer() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_compressed_instruction(bin).unwrap();
+    let i2 = CInstruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_compressed_instruction(&i);
+    let b = CInstruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -308,11 +308,11 @@ fn load_upper_immediate() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_compressed_instruction(bin).unwrap();
+    let i2 = CInstruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_compressed_instruction(&i);
+    let b = CInstruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -334,11 +334,11 @@ fn shift_right_logical_immediate() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_compressed_instruction(bin).unwrap();
+    let i2 = CInstruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_compressed_instruction(&i);
+    let b = CInstruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -360,11 +360,11 @@ fn shift_right_arithmetic_immediate() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_compressed_instruction(bin).unwrap();
+    let i2 = CInstruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_compressed_instruction(&i);
+    let b = CInstruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -386,11 +386,11 @@ fn and_immediate() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_compressed_instruction(bin).unwrap();
+    let i2 = CInstruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_compressed_instruction(&i);
+    let b = CInstruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -412,11 +412,11 @@ fn subtract() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_compressed_instruction(bin).unwrap();
+    let i2 = CInstruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_compressed_instruction(&i);
+    let b = CInstruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -438,11 +438,11 @@ fn exclusive_or() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_compressed_instruction(bin).unwrap();
+    let i2 = CInstruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_compressed_instruction(&i);
+    let b = CInstruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -464,11 +464,11 @@ fn or() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_compressed_instruction(bin).unwrap();
+    let i2 = CInstruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_compressed_instruction(&i);
+    let b = CInstruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -489,11 +489,11 @@ fn and() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_compressed_instruction(bin).unwrap();
+    let i2 = CInstruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_compressed_instruction(&i);
+    let b = CInstruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -515,11 +515,11 @@ fn subtract_word() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_compressed_instruction(bin).unwrap();
+    let i2 = CInstruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_compressed_instruction(&i);
+    let b = CInstruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -541,11 +541,11 @@ fn add_word() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_compressed_instruction(0x9fb1).unwrap();
+    let i2 = CInstruction::decode(0x9fb1).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_compressed_instruction(&i);
+    let b = CInstruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -566,11 +566,11 @@ fn jump() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_compressed_instruction(0xa0a1).unwrap();
+    let i2 = CInstruction::decode(0xa0a1).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_compressed_instruction(&i);
+    let b = CInstruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -592,11 +592,11 @@ fn jump2() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_compressed_instruction(bin).unwrap();
+    let i2 = CInstruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_compressed_instruction(&i);
+    let b = CInstruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -616,11 +616,11 @@ fn jump3() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_compressed_instruction(bin).unwrap();
+    let i2 = CInstruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_compressed_instruction(&i);
+    let b = CInstruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -641,11 +641,11 @@ fn jump4() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_compressed_instruction(bin).unwrap();
+    let i2 = CInstruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_compressed_instruction(&i);
+    let b = CInstruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -667,11 +667,11 @@ fn branch_equal_zero() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_compressed_instruction(bin).unwrap();
+    let i2 = CInstruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_compressed_instruction(&i);
+    let b = CInstruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -693,11 +693,11 @@ fn branch_not_equal_zero() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_compressed_instruction(0xfffd).unwrap();
+    let i2 = CInstruction::decode(0xfffd).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_compressed_instruction(&i);
+    let b = CInstruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -719,11 +719,11 @@ fn shfit_left_logical_immediate() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_compressed_instruction(bin).unwrap();
+    let i2 = CInstruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_compressed_instruction(&i);
+    let b = CInstruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -745,11 +745,11 @@ fn float_load_double_stack_pointer() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_compressed_instruction(bin).unwrap();
+    let i2 = CInstruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_compressed_instruction(&i);
+    let b = CInstruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -771,11 +771,11 @@ fn load_word_stack_pointer() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_compressed_instruction(bin).unwrap();
+    let i2 = CInstruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_compressed_instruction(&i);
+    let b = CInstruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -797,11 +797,11 @@ fn load_double_stack_pointer() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_compressed_instruction(bin).unwrap();
+    let i2 = CInstruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_compressed_instruction(&i);
+    let b = CInstruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -820,11 +820,11 @@ fn jump_register() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_compressed_instruction(bin).unwrap();
+    let i2 = CInstruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_compressed_instruction(&i);
+    let b = CInstruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -847,11 +847,11 @@ fn mv() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_compressed_instruction(bin).unwrap();
+    let i2 = CInstruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_compressed_instruction(&i);
+    let b = CInstruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -870,11 +870,11 @@ fn environment_break() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_compressed_instruction(bin).unwrap();
+    let i2 = CInstruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_compressed_instruction(&i);
+    let b = CInstruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -893,11 +893,11 @@ fn jump_and_link_register() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_compressed_instruction(bin).unwrap();
+    let i2 = CInstruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_compressed_instruction(&i);
+    let b = CInstruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -919,11 +919,11 @@ fn add() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_compressed_instruction(bin).unwrap();
+    let i2 = CInstruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_compressed_instruction(&i);
+    let b = CInstruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -945,11 +945,11 @@ fn float_store_double_stack_pointer() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_compressed_instruction(bin).unwrap();
+    let i2 = CInstruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_compressed_instruction(&i);
+    let b = CInstruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -971,11 +971,11 @@ fn store_word_stack_pointer() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_compressed_instruction(bin).unwrap();
+    let i2 = CInstruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_compressed_instruction(&i);
+    let b = CInstruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -997,11 +997,11 @@ fn store_double_stack_pointer() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_compressed_instruction(0xf88e).unwrap();
+    let i2 = CInstruction::decode(0xf88e).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_compressed_instruction(&i);
+    let b = CInstruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler

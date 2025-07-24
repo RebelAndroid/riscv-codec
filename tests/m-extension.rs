@@ -1,5 +1,6 @@
+use riscv_codec::assembly::assemble_line;
 use riscv_codec::instruction::{
-    Instruction, assemble_line, decode_instruction, disassemble_instruction, encode_instruction,
+    Instruction, disassemble_instruction,
 };
 use riscv_codec::register::IRegister;
 
@@ -13,11 +14,11 @@ fn multiply() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -35,11 +36,11 @@ fn multiply_high() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -57,11 +58,11 @@ fn multiply_high_signed_unsigned() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -79,11 +80,11 @@ fn multiply_high_unsigned() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -101,11 +102,11 @@ fn divide() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -123,11 +124,11 @@ fn divide_unsigned() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -145,11 +146,11 @@ fn remainder() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -167,11 +168,11 @@ fn remainder_unsigned() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -189,11 +190,11 @@ fn multiply_word() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -211,11 +212,11 @@ fn divide_word() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -233,11 +234,11 @@ fn divide_unsigned_word() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -255,11 +256,11 @@ fn remainder_word() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -277,11 +278,11 @@ fn remainder_unsigned_word() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler

@@ -1,4 +1,4 @@
-use riscv_codec::instruction::{assemble_line, decode_instruction, disassemble_instruction, encode_instruction, Instruction};
+use riscv_codec::{assembly::assemble_line, instruction::{disassemble_instruction, Instruction}};
 
 #[test]
 fn fence_instruction() {
@@ -10,11 +10,11 @@ fn fence_instruction() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected,);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler

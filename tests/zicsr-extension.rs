@@ -1,12 +1,14 @@
 use riscv_codec::{
-    immediates::{CSRImmediate, CSR},
-    instruction::{assemble_line, decode_instruction, disassemble_instruction, encode_instruction, Instruction},
-    register::IRegister
+    assembly::assemble_line, immediates::{CSRImmediate, CSR}, instruction::{disassemble_instruction, Instruction}, register::IRegister
 };
 
 #[test]
 fn read_write_csr() {
-    let expected = Instruction::CSRRW{dest: IRegister::T1, src: IRegister::T2, csr: CSR::try_from(100).unwrap()};
+    let expected = Instruction::CSRRW {
+        dest: IRegister::T1,
+        src: IRegister::T2,
+        csr: CSR::try_from(100).unwrap(),
+    };
     let bin = 0x06439373;
 
     // check assembler
@@ -14,11 +16,11 @@ fn read_write_csr() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -28,7 +30,11 @@ fn read_write_csr() {
 
 #[test]
 fn read_set_csr() {
-    let expected = Instruction::CSRRS{dest: IRegister::ThreadPointer, src: IRegister::S6, csr: CSR::try_from(4000).unwrap()};
+    let expected = Instruction::CSRRS {
+        dest: IRegister::ThreadPointer,
+        src: IRegister::S6,
+        csr: CSR::try_from(4000).unwrap(),
+    };
     let bin = 0xfa0b2273;
 
     // check assembler
@@ -36,11 +42,11 @@ fn read_set_csr() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -50,7 +56,11 @@ fn read_set_csr() {
 
 #[test]
 fn read_clear_csr() {
-    let expected = Instruction::CSRRC{dest: IRegister::A0, src: IRegister::A5, csr: CSR::try_from(1).unwrap()};
+    let expected = Instruction::CSRRC {
+        dest: IRegister::A0,
+        src: IRegister::A5,
+        csr: CSR::try_from(1).unwrap(),
+    };
     let bin = 0x0017b573;
 
     // check assembler
@@ -58,11 +68,11 @@ fn read_clear_csr() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -72,7 +82,11 @@ fn read_clear_csr() {
 
 #[test]
 fn read_write_csr_immediate() {
-    let expected = Instruction::CSRRWI{dest: IRegister::S11, imm: CSRImmediate::try_from(31).unwrap(), csr: CSR::try_from(100).unwrap()};
+    let expected = Instruction::CSRRWI {
+        dest: IRegister::S11,
+        imm: CSRImmediate::try_from(31).unwrap(),
+        csr: CSR::try_from(100).unwrap(),
+    };
     let bin = 0x064fddf3;
 
     // check assembler
@@ -80,11 +94,11 @@ fn read_write_csr_immediate() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -94,7 +108,11 @@ fn read_write_csr_immediate() {
 
 #[test]
 fn read_set_csr_immediate() {
-    let expected = Instruction::CSRRSI{dest: IRegister::S4, imm: CSRImmediate::try_from(1).unwrap(), csr: CSR::try_from(1001).unwrap()};
+    let expected = Instruction::CSRRSI {
+        dest: IRegister::S4,
+        imm: CSRImmediate::try_from(1).unwrap(),
+        csr: CSR::try_from(1001).unwrap(),
+    };
     let bin = 0x3e90ea73;
 
     // check assembler
@@ -102,11 +120,11 @@ fn read_set_csr_immediate() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
@@ -116,7 +134,11 @@ fn read_set_csr_immediate() {
 
 #[test]
 fn read_clear_csr_immediate() {
-    let expected = Instruction::CSRRCI{dest: IRegister::A1, imm: CSRImmediate::try_from(23).unwrap(), csr: CSR::try_from(24).unwrap()};
+    let expected = Instruction::CSRRCI {
+        dest: IRegister::A1,
+        imm: CSRImmediate::try_from(23).unwrap(),
+        csr: CSR::try_from(24).unwrap(),
+    };
     let bin = 0x018bf5f3;
 
     // check assembler
@@ -124,11 +146,11 @@ fn read_clear_csr_immediate() {
     assert_eq!(i, expected);
 
     // check decoder
-    let i2 = decode_instruction(bin).unwrap();
+    let i2 = Instruction::decode(bin).unwrap();
     assert_eq!(i2, expected);
 
     // check encoder
-    let b = encode_instruction(&i);
+    let b = Instruction::encode(&i);
     assert_eq!(b, bin);
 
     // check disassembler
