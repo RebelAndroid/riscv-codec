@@ -1,4 +1,7 @@
-use riscv_codec::{assembly::assemble_line, instruction::{disassemble_instruction, Instruction}};
+use riscv_codec::{
+    assembly::assemble_line,
+    instruction::{Instruction, disassemble_instruction},
+};
 
 #[test]
 fn fence_instruction() {

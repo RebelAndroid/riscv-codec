@@ -1,7 +1,8 @@
 use riscv_codec::{
-    assembly::assemble_line, immediates::{BImmediate, IImmediate, JImmediate, SImmediate, Shamt, ShamtW, UImmediate}, instruction::{
-        disassemble_instruction, Instruction
-    }, register::IRegister
+    assembly::assemble_line,
+    immediates::{BImmediate, IImmediate, JImmediate, SImmediate, Shamt, ShamtW, UImmediate},
+    instruction::{Instruction, disassemble_instruction},
+    register::IRegister,
 };
 
 #[test]
@@ -1276,7 +1277,12 @@ fn shift_right_arithmetic_word() {
 
 #[test]
 fn fence() {
-    let expected = Instruction::FENCE { rd: IRegister::Zero, rs1: IRegister::Zero, ops: 0b1010_0101, fm: 0 };
+    let expected = Instruction::FENCE {
+        rd: IRegister::Zero,
+        rs1: IRegister::Zero,
+        ops: 0b1010_0101,
+        fm: 0,
+    };
     let bin = 0x0a50000f;
 
     // check assembler

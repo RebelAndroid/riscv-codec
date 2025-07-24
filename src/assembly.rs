@@ -1,9 +1,12 @@
-use riscv_codec_proc_macros::{amo_assemble, b_assemble, ci_assemble, cr_assemble, fr_assemble, i_assemble, l_assemble, r_assemble, s_assemble, sh_assemble, shw_assemble};
+use riscv_codec_proc_macros::{
+    amo_assemble, b_assemble, ci_assemble, cr_assemble, fr_assemble, i_assemble, l_assemble,
+    r_assemble, s_assemble, sh_assemble, shw_assemble,
+};
 
-use crate::instruction::RoundingMode;
-use crate::{cinstruction::CInstruction, instruction::Instruction};
 use crate::immediates::*;
+use crate::instruction::RoundingMode;
 use crate::register::{CFRegister, CIRegister, FRegister, IRegister};
+use crate::{cinstruction::CInstruction, instruction::Instruction};
 
 fn parse_int(str: &str) -> Result<i64, String> {
     match str.parse::<i64>() {
@@ -61,8 +64,6 @@ fn parse_fence_set(s: &str) -> u8 {
     }
     x
 }
-
-
 
 #[derive(Debug, PartialEq)]
 pub enum AssemblyResult {
@@ -672,287 +673,287 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
 }
 
 fn compressed_assemble(mnemonics: &[&str], operands: Vec<&str>) -> Result<CInstruction, String> {
-        match mnemonics[0] {
-            "addi4spn" => {
-                if operands.len() != 2 {
-                    Err("c.addi4spn requires 2 operands".to_owned())
-                } else {
-                    Ok(CInstruction::ADDI4SPN {
-                        dest: CIRegister::try_from(operands[0])?,
-                        imm: CWideImmediate::try_from(parse_int(operands[1])?)?,
-                    })
-                }
+    match mnemonics[0] {
+        "addi4spn" => {
+            if operands.len() != 2 {
+                Err("c.addi4spn requires 2 operands".to_owned())
+            } else {
+                Ok(CInstruction::ADDI4SPN {
+                    dest: CIRegister::try_from(operands[0])?,
+                    imm: CWideImmediate::try_from(parse_int(operands[1])?)?,
+                })
             }
-            "fld" => {
-                if operands.len() != 2 {
-                    Err("c.fld requires 2 operands".to_owned())
-                } else {
-                    let (base, imm) = parse_address_expression_compressed(operands[1])?;
-                    Ok(CInstruction::FLD {
-                        dest: CFRegister::try_from(operands[0])?,
-                        base,
-                        offset: CDImmediate::try_from(imm)?,
-                    })
-                }
-            }
-            "lw" => {
-                if operands.len() != 2 {
-                    Err("c.lw requires 2 operands".to_owned())
-                } else {
-                    let (base, imm) = parse_address_expression_compressed(operands[1])?;
-                    Ok(CInstruction::LW {
-                        dest: CIRegister::try_from(operands[0])?,
-                        base,
-                        offset: CWImmediate::try_from(imm)?,
-                    })
-                }
-            }
-            "ld" => {
-                if operands.len() != 2 {
-                    Err("c.ld requires 2 operands".to_owned())
-                } else {
-                    let (base, imm) = parse_address_expression_compressed(operands[1])?;
-                    Ok(CInstruction::LD {
-                        dest: CIRegister::try_from(operands[0])?,
-                        base,
-                        offset: CDImmediate::try_from(imm)?,
-                    })
-                }
-            }
-            "fsd" => {
-                if operands.len() != 2 {
-                    Err("c.fsd requires 2 operands".to_owned())
-                } else {
-                    let (base, imm) = parse_address_expression_compressed(operands[1])?;
-                    Ok(CInstruction::FSD {
-                        src: CFRegister::try_from(operands[0])?,
-                        base,
-                        offset: CDImmediate::try_from(imm)?,
-                    })
-                }
-            }
-            "sw" => {
-                if operands.len() != 2 {
-                    Err("c.sw requires 2 operands".to_owned())
-                } else {
-                    let (base, imm) = parse_address_expression_compressed(operands[1])?;
-                    Ok(CInstruction::SW {
-                        src: CIRegister::try_from(operands[0])?,
-                        base,
-                        offset: CWImmediate::try_from(imm)?,
-                    })
-                }
-            }
-            "sd" => {
-                if operands.len() != 2 {
-                    Err("c.sd requires 2 operands".to_owned())
-                } else {
-                    let (base, imm) = parse_address_expression_compressed(operands[1])?;
-                    Ok(CInstruction::SD {
-                        src: CIRegister::try_from(operands[0])?,
-                        base,
-                        offset: CDImmediate::try_from(imm)?,
-                    })
-                }
-            }
-            "addi" => ci_assemble!(ADDI),
-            "addiw" => ci_assemble!(ADDIW),
-            "li" => ci_assemble!(LI),
-            "addi16sp" => {
-                if operands.len() != 1 {
-                    Err("c.addi16sp requires 1 operands".to_owned())
-                } else {
-                    let i = parse_int(operands[0])?;
-
-                    Ok(CInstruction::ADDI16SP {
-                        imm: C16SPImmediate::try_from(i)?,
-                    })
-                }
-            }
-            "lui" => ci_assemble!(LUI),
-            "srli" => {
-                if operands.len() != 2 {
-                    Err("c.srli requires 2 operands".to_owned())
-                } else {
-                    Ok(CInstruction::SRLI {
-                        dest: CIRegister::try_from(operands[0])?,
-                        shamt: CShamt::try_from(parse_int(operands[1])?)?,
-                    })
-                }
-            }
-            "srai" => {
-                if operands.len() != 2 {
-                    Err("c.srai requires 2 operands".to_owned())
-                } else {
-                    Ok(CInstruction::SRAI {
-                        dest: CIRegister::try_from(operands[0])?,
-                        shamt: CShamt::try_from(parse_int(operands[1])?)?,
-                    })
-                }
-            }
-            "andi" => {
-                if operands.len() != 2 {
-                    Err("c.andi requires 2 operands".to_owned())
-                } else {
-                    Ok(CInstruction::ANDI {
-                        dest: CIRegister::try_from(operands[0])?,
-                        imm: CIImmediate::try_from(parse_int(operands[1])?)?,
-                    })
-                }
-            }
-            "sub" => cr_assemble!(SUB),
-            "xor" => cr_assemble!(XOR),
-            "or" => cr_assemble!(OR),
-            "and" => cr_assemble!(AND),
-            "subw" => cr_assemble!(SUBW),
-            "addw" => cr_assemble!(ADDW),
-            "j" => {
-                if operands.len() != 1 {
-                    Err("c.j requires 1 operand".to_owned())
-                } else {
-                    Ok(CInstruction::J {
-                        offset: CJImmediate::try_from(parse_int(operands[0])?)?,
-                    })
-                }
-            }
-            "beqz" => {
-                if operands.len() != 2 {
-                    Err("c.beqz requires 2 operands".to_owned())
-                } else {
-                    Ok(CInstruction::BEQZ {
-                        src: CIRegister::try_from(operands[0])?,
-                        offset: CBImmediate::try_from(parse_int(operands[1])?)?,
-                    })
-                }
-            }
-            "bnez" => {
-                if operands.len() != 2 {
-                    Err("c.bne requires 2 operands".to_owned())
-                } else {
-                    Ok(CInstruction::BNEZ {
-                        src: CIRegister::try_from(operands[0])?,
-                        offset: CBImmediate::try_from(parse_int(operands[1])?)?,
-                    })
-                }
-            }
-            "slli" => {
-                if operands.len() != 2 {
-                    Err("c.slli requires 2 operands".to_owned())
-                } else {
-                    Ok(CInstruction::SLLI {
-                        dest: IRegister::from_string(operands[0])?,
-                        shamt: CShamt::try_from(parse_int(operands[1])?)?,
-                    })
-                }
-            }
-            "fldsp" => {
-                if operands.len() != 2 {
-                    Err("c.fldsp requires 2 operands".to_owned())
-                } else {
-                    Ok(CInstruction::FLDSP {
-                        dest: FRegister::try_from(operands[0])?,
-                        offset: CDSPImmediate::try_from(parse_int(operands[1])?)?,
-                    })
-                }
-            }
-            "ldsp" => {
-                if operands.len() != 2 {
-                    Err("c.ldsp requires 2 operands".to_owned())
-                } else {
-                    Ok(CInstruction::LDSP {
-                        dest: IRegister::from_string(operands[0])?,
-                        offset: CDSPImmediate::try_from(parse_int(operands[1])?)?,
-                    })
-                }
-            }
-            "lwsp" => {
-                if operands.len() != 2 {
-                    Err("c.lwsp requires 2 operands".to_owned())
-                } else {
-                    Ok(CInstruction::LWSP {
-                        dest: IRegister::from_string(operands[0])?,
-                        offset: CWSPImmediate::try_from(parse_int(operands[1])?)?,
-                    })
-                }
-            }
-            "jr" => {
-                if operands.len() != 1 {
-                    Err("c.jr requires 1 operand".to_owned())
-                } else {
-                    Ok(CInstruction::JR {
-                        src: IRegister::from_string(operands[0])?,
-                    })
-                }
-            }
-            "jalr" => {
-                if operands.len() != 1 {
-                    Err("c.jalr requires 1 operand".to_owned())
-                } else {
-                    Ok(CInstruction::JALR {
-                        src: IRegister::from_string(operands[0])?,
-                    })
-                }
-            }
-            "ebreak" => {
-                if operands.len() != 0 {
-                    Err("c.jr requires 0 operands".to_owned())
-                } else {
-                    Ok(CInstruction::EBREAK)
-                }
-            }
-            "add" => {
-                if operands.len() != 2 {
-                    Err("c.add requires 2 operands".to_owned())
-                } else {
-                    Ok(CInstruction::ADD {
-                        dest: IRegister::from_string(operands[0])?,
-                        src: IRegister::from_string(operands[1])?,
-                    })
-                }
-            }
-            "fsdsp" => {
-                if operands.len() != 2 {
-                    Err("c.fsdsp requires 2 operands".to_owned())
-                } else {
-                    Ok(CInstruction::FSDSP {
-                        src: FRegister::try_from(operands[0])?,
-                        offset: CSDSPImmediate::try_from(parse_int(operands[1])?)?,
-                    })
-                }
-            }
-            "swsp" => {
-                if operands.len() != 2 {
-                    Err("c.swsp requires 2 operands".to_owned())
-                } else {
-                    Ok(CInstruction::SWSP {
-                        src: IRegister::from_string(operands[0])?,
-                        offset: CSWSPImmediate::try_from(parse_int(operands[1])?)?,
-                    })
-                }
-            }
-            "sdsp" => {
-                if operands.len() != 2 {
-                    Err("c.sdsp requires 2 operands".to_owned())
-                } else {
-                    Ok(CInstruction::SDSP {
-                        src: IRegister::from_string(operands[0])?,
-                        offset: CSDSPImmediate::try_from(parse_int(operands[1])?)?,
-                    })
-                }
-            }
-            "mv" => {
-                if operands.len() != 2 {
-                    Err("c.mv requires 2 operands".to_owned())
-                } else {
-                    Ok(CInstruction::MV {
-                        dest: IRegister::from_string(operands[0])?,
-                        src: IRegister::from_string(operands[1])?,
-                    })
-                }
-            }
-            _ => Err(format!(
-                "unknown compressed instruction mnemonic: {}",
-                mnemonics[0]
-            )),
         }
+        "fld" => {
+            if operands.len() != 2 {
+                Err("c.fld requires 2 operands".to_owned())
+            } else {
+                let (base, imm) = parse_address_expression_compressed(operands[1])?;
+                Ok(CInstruction::FLD {
+                    dest: CFRegister::try_from(operands[0])?,
+                    base,
+                    offset: CDImmediate::try_from(imm)?,
+                })
+            }
+        }
+        "lw" => {
+            if operands.len() != 2 {
+                Err("c.lw requires 2 operands".to_owned())
+            } else {
+                let (base, imm) = parse_address_expression_compressed(operands[1])?;
+                Ok(CInstruction::LW {
+                    dest: CIRegister::try_from(operands[0])?,
+                    base,
+                    offset: CWImmediate::try_from(imm)?,
+                })
+            }
+        }
+        "ld" => {
+            if operands.len() != 2 {
+                Err("c.ld requires 2 operands".to_owned())
+            } else {
+                let (base, imm) = parse_address_expression_compressed(operands[1])?;
+                Ok(CInstruction::LD {
+                    dest: CIRegister::try_from(operands[0])?,
+                    base,
+                    offset: CDImmediate::try_from(imm)?,
+                })
+            }
+        }
+        "fsd" => {
+            if operands.len() != 2 {
+                Err("c.fsd requires 2 operands".to_owned())
+            } else {
+                let (base, imm) = parse_address_expression_compressed(operands[1])?;
+                Ok(CInstruction::FSD {
+                    src: CFRegister::try_from(operands[0])?,
+                    base,
+                    offset: CDImmediate::try_from(imm)?,
+                })
+            }
+        }
+        "sw" => {
+            if operands.len() != 2 {
+                Err("c.sw requires 2 operands".to_owned())
+            } else {
+                let (base, imm) = parse_address_expression_compressed(operands[1])?;
+                Ok(CInstruction::SW {
+                    src: CIRegister::try_from(operands[0])?,
+                    base,
+                    offset: CWImmediate::try_from(imm)?,
+                })
+            }
+        }
+        "sd" => {
+            if operands.len() != 2 {
+                Err("c.sd requires 2 operands".to_owned())
+            } else {
+                let (base, imm) = parse_address_expression_compressed(operands[1])?;
+                Ok(CInstruction::SD {
+                    src: CIRegister::try_from(operands[0])?,
+                    base,
+                    offset: CDImmediate::try_from(imm)?,
+                })
+            }
+        }
+        "addi" => ci_assemble!(ADDI),
+        "addiw" => ci_assemble!(ADDIW),
+        "li" => ci_assemble!(LI),
+        "addi16sp" => {
+            if operands.len() != 1 {
+                Err("c.addi16sp requires 1 operands".to_owned())
+            } else {
+                let i = parse_int(operands[0])?;
+
+                Ok(CInstruction::ADDI16SP {
+                    imm: C16SPImmediate::try_from(i)?,
+                })
+            }
+        }
+        "lui" => ci_assemble!(LUI),
+        "srli" => {
+            if operands.len() != 2 {
+                Err("c.srli requires 2 operands".to_owned())
+            } else {
+                Ok(CInstruction::SRLI {
+                    dest: CIRegister::try_from(operands[0])?,
+                    shamt: CShamt::try_from(parse_int(operands[1])?)?,
+                })
+            }
+        }
+        "srai" => {
+            if operands.len() != 2 {
+                Err("c.srai requires 2 operands".to_owned())
+            } else {
+                Ok(CInstruction::SRAI {
+                    dest: CIRegister::try_from(operands[0])?,
+                    shamt: CShamt::try_from(parse_int(operands[1])?)?,
+                })
+            }
+        }
+        "andi" => {
+            if operands.len() != 2 {
+                Err("c.andi requires 2 operands".to_owned())
+            } else {
+                Ok(CInstruction::ANDI {
+                    dest: CIRegister::try_from(operands[0])?,
+                    imm: CIImmediate::try_from(parse_int(operands[1])?)?,
+                })
+            }
+        }
+        "sub" => cr_assemble!(SUB),
+        "xor" => cr_assemble!(XOR),
+        "or" => cr_assemble!(OR),
+        "and" => cr_assemble!(AND),
+        "subw" => cr_assemble!(SUBW),
+        "addw" => cr_assemble!(ADDW),
+        "j" => {
+            if operands.len() != 1 {
+                Err("c.j requires 1 operand".to_owned())
+            } else {
+                Ok(CInstruction::J {
+                    offset: CJImmediate::try_from(parse_int(operands[0])?)?,
+                })
+            }
+        }
+        "beqz" => {
+            if operands.len() != 2 {
+                Err("c.beqz requires 2 operands".to_owned())
+            } else {
+                Ok(CInstruction::BEQZ {
+                    src: CIRegister::try_from(operands[0])?,
+                    offset: CBImmediate::try_from(parse_int(operands[1])?)?,
+                })
+            }
+        }
+        "bnez" => {
+            if operands.len() != 2 {
+                Err("c.bne requires 2 operands".to_owned())
+            } else {
+                Ok(CInstruction::BNEZ {
+                    src: CIRegister::try_from(operands[0])?,
+                    offset: CBImmediate::try_from(parse_int(operands[1])?)?,
+                })
+            }
+        }
+        "slli" => {
+            if operands.len() != 2 {
+                Err("c.slli requires 2 operands".to_owned())
+            } else {
+                Ok(CInstruction::SLLI {
+                    dest: IRegister::from_string(operands[0])?,
+                    shamt: CShamt::try_from(parse_int(operands[1])?)?,
+                })
+            }
+        }
+        "fldsp" => {
+            if operands.len() != 2 {
+                Err("c.fldsp requires 2 operands".to_owned())
+            } else {
+                Ok(CInstruction::FLDSP {
+                    dest: FRegister::try_from(operands[0])?,
+                    offset: CDSPImmediate::try_from(parse_int(operands[1])?)?,
+                })
+            }
+        }
+        "ldsp" => {
+            if operands.len() != 2 {
+                Err("c.ldsp requires 2 operands".to_owned())
+            } else {
+                Ok(CInstruction::LDSP {
+                    dest: IRegister::from_string(operands[0])?,
+                    offset: CDSPImmediate::try_from(parse_int(operands[1])?)?,
+                })
+            }
+        }
+        "lwsp" => {
+            if operands.len() != 2 {
+                Err("c.lwsp requires 2 operands".to_owned())
+            } else {
+                Ok(CInstruction::LWSP {
+                    dest: IRegister::from_string(operands[0])?,
+                    offset: CWSPImmediate::try_from(parse_int(operands[1])?)?,
+                })
+            }
+        }
+        "jr" => {
+            if operands.len() != 1 {
+                Err("c.jr requires 1 operand".to_owned())
+            } else {
+                Ok(CInstruction::JR {
+                    src: IRegister::from_string(operands[0])?,
+                })
+            }
+        }
+        "jalr" => {
+            if operands.len() != 1 {
+                Err("c.jalr requires 1 operand".to_owned())
+            } else {
+                Ok(CInstruction::JALR {
+                    src: IRegister::from_string(operands[0])?,
+                })
+            }
+        }
+        "ebreak" => {
+            if operands.len() != 0 {
+                Err("c.jr requires 0 operands".to_owned())
+            } else {
+                Ok(CInstruction::EBREAK)
+            }
+        }
+        "add" => {
+            if operands.len() != 2 {
+                Err("c.add requires 2 operands".to_owned())
+            } else {
+                Ok(CInstruction::ADD {
+                    dest: IRegister::from_string(operands[0])?,
+                    src: IRegister::from_string(operands[1])?,
+                })
+            }
+        }
+        "fsdsp" => {
+            if operands.len() != 2 {
+                Err("c.fsdsp requires 2 operands".to_owned())
+            } else {
+                Ok(CInstruction::FSDSP {
+                    src: FRegister::try_from(operands[0])?,
+                    offset: CSDSPImmediate::try_from(parse_int(operands[1])?)?,
+                })
+            }
+        }
+        "swsp" => {
+            if operands.len() != 2 {
+                Err("c.swsp requires 2 operands".to_owned())
+            } else {
+                Ok(CInstruction::SWSP {
+                    src: IRegister::from_string(operands[0])?,
+                    offset: CSWSPImmediate::try_from(parse_int(operands[1])?)?,
+                })
+            }
+        }
+        "sdsp" => {
+            if operands.len() != 2 {
+                Err("c.sdsp requires 2 operands".to_owned())
+            } else {
+                Ok(CInstruction::SDSP {
+                    src: IRegister::from_string(operands[0])?,
+                    offset: CSDSPImmediate::try_from(parse_int(operands[1])?)?,
+                })
+            }
+        }
+        "mv" => {
+            if operands.len() != 2 {
+                Err("c.mv requires 2 operands".to_owned())
+            } else {
+                Ok(CInstruction::MV {
+                    dest: IRegister::from_string(operands[0])?,
+                    src: IRegister::from_string(operands[1])?,
+                })
+            }
+        }
+        _ => Err(format!(
+            "unknown compressed instruction mnemonic: {}",
+            mnemonics[0]
+        )),
     }
+}

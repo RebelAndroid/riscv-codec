@@ -426,7 +426,7 @@ impl FRegister {
         let v: u32 = self.into();
         return v << 20;
     }
-     pub fn rs3(self) -> u32 {
+    pub fn rs3(self) -> u32 {
         let v: u32 = self.into();
         return v << 27;
     }

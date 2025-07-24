@@ -1,12 +1,14 @@
 use riscv_codec::assembly::assemble_line;
-use riscv_codec::instruction::{
-    Instruction, disassemble_instruction,
-};
+use riscv_codec::instruction::{Instruction, disassemble_instruction};
 use riscv_codec::register::IRegister;
 
 #[test]
 fn multiply() {
-    let expected = Instruction::MUL{dest: IRegister::A0, src1: IRegister::A1, src2: IRegister::A0};
+    let expected = Instruction::MUL {
+        dest: IRegister::A0,
+        src1: IRegister::A1,
+        src2: IRegister::A0,
+    };
     let bin = 0x02A58533;
 
     // check assembler
@@ -28,7 +30,11 @@ fn multiply() {
 
 #[test]
 fn multiply_high() {
-    let expected = Instruction::MULH{dest: IRegister::T3, src1: IRegister::T4, src2: IRegister::S8};
+    let expected = Instruction::MULH {
+        dest: IRegister::T3,
+        src1: IRegister::T4,
+        src2: IRegister::S8,
+    };
     let bin = 0x038e9e33;
 
     // check assembler
@@ -50,7 +56,11 @@ fn multiply_high() {
 
 #[test]
 fn multiply_high_signed_unsigned() {
-    let expected = Instruction::MULHSU{dest: IRegister::T0, src1: IRegister::A1, src2: IRegister::S3};
+    let expected = Instruction::MULHSU {
+        dest: IRegister::T0,
+        src1: IRegister::A1,
+        src2: IRegister::S3,
+    };
     let bin = 0x0335a2b3;
 
     // check assembler
@@ -72,7 +82,11 @@ fn multiply_high_signed_unsigned() {
 
 #[test]
 fn multiply_high_unsigned() {
-    let expected = Instruction::MULHU{dest: IRegister::ReturnAddress, src1: IRegister::T5, src2: IRegister::S11};
+    let expected = Instruction::MULHU {
+        dest: IRegister::ReturnAddress,
+        src1: IRegister::T5,
+        src2: IRegister::S11,
+    };
     let bin = 0x03bf30b3;
 
     // check assembler
@@ -94,7 +108,11 @@ fn multiply_high_unsigned() {
 
 #[test]
 fn divide() {
-    let expected = Instruction::DIV{dest: IRegister::T2, src1: IRegister::A2, src2: IRegister::S2};
+    let expected = Instruction::DIV {
+        dest: IRegister::T2,
+        src1: IRegister::A2,
+        src2: IRegister::S2,
+    };
     let bin = 0x032643b3;
 
     // check assembler
@@ -116,7 +134,11 @@ fn divide() {
 
 #[test]
 fn divide_unsigned() {
-    let expected = Instruction::DIVU{dest: IRegister::T3, src1: IRegister::T1, src2: IRegister::A3};
+    let expected = Instruction::DIVU {
+        dest: IRegister::T3,
+        src1: IRegister::T1,
+        src2: IRegister::A3,
+    };
     let bin = 0x02d35e33;
 
     // check assembler
@@ -138,7 +160,11 @@ fn divide_unsigned() {
 
 #[test]
 fn remainder() {
-    let expected = Instruction::REM{dest: IRegister::S5, src1: IRegister::A5, src2: IRegister::T6};
+    let expected = Instruction::REM {
+        dest: IRegister::S5,
+        src1: IRegister::A5,
+        src2: IRegister::T6,
+    };
     let bin = 0x03f7eab3;
 
     // check assembler
@@ -160,7 +186,11 @@ fn remainder() {
 
 #[test]
 fn remainder_unsigned() {
-    let expected = Instruction::REMU{dest: IRegister::A4, src1: IRegister::S4, src2: IRegister::T4};
+    let expected = Instruction::REMU {
+        dest: IRegister::A4,
+        src1: IRegister::S4,
+        src2: IRegister::T4,
+    };
     let bin = 0x03da7733;
 
     // check assembler
@@ -182,7 +212,11 @@ fn remainder_unsigned() {
 
 #[test]
 fn multiply_word() {
-    let expected = Instruction::MULW{dest: IRegister::StackPointer, src1: IRegister::T4, src2: IRegister::A2};
+    let expected = Instruction::MULW {
+        dest: IRegister::StackPointer,
+        src1: IRegister::T4,
+        src2: IRegister::A2,
+    };
     let bin = 0x02ce813b;
 
     // check assembler
@@ -204,7 +238,11 @@ fn multiply_word() {
 
 #[test]
 fn divide_word() {
-    let expected = Instruction::DIVW{dest: IRegister::T1, src1: IRegister::A3, src2: IRegister::S6};
+    let expected = Instruction::DIVW {
+        dest: IRegister::T1,
+        src1: IRegister::A3,
+        src2: IRegister::S6,
+    };
     let bin = 0x0366c33b;
 
     // check assembler
@@ -226,7 +264,11 @@ fn divide_word() {
 
 #[test]
 fn divide_unsigned_word() {
-    let expected = Instruction::DIVUW{dest: IRegister::T6, src1: IRegister::A0, src2: IRegister::FramePointer};
+    let expected = Instruction::DIVUW {
+        dest: IRegister::T6,
+        src1: IRegister::A0,
+        src2: IRegister::FramePointer,
+    };
     let bin = 0x02855fbb;
 
     // check assembler
@@ -248,7 +290,11 @@ fn divide_unsigned_word() {
 
 #[test]
 fn remainder_word() {
-    let expected = Instruction::REMW{dest: IRegister::FramePointer, src1: IRegister::T3, src2: IRegister::A2};
+    let expected = Instruction::REMW {
+        dest: IRegister::FramePointer,
+        src1: IRegister::T3,
+        src2: IRegister::A2,
+    };
     let bin = 0x02ce643b;
 
     // check assembler
@@ -270,7 +316,11 @@ fn remainder_word() {
 
 #[test]
 fn remainder_unsigned_word() {
-    let expected = Instruction::REMUW{dest: IRegister::A1, src1: IRegister::T4, src2: IRegister::A5};
+    let expected = Instruction::REMUW {
+        dest: IRegister::A1,
+        src1: IRegister::T4,
+        src2: IRegister::A5,
+    };
     let bin = 0x02fef5bb;
 
     // check assembler

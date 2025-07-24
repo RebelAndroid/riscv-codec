@@ -1,9 +1,8 @@
 use riscv_codec::assembly::assemble_line;
-use riscv_codec::cinstruction::{
-    CInstruction,
-};
+use riscv_codec::cinstruction::CInstruction;
 use riscv_codec::immediates::{
-    C16SPImmediate, CBImmediate, CDImmediate, CDSPImmediate, CIImmediate, CJImmediate, CSDSPImmediate, CSWSPImmediate, CShamt, CWImmediate, CWSPImmediate, CWideImmediate
+    C16SPImmediate, CBImmediate, CDImmediate, CDSPImmediate, CIImmediate, CJImmediate,
+    CSDSPImmediate, CSWSPImmediate, CShamt, CWImmediate, CWSPImmediate, CWideImmediate,
 };
 use riscv_codec::register::{CFRegister, CIRegister, FRegister, IRegister};
 
@@ -274,7 +273,9 @@ fn load_immediate() {
 
 #[test]
 fn add_16_immediate_stack_pointer() {
-    let expected = CInstruction::ADDI16SP { imm: C16SPImmediate::try_from(80).unwrap() };
+    let expected = CInstruction::ADDI16SP {
+        imm: C16SPImmediate::try_from(80).unwrap(),
+    };
     let bin = 0x6161;
 
     // check assembler

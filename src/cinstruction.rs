@@ -6,7 +6,7 @@ use crate::{
         CJImmediate, CSDSPImmediate, CSWSPImmediate, CShamt, CWImmediate, CWSPImmediate,
         CWideImmediate, IImmediate, JImmediate, SImmediate, Shamt,
     },
-    instruction::{Instruction},
+    instruction::Instruction,
     register::{CFRegister, CIRegister, FRegister, IRegister},
 };
 
@@ -412,7 +412,7 @@ impl CInstruction {
     }
 
     /// Converts a compressed instruction into the corresponding 32-bit `Instruction`.
-    /// 
+    ///
     /// Note that C.JALR does not have exactly the same effect as the corresponding JALR as described in the manual:
     /// > Strictly speaking, C.JALR does not expand exactly to a base RVI instruction as the value added to the PC to
     /// > form the link address is 2 rather than 4 as in the base ISA, but supporting both offsets of 2 and 4 bytes

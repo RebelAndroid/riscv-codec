@@ -1,5 +1,5 @@
-use std::fmt::{Display, Formatter};
 use riscv_codec_proc_macros::make_immediate;
+use std::fmt::{Display, Formatter};
 
 // name signed compressed (imm_pos size instr pos)+
 make_immediate!(IImmediate true false (0 12 20));

@@ -1,5 +1,8 @@
 use riscv_codec::{
-    assembly::assemble_line, immediates::{CSRImmediate, CSR}, instruction::{disassemble_instruction, Instruction}, register::IRegister
+    assembly::assemble_line,
+    immediates::{CSR, CSRImmediate},
+    instruction::{Instruction, disassemble_instruction},
+    register::IRegister,
 };
 
 #[test]
