@@ -1,6 +1,6 @@
 [package]
 name = "riscv-codec"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2024"
 license = "AGPL-3.0-only"
 description = "Decode/Encode and Assemble/Disassemble RISC-V instructions"
