@@ -24,10 +24,7 @@
         devShells.default = with pkgs;
           mkShell {
             buildInputs = [
-              openssl
               pkg-config
-              eza
-              fd
               (rust-bin.stable.latest.default.override
               {
                 extensions = ["rust-src"];
