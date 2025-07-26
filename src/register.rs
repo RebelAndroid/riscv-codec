@@ -1,4 +1,4 @@
-use std::fmt::{Display, Formatter};
+use alloc::{fmt::{Display, Formatter}, format, string::String};
 
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub enum IRegister {
@@ -38,7 +38,7 @@ pub enum IRegister {
 }
 
 impl Display for IRegister {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), alloc::fmt::Error> {
         write!(
             f,
             "{}",
@@ -248,7 +248,7 @@ pub enum FRegister {
 }
 
 impl Display for FRegister {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), alloc::fmt::Error> {
         write!(
             f,
             "{}",
@@ -510,7 +510,7 @@ impl CIRegister {
 }
 
 impl Display for CIRegister {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), alloc::fmt::Error> {
         write!(
             f,
             "{}",
@@ -606,7 +606,7 @@ impl CFRegister {
 }
 
 impl Display for CFRegister {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), alloc::fmt::Error> {
         write!(
             f,
             "{}",

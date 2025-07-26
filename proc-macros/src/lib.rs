@@ -575,7 +575,7 @@ pub fn make_immediate(input: TokenStream) -> TokenStream {
         let display_string = format!(
             "
             impl Display for {name} {{
-                fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {{
+                fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), alloc::fmt::Error> {{
                     write!(f, \"{{}}\", self.val)
                 }}
             }}"

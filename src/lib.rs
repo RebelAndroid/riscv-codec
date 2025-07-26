@@ -1,3 +1,6 @@
+#![no_std]
+
+extern crate alloc;
 pub mod assembly;
 pub mod cinstruction;
 pub mod immediates;

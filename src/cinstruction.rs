@@ -1,4 +1,4 @@
-use std::fmt::{Display, Formatter};
+use alloc::{borrow::ToOwned, fmt::{Display, Formatter}, format, string::String};
 
 use crate::{
     immediates::{
@@ -161,7 +161,7 @@ pub enum CInstruction {
 }
 
 impl Display for CInstruction {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), alloc::fmt::Error> {
         match self {
             CInstruction::ADDI4SPN { dest, imm } => write!(f, "c.addi4spn {dest},{imm}"),
             CInstruction::FLD {

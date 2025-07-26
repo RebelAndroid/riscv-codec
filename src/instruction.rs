@@ -3,7 +3,10 @@ use crate::immediates::{
 };
 use crate::register::{FRegister, IRegister};
 use crate::{immediates::IImmediate, opcode::Opcode};
-use std::fmt::{Display, Formatter};
+use alloc::borrow::ToOwned;
+use alloc::fmt::{Display, Formatter};
+use alloc::format;
+use alloc::string::String;
 
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub enum RoundingMode {
@@ -22,7 +25,7 @@ pub enum RoundingMode {
 }
 
 impl Display for RoundingMode {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), alloc::fmt::Error> {
         match self {
             RoundingMode::RNE => write!(f, "rne"),
             RoundingMode::RTZ => write!(f, "rtz"),
@@ -815,7 +818,7 @@ fn rlb(rl: bool) -> u32 {
 }
 
 impl Display for Instruction {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), alloc::fmt::Error> {
         match self {
             Instruction::LUI { dest, imm } => write!(f, "lui {dest},{imm}"),
             Instruction::AUIPC { dest, imm } => write!(f, "auipc {dest},{imm}"),
@@ -1766,7 +1769,6 @@ impl Instruction {
                 _ => Err(format!("unknown AMO. func3: {func3}, func7: {func7}")),
             },
             Opcode::LoadFp => {
-                println!("{i_immediate}, {:b}", instruction);
                 if func3 == 0b010 {
                     Ok(Instruction::FLW {
                         dest: frd,

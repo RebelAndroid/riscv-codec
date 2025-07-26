@@ -1,3 +1,7 @@
+use alloc::borrow::ToOwned;
+use alloc::{format, vec};
+use alloc::string::String;
+use alloc::vec::Vec;
 use riscv_codec_proc_macros::{
     amo_assemble, b_assemble, ci_assemble, cr_assemble, fr_assemble, i_assemble, l_assemble,
     r_assemble, s_assemble, sh_assemble, shw_assemble,
@@ -337,7 +341,6 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
             "amomaxu" => amo_assemble!(AMOMAXU),
             "flw" => {
                 if operands.len() != 2 {
-                    println!("{:?}", operands);
                     Err("flw instruction requires 2 operands".to_owned())
                 } else {
                     let (base, offset) = parse_address_expression(operands[1])?;
@@ -350,7 +353,6 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
             }
             "fsw" => {
                 if operands.len() != 2 {
-                    println!("{:?}", operands);
                     Err("fsw instruction requires 2 operands".to_owned())
                 } else {
                     let (base, offset) = parse_address_expression(operands[1])?;
