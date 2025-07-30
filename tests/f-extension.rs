@@ -56,6 +56,126 @@ fn float_store_word() {
 }
 
 #[test]
+fn float_multiply_add() {
+    let expected = Instruction::FmaddS {
+        dest: FRegister::FT2,
+        src1: FRegister::FA1,
+        src2: FRegister::FS3,
+        src3: FRegister::FT3,
+        rm: RoundingMode::RUP,
+    };
+    let bin = 0x1935b143;
+
+    // check assembler
+    let i = assemble_line("fmadd.s ft2, fa1, fs3, ft3, rup")
+        .unwrap()
+        .i();
+    assert_eq!(i, expected);
+
+    // check decoder
+    let i2 = Instruction::decode(bin).unwrap();
+    assert_eq!(i2, expected);
+
+    // check encoder
+    let b = Instruction::encode(&i);
+    assert_eq!(b, bin);
+
+    // check disassembler
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
+    assert_eq!(i, i3);
+}
+
+#[test]
+fn float_multiply_subtract() {
+    let expected = Instruction::FmsubS {
+        dest: FRegister::FT2,
+        src1: FRegister::FS0,
+        src2: FRegister::FS3,
+        src3: FRegister::FS11,
+        rm: RoundingMode::DYN,
+    };
+    let bin = 0xd9347147;
+
+    // check assembler
+    let i = assemble_line("fmsub.s ft2, fs0, fs3, fs11")
+        .unwrap()
+        .i();
+    assert_eq!(i, expected);
+
+    // check decoder
+    let i2 = Instruction::decode(bin).unwrap();
+    assert_eq!(i2, expected);
+
+    // check encoder
+    let b = Instruction::encode(&i);
+    assert_eq!(b, bin);
+
+    // check disassembler
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
+    assert_eq!(i, i3);
+}
+
+#[test]
+fn float_negate_multiply_subtract() {
+    let expected = Instruction::FnmsubS {
+        dest: FRegister::FT2,
+        src1: FRegister::FS0,
+        src2: FRegister::FS3,
+        src3: FRegister::FS11,
+        rm: RoundingMode::DYN,
+    };
+    let bin = 0xd934714b;
+
+    // check assembler
+    let i = assemble_line("fnmsub.s ft2, fs0, fs3, fs11")
+        .unwrap()
+        .i();
+    assert_eq!(i, expected);
+
+    // check decoder
+    let i2 = Instruction::decode(bin).unwrap();
+    assert_eq!(i2, expected);
+
+    // check encoder
+    let b = Instruction::encode(&i);
+    assert_eq!(b, bin);
+
+    // check disassembler
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
+    assert_eq!(i, i3);
+}
+
+#[test]
+fn float_negate_multiply_add() {
+    let expected = Instruction::FnmaddS {
+        dest: FRegister::FA2,
+        src1: FRegister::FT9,
+        src2: FRegister::FS3,
+        src3: FRegister::FT6,
+        rm: RoundingMode::RTZ,
+    };
+    let bin = 0x313e964f;
+
+    // check assembler
+    let i = assemble_line("fnmadd.s fa2,ft9,fs3,ft6,rtz")
+        .unwrap()
+        .i();
+    assert_eq!(i, expected);
+
+    // check decoder
+    let i2 = Instruction::decode(bin).unwrap();
+    assert_eq!(i2, expected);
+
+    // check encoder
+    let b = Instruction::encode(&i);
+    assert_eq!(b, bin);
+
+    // check disassembler
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
+    assert_eq!(i, i3);
+}
+
+#[test]
 fn float_add() {
     let expected = Instruction::FaddS {
         dest: FRegister::FT7,
@@ -174,6 +294,72 @@ fn float_sqrt() {
 
     // check assembler
     let i = assemble_line("fsqrt.s ft3,fa3, rne").unwrap().i();
+    assert_eq!(i, expected);
+
+    // check decoder
+    let i2 = Instruction::decode(bin).unwrap();
+    assert_eq!(i2, expected);
+
+    // check encoder
+    let b = Instruction::encode(&i);
+    assert_eq!(b, bin);
+
+    // check disassembler
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
+    assert_eq!(i, i3);
+}
+
+#[test]
+fn float_sign_inject() {
+    let expected = Instruction::FsgnjS { dest: FRegister::FA5, src1: FRegister::FA3, src2: FRegister::FT1 };
+    let bin = 0x201687d3;
+
+    // check assembler
+    let i = assemble_line("fsgnj.s fa5,fa3,ft1").unwrap().i();
+    assert_eq!(i, expected);
+
+    // check decoder
+    let i2 = Instruction::decode(bin).unwrap();
+    assert_eq!(i2, expected);
+
+    // check encoder
+    let b = Instruction::encode(&i);
+    assert_eq!(b, bin);
+
+    // check disassembler
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
+    assert_eq!(i, i3);
+}
+
+#[test]
+fn float_sign_inject_negate() {
+    let expected = Instruction::FsgnjnS { dest: FRegister::FA5, src1: FRegister::FA3, src2: FRegister::FT1 };
+    let bin = 0x201697d3;
+
+    // check assembler
+    let i = assemble_line("fsgnjn.s fa5,fa3,ft1").unwrap().i();
+    assert_eq!(i, expected);
+
+    // check decoder
+    let i2 = Instruction::decode(bin).unwrap();
+    assert_eq!(i2, expected);
+
+    // check encoder
+    let b = Instruction::encode(&i);
+    assert_eq!(b, bin);
+
+    // check disassembler
+    let i3 = assemble_line(&disassemble_instruction(&i)).unwrap().i();
+    assert_eq!(i, i3);
+}
+
+#[test]
+fn float_sign_inject_xor() {
+    let expected = Instruction::FsgnjxS { dest: FRegister::FS1, src1: FRegister::FT1, src2: FRegister::FT4 };
+    let bin = 0x2040a4d3;
+
+    // check assembler
+    let i = assemble_line("fsgnjx.s fs1,ft1,ft4").unwrap().i();
     assert_eq!(i, expected);
 
     // check decoder
