@@ -57,7 +57,7 @@ fn float_store_word() {
 
 #[test]
 fn float_add() {
-    let expected = Instruction::FADDS {
+    let expected = Instruction::FaddS {
         dest: FRegister::FT7,
         src1: FRegister::FA5,
         src2: FRegister::FS10,
@@ -84,7 +84,7 @@ fn float_add() {
 
 #[test]
 fn float_subtract() {
-    let expected = Instruction::FSUBS {
+    let expected = Instruction::FsubS {
         dest: FRegister::FT0,
         src1: FRegister::FT8,
         src2: FRegister::FS0,
@@ -93,7 +93,7 @@ fn float_subtract() {
     let bin = 0x088e1053;
 
     // check assembler
-    let i = assemble_line("fsub.s.rtz ft0,ft8,fs0").unwrap().i();
+    let i = assemble_line("fsub.s ft0,ft8,fs0, rtz").unwrap().i();
     assert_eq!(i, expected);
 
     // check decoder
@@ -111,7 +111,7 @@ fn float_subtract() {
 
 #[test]
 fn float_multiply() {
-    let expected = Instruction::FMULS {
+    let expected = Instruction::FmulS {
         dest: FRegister::FS1,
         src1: FRegister::FS9,
         src2: FRegister::FT11,
@@ -120,7 +120,7 @@ fn float_multiply() {
     let bin = 0x11fcc4d3;
 
     // check assembler
-    let i = assemble_line("fmul.s.rmm fs1,fs9,ft11").unwrap().i();
+    let i = assemble_line("fmul.s fs1,fs9,ft11, rmm").unwrap().i();
     assert_eq!(i, expected);
 
     // check decoder
@@ -138,7 +138,7 @@ fn float_multiply() {
 
 #[test]
 fn float_divide() {
-    let expected = Instruction::FDIVS {
+    let expected = Instruction::FdivS {
         dest: FRegister::FS6,
         src1: FRegister::FS10,
         src2: FRegister::FT2,
@@ -147,7 +147,7 @@ fn float_divide() {
     let bin = 0x182d3b53;
 
     // check assembler
-    let i = assemble_line("fdiv.s.rup fs6,fs10,ft2").unwrap().i();
+    let i = assemble_line("fdiv.s fs6,fs10,ft2, rup").unwrap().i();
     assert_eq!(i, expected);
 
     // check decoder
@@ -165,7 +165,7 @@ fn float_divide() {
 
 #[test]
 fn float_sqrt() {
-    let expected = Instruction::FSQRTS {
+    let expected = Instruction::FsqrtS {
         dest: FRegister::FT3,
         src: FRegister::FA3,
         rm: RoundingMode::RNE,
@@ -173,7 +173,7 @@ fn float_sqrt() {
     let bin = 0x580681d3;
 
     // check assembler
-    let i = assemble_line("fsqrt.s.rne ft3,fa3").unwrap().i();
+    let i = assemble_line("fsqrt.s ft3,fa3, rne").unwrap().i();
     assert_eq!(i, expected);
 
     // check decoder
@@ -191,7 +191,7 @@ fn float_sqrt() {
 
 #[test]
 fn float_minimum() {
-    let expected = Instruction::FMINS {
+    let expected = Instruction::FminS {
         dest: FRegister::FT1,
         src1: FRegister::FS4,
         src2: FRegister::FA5,
@@ -217,7 +217,7 @@ fn float_minimum() {
 
 #[test]
 fn float_maximum() {
-    let expected = Instruction::FMAXS {
+    let expected = Instruction::FmaxS {
         dest: FRegister::FA3,
         src1: FRegister::FS9,
         src2: FRegister::FS2,
@@ -243,7 +243,7 @@ fn float_maximum() {
 
 #[test]
 fn float_convert_word_from_single() {
-    let expected = Instruction::FCVTWS {
+    let expected = Instruction::FcvtWS {
         dest: IRegister::S1,
         src: FRegister::FS2,
         rm: RoundingMode::RUP,
@@ -251,7 +251,7 @@ fn float_convert_word_from_single() {
     let bin = 0xc00934d3;
 
     // check assembler
-    let i = assemble_line("fcvt.w.s.rup s1,fs2").unwrap().i();
+    let i = assemble_line("fcvt.w.s s1,fs2,rup").unwrap().i();
     assert_eq!(i, expected);
 
     // check decoder
@@ -269,7 +269,7 @@ fn float_convert_word_from_single() {
 
 #[test]
 fn float_convert_unsigned_word_from_single() {
-    let expected = Instruction::FCVTWUS {
+    let expected = Instruction::FcvtWuS {
         dest: IRegister::StackPointer,
         src: FRegister::FT3,
         rm: RoundingMode::RMM,
@@ -277,7 +277,7 @@ fn float_convert_unsigned_word_from_single() {
     let bin = 0xc011c153;
 
     // check assembler
-    let i = assemble_line("fcvt.wu.s.rmm sp,ft3").unwrap().i();
+    let i = assemble_line("fcvt.wu.s sp,ft3, rmm").unwrap().i();
     assert_eq!(i, expected);
 
     // check decoder
@@ -295,7 +295,7 @@ fn float_convert_unsigned_word_from_single() {
 
 #[test]
 fn float_move_x_from_word() {
-    let expected = Instruction::FMVXW {
+    let expected = Instruction::FmvXW {
         dest: IRegister::S2,
         src: FRegister::FT4,
     };
@@ -320,7 +320,7 @@ fn float_move_x_from_word() {
 
 #[test]
 fn float_equal_single() {
-    let expected = Instruction::FEQS {
+    let expected = Instruction::FeqS {
         dest: IRegister::A4,
         src1: FRegister::FS7,
         src2: FRegister::FT11,
@@ -346,7 +346,7 @@ fn float_equal_single() {
 
 #[test]
 fn float_less_than_single() {
-    let expected = Instruction::FLTS {
+    let expected = Instruction::FltS {
         dest: IRegister::S6,
         src1: FRegister::FT10,
         src2: FRegister::FA6,
@@ -372,7 +372,7 @@ fn float_less_than_single() {
 
 #[test]
 fn float_less_equal_single() {
-    let expected = Instruction::FLES {
+    let expected = Instruction::FleS {
         dest: IRegister::S2,
         src1: FRegister::FS4,
         src2: FRegister::FT0,
@@ -398,7 +398,7 @@ fn float_less_equal_single() {
 
 #[test]
 fn float_class_single() {
-    let expected = Instruction::FCLASSS {
+    let expected = Instruction::FclassS {
         dest: IRegister::ThreadPointer,
         src: FRegister::FS3,
     };
@@ -423,7 +423,7 @@ fn float_class_single() {
 
 #[test]
 fn float_convert_single_from_word() {
-    let expected = Instruction::FCVTSW {
+    let expected = Instruction::FcvtSW {
         dest: FRegister::FA2,
         src: IRegister::T4,
         rm: RoundingMode::RDN,
@@ -431,7 +431,7 @@ fn float_convert_single_from_word() {
     let bin = 0xd00ea653;
 
     // check assembler
-    let i = assemble_line("fcvt.s.w.rdn fa2,t4").unwrap().i();
+    let i = assemble_line("fcvt.s.w fa2,t4, rdn").unwrap().i();
     assert_eq!(i, expected);
 
     // check decoder
@@ -449,7 +449,7 @@ fn float_convert_single_from_word() {
 
 #[test]
 fn float_convert_single_from_unsigned_word() {
-    let expected = Instruction::FCVTSWU {
+    let expected = Instruction::FcvtSWu {
         dest: FRegister::FS4,
         src: IRegister::T6,
         rm: RoundingMode::DYN,
@@ -457,7 +457,7 @@ fn float_convert_single_from_unsigned_word() {
     let bin = 0xd01ffa53;
 
     // check assembler
-    let i = assemble_line("fcvt.s.wu.dyn fs4,t6").unwrap().i();
+    let i = assemble_line("fcvt.s.wu fs4,t6,dyn").unwrap().i();
     assert_eq!(i, expected);
 
     // check decoder
@@ -475,7 +475,7 @@ fn float_convert_single_from_unsigned_word() {
 
 #[test]
 fn float_move_word_from_x() {
-    let expected = Instruction::FMVWX {
+    let expected = Instruction::FmvWX {
         dest: FRegister::FS3,
         src: IRegister::T1,
     };

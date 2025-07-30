@@ -1,4 +1,8 @@
-use alloc::{fmt::{Display, Formatter}, format, string::String};
+use alloc::{
+    fmt::{Display, Formatter},
+    format,
+    string::String,
+};
 
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub enum IRegister {
@@ -119,6 +123,49 @@ impl Into<u32> for IRegister {
     }
 }
 
+impl TryFrom<&str> for IRegister {
+    type Error = String;
+
+    fn try_from(value: &str) -> Result<Self, Self::Error> {
+        match value {
+            "zero" => Ok(Self::Zero),
+            "ra" => Ok(Self::ReturnAddress),
+            "sp" => Ok(Self::StackPointer),
+            "gp" => Ok(Self::GlobalPointer),
+            "tp" => Ok(Self::ThreadPointer),
+            "t0" => Ok(Self::T0),
+            "t1" => Ok(Self::T1),
+            "t2" => Ok(Self::T2),
+            "fp" => Ok(Self::FramePointer),
+            "s0" => Ok(Self::FramePointer),
+            "s1" => Ok(Self::S1),
+            "a0" => Ok(Self::A0),
+            "a1" => Ok(Self::A1),
+            "a2" => Ok(Self::A2),
+            "a3" => Ok(Self::A3),
+            "a4" => Ok(Self::A4),
+            "a5" => Ok(Self::A5),
+            "a6" => Ok(Self::A6),
+            "a7" => Ok(Self::A7),
+            "s2" => Ok(Self::S2),
+            "s3" => Ok(Self::S3),
+            "s4" => Ok(Self::S4),
+            "s5" => Ok(Self::S5),
+            "s6" => Ok(Self::S6),
+            "s7" => Ok(Self::S7),
+            "s8" => Ok(Self::S8),
+            "s9" => Ok(Self::S9),
+            "s10" => Ok(Self::S10),
+            "s11" => Ok(Self::S11),
+            "t3" => Ok(Self::T3),
+            "t4" => Ok(Self::T4),
+            "t5" => Ok(Self::T5),
+            "t6" => Ok(Self::T6),
+            x => Err(format!("converted invalid str to integer register {}", x)),
+        }
+    }
+}
+
 impl IRegister {
     pub fn from_int(int: u32) -> Self {
         match int {
@@ -155,45 +202,6 @@ impl IRegister {
             30 => Self::T5,
             31 => Self::T6,
             x => panic!("converted invalid to integer register {}", x),
-        }
-    }
-
-    pub fn from_string(str: &str) -> Result<Self, String> {
-        match str {
-            "zero" => Ok(Self::Zero),
-            "ra" => Ok(Self::ReturnAddress),
-            "sp" => Ok(Self::StackPointer),
-            "gp" => Ok(Self::GlobalPointer),
-            "tp" => Ok(Self::ThreadPointer),
-            "t0" => Ok(Self::T0),
-            "t1" => Ok(Self::T1),
-            "t2" => Ok(Self::T2),
-            "fp" => Ok(Self::FramePointer),
-            "s0" => Ok(Self::FramePointer),
-            "s1" => Ok(Self::S1),
-            "a0" => Ok(Self::A0),
-            "a1" => Ok(Self::A1),
-            "a2" => Ok(Self::A2),
-            "a3" => Ok(Self::A3),
-            "a4" => Ok(Self::A4),
-            "a5" => Ok(Self::A5),
-            "a6" => Ok(Self::A6),
-            "a7" => Ok(Self::A7),
-            "s2" => Ok(Self::S2),
-            "s3" => Ok(Self::S3),
-            "s4" => Ok(Self::S4),
-            "s5" => Ok(Self::S5),
-            "s6" => Ok(Self::S6),
-            "s7" => Ok(Self::S7),
-            "s8" => Ok(Self::S8),
-            "s9" => Ok(Self::S9),
-            "s10" => Ok(Self::S10),
-            "s11" => Ok(Self::S11),
-            "t3" => Ok(Self::T3),
-            "t4" => Ok(Self::T4),
-            "t5" => Ok(Self::T5),
-            "t6" => Ok(Self::T6),
-            x => Err(format!("converted invalid str to integer register {}", x)),
         }
     }
 
