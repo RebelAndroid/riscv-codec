@@ -23,7 +23,7 @@ A crate for working with RISC-V Instructions. Instructions can be encoded and de
 - [x] M
 - [x] A
 - [x] F
-- [ ] D
+- [x] D
 - [x] C
 - [x] Zicsr
 - [x] Zifencei
