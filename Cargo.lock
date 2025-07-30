@@ -22,14 +22,14 @@ dependencies = [
 
 [[package]]
 name = "riscv-codec"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "riscv-codec-proc-macros",
 ]
 
 [[package]]
 name = "riscv-codec-proc-macros"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "litrs",
 ]
