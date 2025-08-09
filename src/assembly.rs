@@ -118,74 +118,74 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
     } else {
         let x = match mnemonics[0] {
             // register-immediate instructions
-            "addi" => i_assemble!(ADDI),
-            "addiw" => i_assemble!(ADDIW),
-            "andi" => i_assemble!(ANDI),
-            "ori" => i_assemble!(ORI),
-            "xori" => i_assemble!(XORI),
-            "slti" => i_assemble!(SLTI),
-            "sltiu" => i_assemble!(SLTIU),
-            "slli" => sh_assemble!(SLLI),
-            "srai" => sh_assemble!(SRAI),
-            "sraiw" => shw_assemble!(SRAIW),
-            "srli" => sh_assemble!(SRLI),
-            "srliw" => shw_assemble!(SRLIW),
-            "slliw" => shw_assemble!(SLLIW),
+            "addi" => i_assemble!(Addi),
+            "addiw" => i_assemble!(Addiw),
+            "andi" => i_assemble!(Andi),
+            "ori" => i_assemble!(Ori),
+            "xori" => i_assemble!(Xori),
+            "slti" => i_assemble!(Slti),
+            "sltiu" => i_assemble!(Sltiu),
+            "slli" => sh_assemble!(Slli),
+            "srai" => sh_assemble!(Srai),
+            "sraiw" => shw_assemble!(Sraiw),
+            "srli" => sh_assemble!(Srli),
+            "srliw" => shw_assemble!(Srliw),
+            "slliw" => shw_assemble!(Slliw),
             // register-register instructions
-            "add" => r_assemble!(ADD),
-            "addw" => r_assemble!(ADDW),
-            "subw" => r_assemble!(SUBW),
-            "and" => r_assemble!(AND),
-            "sub" => r_assemble!(SUB),
-            "or" => r_assemble!(OR),
-            "xor" => r_assemble!(XOR),
-            "sllw" => r_assemble!(SLLW),
-            "srl" => r_assemble!(SRL),
-            "sra" => r_assemble!(SRA),
-            "srlw" => r_assemble!(SRLW),
-            "sraw" => r_assemble!(SRAW),
-            "sll" => r_assemble!(SLL),
-            "slt" => r_assemble!(SLT),
-            "sltu" => r_assemble!(SLTU),
-            "mul" => r_assemble!(MUL),
-            "mulh" => r_assemble!(MULH),
-            "mulhsu" => r_assemble!(MULHSU),
-            "mulhu" => r_assemble!(MULHU),
-            "div" => r_assemble!(DIV),
-            "divu" => r_assemble!(DIVU),
-            "rem" => r_assemble!(REM),
-            "remu" => r_assemble!(REMU),
-            "mulw" => r_assemble!(MULW),
-            "divw" => r_assemble!(DIVW),
-            "divuw" => r_assemble!(DIVUW),
-            "remw" => r_assemble!(REMW),
-            "remuw" => r_assemble!(REMUW),
+            "add" => r_assemble!(Add),
+            "addw" => r_assemble!(Addw),
+            "subw" => r_assemble!(Subw),
+            "and" => r_assemble!(And),
+            "sub" => r_assemble!(Sub),
+            "or" => r_assemble!(Or),
+            "xor" => r_assemble!(Xor),
+            "sllw" => r_assemble!(Sllw),
+            "srl" => r_assemble!(Srl),
+            "sra" => r_assemble!(Sra),
+            "srlw" => r_assemble!(Srlw),
+            "sraw" => r_assemble!(Sraw),
+            "sll" => r_assemble!(Sll),
+            "slt" => r_assemble!(Slt),
+            "sltu" => r_assemble!(Sltu),
+            "mul" => r_assemble!(Mul),
+            "mulh" => r_assemble!(Mulh),
+            "mulhsu" => r_assemble!(Mulhsu),
+            "mulhu" => r_assemble!(Mulhu),
+            "div" => r_assemble!(Div),
+            "divu" => r_assemble!(Divu),
+            "rem" => r_assemble!(Rem),
+            "remu" => r_assemble!(Remu),
+            "mulw" => r_assemble!(Mulw),
+            "divw" => r_assemble!(Divw),
+            "divuw" => r_assemble!(Divuw),
+            "remw" => r_assemble!(Remw),
+            "remuw" => r_assemble!(Remuw),
             // load instructions
-            "lb" => l_assemble!(LB),
-            "lbu" => l_assemble!(LBU),
-            "lhu" => l_assemble!(LHU),
-            "lw" => l_assemble!(LW),
-            "lwu" => l_assemble!(LWU),
-            "lh" => l_assemble!(LH),
+            "lb" => l_assemble!(Lb),
+            "lbu" => l_assemble!(Lbu),
+            "lhu" => l_assemble!(Lhu),
+            "lw" => l_assemble!(Lw),
+            "lwu" => l_assemble!(Lwu),
+            "lh" => l_assemble!(Lh),
             // store instructions
-            "ld" => l_assemble!(LD),
-            "sd" => s_assemble!(SD),
-            "sw" => s_assemble!(SW),
-            "sh" => s_assemble!(SH),
-            "sb" => s_assemble!(SB),
+            "ld" => l_assemble!(Ld),
+            "sd" => s_assemble!(Sd),
+            "sw" => s_assemble!(Sw),
+            "sh" => s_assemble!(Sh),
+            "sb" => s_assemble!(Sb),
             // branch instructions
-            "blt" => b_assemble!(BLT),
-            "beq" => b_assemble!(BEQ),
-            "bne" => b_assemble!(BNE),
-            "bge" => b_assemble!(BGE),
-            "bgeu" => b_assemble!(BGEU),
-            "bltu" => b_assemble!(BLTU),
+            "blt" => b_assemble!(Blt),
+            "beq" => b_assemble!(Beq),
+            "bne" => b_assemble!(Bne),
+            "bge" => b_assemble!(Bge),
+            "bgeu" => b_assemble!(Bgeu),
+            "bltu" => b_assemble!(Bltu),
             "jalr" => {
                 if operands.len() != 2 {
                     Err("jalr instruction requires 2 operands".to_owned())
                 } else {
                     let (base, offset) = parse_address_expression(operands[1])?;
-                    Ok(Instruction::JALR {
+                    Ok(Instruction::Jalr {
                         dest: IRegister::try_from(operands[0])?,
                         base,
                         offset: IImmediate::try_from(offset)?,
@@ -196,7 +196,7 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                 if operands.len() != 2 {
                     Err("jal instruction requires 2 operands".to_owned())
                 } else {
-                    Ok(Instruction::JAL {
+                    Ok(Instruction::Jal {
                         dest: IRegister::try_from(operands[0])?,
                         offset: JImmediate::try_from(parse_int(operands[1])?)?,
                     })
@@ -210,7 +210,7 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                     if int > 2i64.pow(19) - 1 || int < -2i64.pow(19) {
                         Err("UImmediate out of range".to_owned())
                     } else {
-                        Ok(Instruction::LUI {
+                        Ok(Instruction::Lui {
                             dest: IRegister::try_from(operands[0])?,
                             imm: UImmediate::try_from(int)?,
                         })
@@ -225,7 +225,7 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                     if int > 2i64.pow(19) - 1 || int < -2i64.pow(19) {
                         Err("UImmediate out of range".to_owned())
                     } else {
-                        Ok(Instruction::AUIPC {
+                        Ok(Instruction::Auipc {
                             dest: IRegister::try_from(operands[0])?,
                             imm: UImmediate::try_from(int)?,
                         })
@@ -239,7 +239,7 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                     } else {
                         let ops =
                             parse_fence_set(operands[1]) | (parse_fence_set(operands[0]) << 4);
-                        Ok(Instruction::FENCE {
+                        Ok(Instruction::Fence {
                             // rd and rs1 are currently unused
                             rd: IRegister::Zero,
                             rs1: IRegister::Zero,
@@ -256,7 +256,7 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                         if ops != (parse_fence_set("rw") | (parse_fence_set("rw") << 4)) {
                             Err("fence.tso should be rw,rw".to_owned())
                         } else {
-                            Ok(Instruction::FENCE {
+                            Ok(Instruction::Fence {
                                 // rd and rs1 are currently unused
                                 rd: IRegister::Zero,
                                 rs1: IRegister::Zero,
@@ -440,7 +440,7 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                         ("lu", "s") => Ok(Instruction::FCVTLUS {
                             dest: IRegister::try_from(operands[0])?,
                             src: FRegister::try_from(operands[1])?,
-                            rm: RoundingMode::DYN,
+                            rm,
                         }),
                         ("s", "l") => Ok(Instruction::FCVTSL {
                             dest: FRegister::try_from(operands[0])?,

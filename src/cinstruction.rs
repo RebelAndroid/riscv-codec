@@ -419,162 +419,162 @@ impl CInstruction {
     /// > is only a very minor change to the base microarchitecture.
     pub fn expand(&self) -> Instruction {
         match self {
-            CInstruction::ADDI4SPN { dest, imm } => Instruction::ADDI {
+            CInstruction::ADDI4SPN { dest, imm } => Instruction::Addi {
                 dest: dest.expand(),
                 src: IRegister::StackPointer,
                 imm: IImmediate::try_from(imm.val()).unwrap(),
             },
             CInstruction::FLD { .. } => todo!(), // needs unimplemented double extension
-            CInstruction::LW { dest, base, offset } => Instruction::LW {
+            CInstruction::LW { dest, base, offset } => Instruction::Lw {
                 dest: dest.expand(),
                 base: base.expand(),
                 offset: IImmediate::try_from(offset.val()).unwrap(),
             },
-            CInstruction::LD { dest, base, offset } => Instruction::LD {
+            CInstruction::LD { dest, base, offset } => Instruction::Ld {
                 dest: dest.expand(),
                 base: base.expand(),
                 offset: IImmediate::try_from(offset.val()).unwrap(),
             },
             CInstruction::FSD { .. } => todo!(), // needs unimplemented double extension
-            CInstruction::SW { src, base, offset } => Instruction::SW {
+            CInstruction::SW { src, base, offset } => Instruction::Sw {
                 src: src.expand(),
                 base: base.expand(),
                 offset: SImmediate::try_from(offset.val()).unwrap(),
             },
-            CInstruction::SD { src, base, offset } => Instruction::SD {
+            CInstruction::SD { src, base, offset } => Instruction::Sd {
                 src: src.expand(),
                 base: base.expand(),
                 offset: SImmediate::try_from(offset.val()).unwrap(),
             },
-            CInstruction::ADDI { dest, imm } => Instruction::ADDI {
+            CInstruction::ADDI { dest, imm } => Instruction::Addi {
                 dest: *dest,
                 src: *dest,
                 imm: IImmediate::try_from(imm.val()).unwrap(),
             },
-            CInstruction::ADDIW { dest, imm } => Instruction::ADDIW {
+            CInstruction::ADDIW { dest, imm } => Instruction::Addiw {
                 dest: *dest,
                 src: *dest,
                 imm: IImmediate::try_from(imm.val()).unwrap(),
             },
-            CInstruction::LI { dest, imm } => Instruction::ADDI {
+            CInstruction::LI { dest, imm } => Instruction::Addi {
                 dest: *dest,
                 src: IRegister::Zero,
                 imm: IImmediate::try_from(imm.val()).unwrap(),
             },
-            CInstruction::ADDI16SP { imm } => Instruction::ADDI {
+            CInstruction::ADDI16SP { imm } => Instruction::Addi {
                 dest: IRegister::StackPointer,
                 src: IRegister::StackPointer,
                 imm: IImmediate::try_from(imm.val()).unwrap(),
             },
-            CInstruction::LUI { dest, imm } => Instruction::ADDI {
+            CInstruction::LUI { dest, imm } => Instruction::Addi {
                 dest: *dest,
                 src: IRegister::Zero,
                 imm: IImmediate::try_from(imm.val()).unwrap(),
             },
-            CInstruction::SRLI { dest, shamt } => Instruction::SRLI {
+            CInstruction::SRLI { dest, shamt } => Instruction::Srli {
                 dest: dest.expand(),
                 src: dest.expand(),
                 shamt: Shamt::try_from(shamt.val()).unwrap(),
             },
-            CInstruction::SRAI { dest, shamt } => Instruction::SRAI {
+            CInstruction::SRAI { dest, shamt } => Instruction::Srai {
                 dest: dest.expand(),
                 src: dest.expand(),
                 shamt: Shamt::try_from(shamt.val()).unwrap(),
             },
-            CInstruction::ANDI { dest, imm } => Instruction::ANDI {
+            CInstruction::ANDI { dest, imm } => Instruction::Andi {
                 dest: dest.expand(),
                 src: dest.expand(),
                 imm: IImmediate::try_from(imm.val()).unwrap(),
             },
-            CInstruction::SUB { dest, src } => Instruction::SUB {
+            CInstruction::SUB { dest, src } => Instruction::Sub {
                 dest: dest.expand(),
                 src1: dest.expand(),
                 src2: src.expand(),
             },
-            CInstruction::XOR { dest, src } => Instruction::XOR {
+            CInstruction::XOR { dest, src } => Instruction::Xor {
                 dest: dest.expand(),
                 src1: dest.expand(),
                 src2: src.expand(),
             },
-            CInstruction::OR { dest, src } => Instruction::OR {
+            CInstruction::OR { dest, src } => Instruction::Or {
                 dest: dest.expand(),
                 src1: dest.expand(),
                 src2: src.expand(),
             },
-            CInstruction::AND { dest, src } => Instruction::AND {
+            CInstruction::AND { dest, src } => Instruction::And {
                 dest: dest.expand(),
                 src1: dest.expand(),
                 src2: src.expand(),
             },
-            CInstruction::SUBW { dest, src } => Instruction::SUBW {
+            CInstruction::SUBW { dest, src } => Instruction::Subw {
                 dest: dest.expand(),
                 src1: dest.expand(),
                 src2: src.expand(),
             },
-            CInstruction::ADDW { dest, src } => Instruction::ADDW {
+            CInstruction::ADDW { dest, src } => Instruction::Addw {
                 dest: dest.expand(),
                 src1: dest.expand(),
                 src2: src.expand(),
             },
-            CInstruction::J { offset } => Instruction::JAL {
+            CInstruction::J { offset } => Instruction::Jal {
                 dest: IRegister::Zero,
                 offset: JImmediate::try_from(offset.val()).unwrap(),
             },
-            CInstruction::BEQZ { src, offset } => Instruction::BEQ {
+            CInstruction::BEQZ { src, offset } => Instruction::Beq {
                 src1: src.expand(),
                 src2: IRegister::Zero,
                 offset: BImmediate::try_from(offset.val()).unwrap(),
             },
-            CInstruction::BNEZ { src, offset } => Instruction::BNE {
+            CInstruction::BNEZ { src, offset } => Instruction::Bne {
                 src1: src.expand(),
                 src2: IRegister::Zero,
                 offset: BImmediate::try_from(offset.val()).unwrap(),
             },
-            CInstruction::SLLI { dest, shamt } => Instruction::SLLI {
+            CInstruction::SLLI { dest, shamt } => Instruction::Slli {
                 dest: *dest,
                 src: *dest,
                 shamt: Shamt::try_from(shamt.val()).unwrap(),
             },
             CInstruction::FLDSP { .. } => todo!(), // needs unimplemented double extension
-            CInstruction::LWSP { dest, offset } => Instruction::LW {
+            CInstruction::LWSP { dest, offset } => Instruction::Lw {
                 dest: *dest,
                 base: IRegister::StackPointer,
                 offset: IImmediate::try_from(offset.val()).unwrap(),
             },
-            CInstruction::LDSP { dest, offset } => Instruction::LD {
+            CInstruction::LDSP { dest, offset } => Instruction::Ld {
                 dest: *dest,
                 base: IRegister::StackPointer,
                 offset: IImmediate::try_from(offset.val()).unwrap(),
             },
-            CInstruction::JR { src } => Instruction::JALR {
+            CInstruction::JR { src } => Instruction::Jalr {
                 dest: IRegister::Zero,
                 base: *src,
                 offset: IImmediate::try_from(0).unwrap(),
             },
-            CInstruction::MV { dest, src } => Instruction::ADD {
+            CInstruction::MV { dest, src } => Instruction::Add {
                 dest: *dest,
                 src1: IRegister::Zero,
                 src2: *src,
             },
-            CInstruction::EBREAK => Instruction::EBREAK,
-            CInstruction::JALR { src } => Instruction::JALR {
+            CInstruction::EBREAK => Instruction::Ebreak,
+            CInstruction::JALR { src } => Instruction::Jalr {
                 dest: IRegister::ReturnAddress,
                 base: *src,
                 offset: IImmediate::try_from(0).unwrap(),
             },
             // CInstruction::JALR { .. } => todo!(), // not exactly the same as the expanded version (see manual)
-            CInstruction::ADD { dest, src } => Instruction::ADD {
+            CInstruction::ADD { dest, src } => Instruction::Add {
                 dest: *dest,
                 src1: *dest,
                 src2: *src,
             },
             CInstruction::FSDSP { .. } => todo!(), // needs unimplemented double extension
-            CInstruction::SWSP { src, offset } => Instruction::SW {
+            CInstruction::SWSP { src, offset } => Instruction::Sw {
                 src: *src,
                 base: IRegister::StackPointer,
                 offset: SImmediate::try_from(offset.val()).unwrap(),
             },
-            CInstruction::SDSP { src, offset } => Instruction::SD {
+            CInstruction::SDSP { src, offset } => Instruction::Sd {
                 src: *src,
                 base: IRegister::StackPointer,
                 offset: SImmediate::try_from(offset.val()).unwrap(),

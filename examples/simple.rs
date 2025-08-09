@@ -10,4 +10,7 @@ fn main() {
 
     // and encoded
     assert_eq!(Instruction::encode(&instr2), 0xe0058513);
+
+    let instr2 = assemble_line("fcvt.lu.s zero,ft0,rne").unwrap().i();
+    println!("assembled instruction: {}", instr2);
 }

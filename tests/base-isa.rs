@@ -7,7 +7,7 @@ use riscv_codec::{
 
 #[test]
 fn load_upper_immediate() {
-    let expected = Instruction::LUI {
+    let expected = Instruction::Lui {
         dest: IRegister::S2,
         imm: UImmediate::try_from(400).unwrap(),
     };
@@ -31,7 +31,7 @@ fn load_upper_immediate() {
 
 #[test]
 fn add_upper_immediate_to_program_counter() {
-    let expected = Instruction::AUIPC {
+    let expected = Instruction::Auipc {
         dest: IRegister::A3,
         imm: UImmediate::try_from(-1).unwrap(),
     };
@@ -56,7 +56,7 @@ fn add_upper_immediate_to_program_counter() {
 
 #[test]
 fn jump_and_link() {
-    let expected = Instruction::JAL {
+    let expected = Instruction::Jal {
         dest: IRegister::Zero,
         offset: JImmediate::try_from(-1016708).unwrap(),
     };
@@ -81,7 +81,7 @@ fn jump_and_link() {
 
 #[test]
 fn jump_and_link_register() {
-    let expected = Instruction::JALR {
+    let expected = Instruction::Jalr {
         dest: IRegister::A0,
         base: IRegister::T0,
         offset: IImmediate::try_from(-2048).unwrap(),
@@ -107,7 +107,7 @@ fn jump_and_link_register() {
 
 #[test]
 fn branch_equal() {
-    let expected = Instruction::BEQ {
+    let expected = Instruction::Beq {
         src1: IRegister::T2,
         src2: IRegister::StackPointer,
         offset: BImmediate::try_from(2).unwrap(),
@@ -133,7 +133,7 @@ fn branch_equal() {
 
 #[test]
 fn branch_not_equal() {
-    let expected = Instruction::BNE {
+    let expected = Instruction::Bne {
         src1: IRegister::ThreadPointer,
         src2: IRegister::A4,
         offset: BImmediate::try_from(4094).unwrap(),
@@ -159,7 +159,7 @@ fn branch_not_equal() {
 
 #[test]
 fn branch_less_than() {
-    let expected = Instruction::BLT {
+    let expected = Instruction::Blt {
         src1: IRegister::A1,
         src2: IRegister::T6,
         offset: BImmediate::try_from(-4096).unwrap(),
@@ -185,7 +185,7 @@ fn branch_less_than() {
 
 #[test]
 fn branch_greater_equal() {
-    let expected = Instruction::BGE {
+    let expected = Instruction::Bge {
         src1: IRegister::A1,
         src2: IRegister::T6,
         offset: BImmediate::try_from(-2030).unwrap(),
@@ -211,7 +211,7 @@ fn branch_greater_equal() {
 
 #[test]
 fn branch_less_than_unsigned() {
-    let expected = Instruction::BLTU {
+    let expected = Instruction::Bltu {
         src1: IRegister::T0,
         src2: IRegister::S2,
         offset: BImmediate::try_from(512).unwrap(),
@@ -237,7 +237,7 @@ fn branch_less_than_unsigned() {
 
 #[test]
 fn branch_greater_equal_unsigned() {
-    let expected = Instruction::BGEU {
+    let expected = Instruction::Bgeu {
         src1: IRegister::S1,
         src2: IRegister::A3,
         offset: BImmediate::try_from(-128).unwrap(),
@@ -263,7 +263,7 @@ fn branch_greater_equal_unsigned() {
 
 #[test]
 fn load_byte() {
-    let expected = Instruction::LB {
+    let expected = Instruction::Lb {
         dest: IRegister::T2,
         base: IRegister::A0,
         offset: IImmediate::try_from(8).unwrap(),
@@ -289,7 +289,7 @@ fn load_byte() {
 
 #[test]
 fn load_half() {
-    let expected = Instruction::LH {
+    let expected = Instruction::Lh {
         dest: IRegister::S3,
         base: IRegister::StackPointer,
         offset: IImmediate::try_from(-16).unwrap(),
@@ -315,7 +315,7 @@ fn load_half() {
 
 #[test]
 fn load_word() {
-    let expected = Instruction::LW {
+    let expected = Instruction::Lw {
         dest: IRegister::A4,
         base: IRegister::T5,
         offset: IImmediate::try_from(1024).unwrap(),
@@ -341,7 +341,7 @@ fn load_word() {
 
 #[test]
 fn load_byte_unsigned() {
-    let expected = Instruction::LBU {
+    let expected = Instruction::Lbu {
         dest: IRegister::FramePointer,
         base: IRegister::A6,
         offset: IImmediate::try_from(63).unwrap(),
@@ -367,7 +367,7 @@ fn load_byte_unsigned() {
 
 #[test]
 fn load_half_unsigned() {
-    let expected = Instruction::LHU {
+    let expected = Instruction::Lhu {
         dest: IRegister::T4,
         base: IRegister::A1,
         offset: IImmediate::try_from(-2047).unwrap(),
@@ -393,7 +393,7 @@ fn load_half_unsigned() {
 
 #[test]
 fn store_byte() {
-    let expected = Instruction::SB {
+    let expected = Instruction::Sb {
         base: IRegister::A2,
         src: IRegister::T1,
         offset: SImmediate::try_from(127).unwrap(),
@@ -419,7 +419,7 @@ fn store_byte() {
 
 #[test]
 fn store_half() {
-    let expected = Instruction::SH {
+    let expected = Instruction::Sh {
         base: IRegister::S2,
         src: IRegister::A5,
         offset: SImmediate::try_from(-32).unwrap(),
@@ -445,7 +445,7 @@ fn store_half() {
 
 #[test]
 fn store_word() {
-    let expected = Instruction::SW {
+    let expected = Instruction::Sw {
         base: IRegister::T6,
         src: IRegister::S7,
         offset: SImmediate::try_from(2046).unwrap(),
@@ -471,7 +471,7 @@ fn store_word() {
 
 #[test]
 fn add_immediate() {
-    let expected = Instruction::ADDI {
+    let expected = Instruction::Addi {
         dest: IRegister::T3,
         src: IRegister::S4,
         imm: IImmediate::try_from(99).unwrap(),
@@ -497,7 +497,7 @@ fn add_immediate() {
 
 #[test]
 fn set_less_than_immediate() {
-    let expected = Instruction::SLTI {
+    let expected = Instruction::Slti {
         dest: IRegister::A1,
         src: IRegister::T2,
         imm: IImmediate::try_from(-12).unwrap(),
@@ -523,7 +523,7 @@ fn set_less_than_immediate() {
 
 #[test]
 fn set_less_than_immediate_unsigned() {
-    let expected = Instruction::SLTIU {
+    let expected = Instruction::Sltiu {
         dest: IRegister::S5,
         src: IRegister::A0,
         imm: IImmediate::try_from(2047).unwrap(),
@@ -549,7 +549,7 @@ fn set_less_than_immediate_unsigned() {
 
 #[test]
 fn xor_immediate() {
-    let expected = Instruction::XORI {
+    let expected = Instruction::Xori {
         dest: IRegister::A7,
         src: IRegister::ReturnAddress,
         imm: IImmediate::try_from(15).unwrap(),
@@ -575,7 +575,7 @@ fn xor_immediate() {
 
 #[test]
 fn or_immediate() {
-    let expected = Instruction::ORI {
+    let expected = Instruction::Ori {
         dest: IRegister::T6,
         src: IRegister::GlobalPointer,
         imm: IImmediate::try_from(31).unwrap(),
@@ -601,7 +601,7 @@ fn or_immediate() {
 
 #[test]
 fn and_immediate() {
-    let expected = Instruction::ANDI {
+    let expected = Instruction::Andi {
         dest: IRegister::GlobalPointer,
         src: IRegister::StackPointer,
         imm: IImmediate::try_from(-256).unwrap(),
@@ -627,7 +627,7 @@ fn and_immediate() {
 
 #[test]
 fn shift_left_logical_immediate() {
-    let expected = Instruction::SLLI {
+    let expected = Instruction::Slli {
         dest: IRegister::T1,
         src: IRegister::FramePointer,
         shamt: Shamt::try_from(13).unwrap(),
@@ -653,7 +653,7 @@ fn shift_left_logical_immediate() {
 
 #[test]
 fn shift_right_logical_immediate() {
-    let expected = Instruction::SRLI {
+    let expected = Instruction::Srli {
         dest: IRegister::S2,
         src: IRegister::A6,
         shamt: Shamt::try_from(9).unwrap(),
@@ -679,7 +679,7 @@ fn shift_right_logical_immediate() {
 
 #[test]
 fn shift_right_arithmetic_immediate() {
-    let expected = Instruction::SRAI {
+    let expected = Instruction::Srai {
         dest: IRegister::S1,
         src: IRegister::S3,
         shamt: Shamt::try_from(17).unwrap(),
@@ -705,7 +705,7 @@ fn shift_right_arithmetic_immediate() {
 
 #[test]
 fn add() {
-    let expected = Instruction::ADD {
+    let expected = Instruction::Add {
         dest: IRegister::T0,
         src1: IRegister::T1,
         src2: IRegister::T2,
@@ -731,7 +731,7 @@ fn add() {
 
 #[test]
 fn sub() {
-    let expected = Instruction::SUB {
+    let expected = Instruction::Sub {
         dest: IRegister::S4,
         src1: IRegister::S5,
         src2: IRegister::S6,
@@ -757,7 +757,7 @@ fn sub() {
 
 #[test]
 fn shift_left_logical() {
-    let expected = Instruction::SLL {
+    let expected = Instruction::Sll {
         dest: IRegister::A2,
         src1: IRegister::A3,
         src2: IRegister::A4,
@@ -783,7 +783,7 @@ fn shift_left_logical() {
 
 #[test]
 fn set_less_than() {
-    let expected = Instruction::SLT {
+    let expected = Instruction::Slt {
         dest: IRegister::T3,
         src1: IRegister::T4,
         src2: IRegister::T5,
@@ -809,7 +809,7 @@ fn set_less_than() {
 
 #[test]
 fn set_less_than_unsigned() {
-    let expected = Instruction::SLTU {
+    let expected = Instruction::Sltu {
         dest: IRegister::S6,
         src1: IRegister::S7,
         src2: IRegister::Zero,
@@ -835,7 +835,7 @@ fn set_less_than_unsigned() {
 
 #[test]
 fn xor() {
-    let expected = Instruction::XOR {
+    let expected = Instruction::Xor {
         dest: IRegister::A5,
         src1: IRegister::A6,
         src2: IRegister::A7,
@@ -861,7 +861,7 @@ fn xor() {
 
 #[test]
 fn shift_right_logical() {
-    let expected = Instruction::SRL {
+    let expected = Instruction::Srl {
         dest: IRegister::T1,
         src1: IRegister::T2,
         src2: IRegister::T3,
@@ -887,7 +887,7 @@ fn shift_right_logical() {
 
 #[test]
 fn shift_right_arithmetic() {
-    let expected = Instruction::SRA {
+    let expected = Instruction::Sra {
         dest: IRegister::FramePointer,
         src1: IRegister::S1,
         src2: IRegister::S2,
@@ -913,7 +913,7 @@ fn shift_right_arithmetic() {
 
 #[test]
 fn or() {
-    let expected = Instruction::OR {
+    let expected = Instruction::Or {
         dest: IRegister::T4,
         src1: IRegister::T5,
         src2: IRegister::T6,
@@ -939,7 +939,7 @@ fn or() {
 
 #[test]
 fn and() {
-    let expected = Instruction::AND {
+    let expected = Instruction::And {
         dest: IRegister::S1,
         src1: IRegister::S2,
         src2: IRegister::S3,
@@ -965,7 +965,7 @@ fn and() {
 
 #[test]
 fn load_word_unsigned() {
-    let expected = Instruction::LWU {
+    let expected = Instruction::Lwu {
         dest: IRegister::A0,
         base: IRegister::A1,
         offset: IImmediate::try_from(100).unwrap(),
@@ -991,7 +991,7 @@ fn load_word_unsigned() {
 
 #[test]
 fn load_doubleword() {
-    let expected = Instruction::LD {
+    let expected = Instruction::Ld {
         dest: IRegister::A2,
         base: IRegister::A3,
         offset: IImmediate::try_from(200).unwrap(),
@@ -1017,7 +1017,7 @@ fn load_doubleword() {
 
 #[test]
 fn store_doubleword() {
-    let expected = Instruction::SD {
+    let expected = Instruction::Sd {
         base: IRegister::A4,
         src: IRegister::A5,
         offset: SImmediate::try_from(300).unwrap(),
@@ -1043,7 +1043,7 @@ fn store_doubleword() {
 
 #[test]
 fn add_immediate_word() {
-    let expected = Instruction::ADDIW {
+    let expected = Instruction::Addiw {
         dest: IRegister::A6,
         src: IRegister::A7,
         imm: IImmediate::try_from(123).unwrap(),
@@ -1069,7 +1069,7 @@ fn add_immediate_word() {
 
 #[test]
 fn shift_left_logical_immediate_word() {
-    let expected = Instruction::SLLIW {
+    let expected = Instruction::Slliw {
         dest: IRegister::FramePointer,
         src: IRegister::S1,
         shamt: ShamtW::try_from(5).unwrap(),
@@ -1095,7 +1095,7 @@ fn shift_left_logical_immediate_word() {
 
 #[test]
 fn shift_right_logical_immediate_word() {
-    let expected = Instruction::SRLIW {
+    let expected = Instruction::Srliw {
         dest: IRegister::S2,
         src: IRegister::S3,
         shamt: ShamtW::try_from(10).unwrap(),
@@ -1121,7 +1121,7 @@ fn shift_right_logical_immediate_word() {
 
 #[test]
 fn shift_right_arithmetic_immediate_word() {
-    let expected = Instruction::SRAIW {
+    let expected = Instruction::Sraiw {
         dest: IRegister::S4,
         src: IRegister::S5,
         shamt: ShamtW::try_from(15).unwrap(),
@@ -1147,7 +1147,7 @@ fn shift_right_arithmetic_immediate_word() {
 
 #[test]
 fn add_word() {
-    let expected = Instruction::ADDW {
+    let expected = Instruction::Addw {
         dest: IRegister::S6,
         src1: IRegister::S7,
         src2: IRegister::T0,
@@ -1173,7 +1173,7 @@ fn add_word() {
 
 #[test]
 fn subtract_word() {
-    let expected = Instruction::SUBW {
+    let expected = Instruction::Subw {
         dest: IRegister::T1,
         src1: IRegister::T2,
         src2: IRegister::T3,
@@ -1199,7 +1199,7 @@ fn subtract_word() {
 
 #[test]
 fn shift_left_logical_word() {
-    let expected = Instruction::SLLW {
+    let expected = Instruction::Sllw {
         dest: IRegister::T4,
         src1: IRegister::T5,
         src2: IRegister::T6,
@@ -1225,7 +1225,7 @@ fn shift_left_logical_word() {
 
 #[test]
 fn shift_right_logical_word() {
-    let expected = Instruction::SRLW {
+    let expected = Instruction::Srlw {
         dest: IRegister::A0,
         src1: IRegister::A1,
         src2: IRegister::A2,
@@ -1251,7 +1251,7 @@ fn shift_right_logical_word() {
 
 #[test]
 fn shift_right_arithmetic_word() {
-    let expected = Instruction::SRAW {
+    let expected = Instruction::Sraw {
         dest: IRegister::A3,
         src1: IRegister::A4,
         src2: IRegister::A5,
@@ -1277,7 +1277,7 @@ fn shift_right_arithmetic_word() {
 
 #[test]
 fn fence() {
-    let expected = Instruction::FENCE {
+    let expected = Instruction::Fence {
         rd: IRegister::Zero,
         rs1: IRegister::Zero,
         ops: 0b1010_0101,

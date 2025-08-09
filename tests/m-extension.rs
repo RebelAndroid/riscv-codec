@@ -4,7 +4,7 @@ use riscv_codec::register::IRegister;
 
 #[test]
 fn multiply() {
-    let expected = Instruction::MUL {
+    let expected = Instruction::Mul {
         dest: IRegister::A0,
         src1: IRegister::A1,
         src2: IRegister::A0,
@@ -30,7 +30,7 @@ fn multiply() {
 
 #[test]
 fn multiply_high() {
-    let expected = Instruction::MULH {
+    let expected = Instruction::Mulh {
         dest: IRegister::T3,
         src1: IRegister::T4,
         src2: IRegister::S8,
@@ -56,7 +56,7 @@ fn multiply_high() {
 
 #[test]
 fn multiply_high_signed_unsigned() {
-    let expected = Instruction::MULHSU {
+    let expected = Instruction::Mulhsu {
         dest: IRegister::T0,
         src1: IRegister::A1,
         src2: IRegister::S3,
@@ -82,7 +82,7 @@ fn multiply_high_signed_unsigned() {
 
 #[test]
 fn multiply_high_unsigned() {
-    let expected = Instruction::MULHU {
+    let expected = Instruction::Mulhu {
         dest: IRegister::ReturnAddress,
         src1: IRegister::T5,
         src2: IRegister::S11,
@@ -108,7 +108,7 @@ fn multiply_high_unsigned() {
 
 #[test]
 fn divide() {
-    let expected = Instruction::DIV {
+    let expected = Instruction::Div {
         dest: IRegister::T2,
         src1: IRegister::A2,
         src2: IRegister::S2,
@@ -134,7 +134,7 @@ fn divide() {
 
 #[test]
 fn divide_unsigned() {
-    let expected = Instruction::DIVU {
+    let expected = Instruction::Divu {
         dest: IRegister::T3,
         src1: IRegister::T1,
         src2: IRegister::A3,
@@ -160,7 +160,7 @@ fn divide_unsigned() {
 
 #[test]
 fn remainder() {
-    let expected = Instruction::REM {
+    let expected = Instruction::Rem {
         dest: IRegister::S5,
         src1: IRegister::A5,
         src2: IRegister::T6,
@@ -186,7 +186,7 @@ fn remainder() {
 
 #[test]
 fn remainder_unsigned() {
-    let expected = Instruction::REMU {
+    let expected = Instruction::Remu {
         dest: IRegister::A4,
         src1: IRegister::S4,
         src2: IRegister::T4,
@@ -212,7 +212,7 @@ fn remainder_unsigned() {
 
 #[test]
 fn multiply_word() {
-    let expected = Instruction::MULW {
+    let expected = Instruction::Mulw {
         dest: IRegister::StackPointer,
         src1: IRegister::T4,
         src2: IRegister::A2,
@@ -238,7 +238,7 @@ fn multiply_word() {
 
 #[test]
 fn divide_word() {
-    let expected = Instruction::DIVW {
+    let expected = Instruction::Divw {
         dest: IRegister::T1,
         src1: IRegister::A3,
         src2: IRegister::S6,
@@ -264,7 +264,7 @@ fn divide_word() {
 
 #[test]
 fn divide_unsigned_word() {
-    let expected = Instruction::DIVUW {
+    let expected = Instruction::Divuw {
         dest: IRegister::T6,
         src1: IRegister::A0,
         src2: IRegister::FramePointer,
@@ -290,7 +290,7 @@ fn divide_unsigned_word() {
 
 #[test]
 fn remainder_word() {
-    let expected = Instruction::REMW {
+    let expected = Instruction::Remw {
         dest: IRegister::FramePointer,
         src1: IRegister::T3,
         src2: IRegister::A2,
@@ -316,7 +316,7 @@ fn remainder_word() {
 
 #[test]
 fn remainder_unsigned_word() {
-    let expected = Instruction::REMUW {
+    let expected = Instruction::Remuw {
         dest: IRegister::A1,
         src1: IRegister::T4,
         src2: IRegister::A5,

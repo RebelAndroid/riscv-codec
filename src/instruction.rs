@@ -72,285 +72,284 @@ pub enum Instruction {
     // Instructions from RV32I
     //
     /// Load upper immediate
-    LUI {
+    Lui {
         dest: IRegister,
         imm: UImmediate,
     },
     /// Add upper immediate to PC
-    AUIPC {
+    Auipc {
         dest: IRegister,
         imm: UImmediate,
     },
     /// Jump and Link
-    JAL {
+    Jal {
         dest: IRegister,
         offset: JImmediate,
     },
     /// Jump and Link Register
-    JALR {
+    Jalr {
         dest: IRegister,
         base: IRegister,
         offset: IImmediate,
     },
-    BEQ {
+    Beq {
         src1: IRegister,
         src2: IRegister,
         offset: BImmediate,
     },
-    BNE {
+    Bne {
         src1: IRegister,
         src2: IRegister,
         offset: BImmediate,
     },
-    BLT {
+    Blt {
         src1: IRegister,
         src2: IRegister,
         offset: BImmediate,
     },
-    BGE {
+    Bge {
         src1: IRegister,
         src2: IRegister,
         offset: BImmediate,
     },
-    BLTU {
+    Bltu {
         src1: IRegister,
         src2: IRegister,
         offset: BImmediate,
     },
-    BGEU {
+    Bgeu {
         src1: IRegister,
         src2: IRegister,
         offset: BImmediate,
     },
     /// Load Byte
-    LB {
+    Lb {
         dest: IRegister,
         base: IRegister,
         offset: IImmediate,
     },
     /// Load Halfword
-    LH {
+    Lh {
         dest: IRegister,
         base: IRegister,
         offset: IImmediate,
     },
     /// Load Word
-    LW {
+    Lw {
         dest: IRegister,
         base: IRegister,
         offset: IImmediate,
     },
     /// Load Byte Unsigned
-    LBU {
+    Lbu {
         dest: IRegister,
         base: IRegister,
         offset: IImmediate,
     },
     /// Load Halfword Unsigned
-    LHU {
+    Lhu {
         dest: IRegister,
         base: IRegister,
         offset: IImmediate,
     },
     /// Store Byte
-    SB {
+    Sb {
         src: IRegister,
         base: IRegister,
         offset: SImmediate,
     },
     /// Store Halfword
-    SH {
+    Sh {
         src: IRegister,
         base: IRegister,
         offset: SImmediate,
     },
     /// Store Word
-    SW {
+    Sw {
         src: IRegister,
         base: IRegister,
         offset: SImmediate,
     },
-    ADDI {
+    Addi {
         dest: IRegister,
         src: IRegister,
         imm: IImmediate,
     },
-    SLTI {
+    Slti {
         dest: IRegister,
         src: IRegister,
         imm: IImmediate,
     },
-    SLTIU {
+    Sltiu {
         dest: IRegister,
         src: IRegister,
         imm: IImmediate,
     },
-    XORI {
+    Xori {
         dest: IRegister,
         src: IRegister,
         imm: IImmediate,
     },
-    ORI {
+    Ori {
         dest: IRegister,
         src: IRegister,
         imm: IImmediate,
     },
-    ANDI {
+    Andi {
         dest: IRegister,
         src: IRegister,
         imm: IImmediate,
     },
     /// Left Shift Immediate
-    SLLI {
+    Slli {
         dest: IRegister,
         src: IRegister,
         shamt: Shamt,
     },
     /// Logical Right Shift Immediate
-    SRLI {
+    Srli {
         dest: IRegister,
         src: IRegister,
         shamt: Shamt,
     },
     /// Arithmetic Right Shift Immediate
-    SRAI {
+    Srai {
         dest: IRegister,
         src: IRegister,
         shamt: Shamt,
     },
-    ADD {
+    Add {
         dest: IRegister,
         src1: IRegister,
         src2: IRegister,
     },
-    SUB {
+    Sub {
         dest: IRegister,
         src1: IRegister,
         src2: IRegister,
     },
     /// Left Shift
-    SLL {
+    Sll {
         dest: IRegister,
         src1: IRegister,
         src2: IRegister,
     },
-    /// Branch if Equal
-    SLT {
+    Slt {
         dest: IRegister,
         src1: IRegister,
         src2: IRegister,
     },
-    SLTU {
+    Sltu {
         dest: IRegister,
         src1: IRegister,
         src2: IRegister,
     },
-    XOR {
+    Xor {
         dest: IRegister,
         src1: IRegister,
         src2: IRegister,
     },
     /// Logical Right Shift Immediate
-    SRL {
+    Srl {
         dest: IRegister,
         src1: IRegister,
         src2: IRegister,
     },
     /// Arithmetic Right Shift Immediate
-    SRA {
+    Sra {
         dest: IRegister,
         src1: IRegister,
         src2: IRegister,
     },
-    OR {
+    Or {
         dest: IRegister,
         src1: IRegister,
         src2: IRegister,
     },
-    AND {
+    And {
         dest: IRegister,
         src1: IRegister,
         src2: IRegister,
     },
-    FENCE {
+    Fence {
         rd: IRegister,
         rs1: IRegister,
         ops: u8,
         fm: u8,
     },
-    ECALL,
-    EBREAK,
+    Ecall,
+    Ebreak,
     //
     // Instructions Added In RV64I
     //
     /// Load Word Unsigned
-    LWU {
+    Lwu {
         dest: IRegister,
         base: IRegister,
         offset: IImmediate,
     },
     /// Load Doubleword
-    LD {
+    Ld {
         dest: IRegister,
         base: IRegister,
         offset: IImmediate,
     },
     /// Store Doubleword
-    SD {
+    Sd {
         src: IRegister,
         base: IRegister,
         offset: SImmediate,
     },
     /// Add Immediate (word)
-    ADDIW {
+    Addiw {
         dest: IRegister,
         src: IRegister,
         imm: IImmediate,
     },
     /// Left Shift Immediate (word)
-    SLLIW {
+    Slliw {
         dest: IRegister,
         src: IRegister,
         shamt: ShamtW,
     },
     /// Logical Right Shift Immediate (word)
-    SRLIW {
+    Srliw {
         dest: IRegister,
         src: IRegister,
         shamt: ShamtW,
     },
     /// Arithmetic Right Shift Immediate (word)
-    SRAIW {
+    Sraiw {
         dest: IRegister,
         src: IRegister,
         shamt: ShamtW,
     },
     /// Add (word)
-    ADDW {
+    Addw {
         dest: IRegister,
         src1: IRegister,
         src2: IRegister,
     },
     /// Subtract (word)
-    SUBW {
+    Subw {
         dest: IRegister,
         src1: IRegister,
         src2: IRegister,
     },
     /// Left Shift (word)
-    SLLW {
+    Sllw {
         dest: IRegister,
         src1: IRegister,
         src2: IRegister,
     },
     /// Logical Right Shift (word)
-    SRLW {
+    Srlw {
         dest: IRegister,
         src1: IRegister,
         src2: IRegister,
     },
     /// Arithmetic Right Shift (word)
-    SRAW {
+    Sraw {
         dest: IRegister,
         src1: IRegister,
         src2: IRegister,
@@ -359,79 +358,79 @@ pub enum Instruction {
     // Instructions In M Extension
     //
     /// Multiply
-    MUL {
+    Mul {
         dest: IRegister,
         src1: IRegister,
         src2: IRegister,
     },
     /// Multiply (High bits)
-    MULH {
+    Mulh {
         dest: IRegister,
         src1: IRegister,
         src2: IRegister,
     },
     /// Multiply Signed-Unsigned (High bits)
-    MULHSU {
+    Mulhsu {
         dest: IRegister,
         src1: IRegister,
         src2: IRegister,
     },
     /// Multiply Unsigned (High)
-    MULHU {
+    Mulhu {
         dest: IRegister,
         src1: IRegister,
         src2: IRegister,
     },
     /// Divide
-    DIV {
+    Div {
         dest: IRegister,
         src1: IRegister,
         src2: IRegister,
     },
     /// Divide (Unsigned)
-    DIVU {
+    Divu {
         dest: IRegister,
         src1: IRegister,
         src2: IRegister,
     },
     /// Remainder
-    REM {
+    Rem {
         dest: IRegister,
         src1: IRegister,
         src2: IRegister,
     },
     /// Remainder (Unsigned)
-    REMU {
+    Remu {
         dest: IRegister,
         src1: IRegister,
         src2: IRegister,
     },
     /// Multiply Word
-    MULW {
+    Mulw {
         dest: IRegister,
         src1: IRegister,
         src2: IRegister,
     },
     /// Divide Word
-    DIVW {
+    Divw {
         dest: IRegister,
         src1: IRegister,
         src2: IRegister,
     },
     /// Divide Unsigned Word
-    DIVUW {
+    Divuw {
         dest: IRegister,
         src1: IRegister,
         src2: IRegister,
     },
     /// Remainder Word
-    REMW {
+    Remw {
         dest: IRegister,
         src1: IRegister,
         src2: IRegister,
     },
     /// Remainder Unsigned Word
-    REMUW {
+    Remuw {
         dest: IRegister,
         src1: IRegister,
         src2: IRegister,
@@ -992,71 +991,71 @@ fn rlb(rl: bool) -> u32 {
 impl Display for Instruction {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), alloc::fmt::Error> {
         match self {
-            Instruction::LUI { dest, imm } => write!(f, "lui {dest},{imm}"),
-            Instruction::AUIPC { dest, imm } => write!(f, "auipc {dest},{imm}"),
-            Instruction::JAL { dest, offset } => write!(f, "jal {dest},{offset}"),
-            Instruction::JALR { dest, base, offset } => write!(f, "jalr {dest},{offset}({base})"),
-            Instruction::BEQ { src1, src2, offset } => write!(f, "beq {src1},{src2},{offset}"),
-            Instruction::BNE { src1, src2, offset } => write!(f, "bne {src1},{src2},{offset}"),
-            Instruction::BLT { src1, src2, offset } => write!(f, "blt {src1},{src2},{offset}"),
-            Instruction::BGE { src1, src2, offset } => write!(f, "bge {src1},{src2},{offset}"),
-            Instruction::BLTU { src1, src2, offset } => write!(f, "bltu {src1},{src2},{offset}"),
-            Instruction::BGEU { src1, src2, offset } => write!(f, "bgeu {src1},{src2},{offset}"),
-            Instruction::LB { dest, base, offset } => write!(f, "lb {dest},{offset}({base})"),
-            Instruction::LH { dest, base, offset } => write!(f, "lh {dest},{offset}({base})"),
-            Instruction::LW { dest, base, offset } => write!(f, "lw {dest},{offset}({base})"),
-            Instruction::LBU { dest, base, offset } => write!(f, "lbu {dest},{offset}({base})"),
-            Instruction::LHU { dest, base, offset } => write!(f, "lhu {dest},{offset}({base})"),
-            Instruction::SB { src, base, offset } => write!(f, "sb {src},{offset}({base})"),
-            Instruction::SH { src, base, offset } => write!(f, "sh {src},{offset}({base})"),
-            Instruction::SW { src, base, offset } => write!(f, "sw {src},{offset}({base})"),
-            Instruction::ADDI { dest, src, imm } => write!(f, "addi {dest},{src},{imm}"),
-            Instruction::SLTI { dest, src, imm } => write!(f, "slti {dest},{src},{imm}"),
-            Instruction::SLTIU { dest, src, imm } => write!(f, "sltiu {dest},{src},{imm}"),
-            Instruction::XORI { dest, src, imm } => write!(f, "xori {dest},{src},{imm}"),
-            Instruction::ORI { dest, src, imm } => write!(f, "ori {dest},{src},{imm}"),
-            Instruction::ANDI { dest, src, imm } => write!(f, "andi {dest},{src},{imm}"),
-            Instruction::SLLI { dest, src, shamt } => write!(f, "slli {dest},{src},{shamt}"),
-            Instruction::SRLI { dest, src, shamt } => write!(f, "srli {dest},{src},{shamt}"),
-            Instruction::SRAI { dest, src, shamt } => write!(f, "srai {dest},{src},{shamt}"),
-            Instruction::ADD { dest, src1, src2 } => write!(f, "add {dest},{src1},{src2}"),
-            Instruction::SUB { dest, src1, src2 } => write!(f, "sub {dest},{src1},{src2}"),
-            Instruction::SLL { dest, src1, src2 } => write!(f, "sll {dest},{src1},{src2}"),
-            Instruction::SLT { dest, src1, src2 } => write!(f, "slt {dest},{src1},{src2}"),
-            Instruction::SLTU { dest, src1, src2 } => write!(f, "sltu {dest},{src1},{src2}"),
-            Instruction::XOR { dest, src1, src2 } => write!(f, "xor {dest},{src1},{src2}"),
-            Instruction::SRL { dest, src1, src2 } => write!(f, "srl {dest},{src1},{src2}"),
-            Instruction::SRA { dest, src1, src2 } => write!(f, "sra {dest},{src1},{src2}"),
-            Instruction::OR { dest, src1, src2 } => write!(f, "or {dest},{src1},{src2}"),
-            Instruction::AND { dest, src1, src2 } => write!(f, "and {dest},{src1},{src2}"),
-            Instruction::FENCE { .. } => write!(f, "{}", self.fmt_fence()),
-            Instruction::ECALL => write!(f, "ecall"),
-            Instruction::EBREAK => write!(f, "ebreak"),
-            Instruction::LWU { dest, base, offset } => write!(f, "lwu {dest},{offset}({base})"),
-            Instruction::LD { dest, base, offset } => write!(f, "ld {dest},{offset}({base})"),
-            Instruction::SD { src, base, offset } => write!(f, "sd {src},{offset}({base})"),
-            Instruction::ADDIW { dest, src, imm } => write!(f, "addiw {dest},{src},{imm}"),
-            Instruction::SLLIW { dest, src, shamt } => write!(f, "slliw {dest},{src},{shamt}"),
-            Instruction::SRLIW { dest, src, shamt } => write!(f, "srliw {dest},{src},{shamt}"),
-            Instruction::SRAIW { dest, src, shamt } => write!(f, "sraiw {dest},{src},{shamt}"),
-            Instruction::ADDW { dest, src1, src2 } => write!(f, "addw {dest},{src1},{src2}"),
-            Instruction::SUBW { dest, src1, src2 } => write!(f, "subw {dest},{src1},{src2}"),
-            Instruction::SLLW { dest, src1, src2 } => write!(f, "sllw {dest},{src1},{src2}"),
-            Instruction::SRLW { dest, src1, src2 } => write!(f, "srlw {dest},{src1},{src2}"),
-            Instruction::SRAW { dest, src1, src2 } => write!(f, "sraw {dest},{src1},{src2}"),
-            Instruction::MUL { dest, src1, src2 } => write!(f, "mul {dest},{src1},{src2}"),
-            Instruction::MULH { dest, src1, src2 } => write!(f, "mulh {dest},{src1},{src2}"),
-            Instruction::MULHSU { dest, src1, src2 } => write!(f, "mulhsu {dest},{src1},{src2}"),
-            Instruction::MULHU { dest, src1, src2 } => write!(f, "mulhu {dest},{src1},{src2}"),
-            Instruction::DIV { dest, src1, src2 } => write!(f, "div {dest},{src1},{src2}"),
-            Instruction::DIVU { dest, src1, src2 } => write!(f, "divu {dest},{src1},{src2}"),
-            Instruction::REM { dest, src1, src2 } => write!(f, "rem {dest},{src1},{src2}"),
-            Instruction::REMU { dest, src1, src2 } => write!(f, "remu {dest},{src1},{src2}"),
-            Instruction::MULW { dest, src1, src2 } => write!(f, "mulw {dest},{src1},{src2}"),
-            Instruction::DIVW { dest, src1, src2 } => write!(f, "divw {dest},{src1},{src2}"),
-            Instruction::DIVUW { dest, src1, src2 } => write!(f, "divuw {dest},{src1},{src2}"),
-            Instruction::REMW { dest, src1, src2 } => write!(f, "remw {dest},{src1},{src2}"),
-            Instruction::REMUW { dest, src1, src2 } => write!(f, "remuw {dest},{src1},{src2}"),
+            Instruction::Lui { dest, imm } => write!(f, "lui {dest},{imm}"),
+            Instruction::Auipc { dest, imm } => write!(f, "auipc {dest},{imm}"),
+            Instruction::Jal { dest, offset } => write!(f, "jal {dest},{offset}"),
+            Instruction::Jalr { dest, base, offset } => write!(f, "jalr {dest},{offset}({base})"),
+            Instruction::Beq { src1, src2, offset } => write!(f, "beq {src1},{src2},{offset}"),
+            Instruction::Bne { src1, src2, offset } => write!(f, "bne {src1},{src2},{offset}"),
+            Instruction::Blt { src1, src2, offset } => write!(f, "blt {src1},{src2},{offset}"),
+            Instruction::Bge { src1, src2, offset } => write!(f, "bge {src1},{src2},{offset}"),
+            Instruction::Bltu { src1, src2, offset } => write!(f, "bltu {src1},{src2},{offset}"),
+            Instruction::Bgeu { src1, src2, offset } => write!(f, "bgeu {src1},{src2},{offset}"),
+            Instruction::Lb { dest, base, offset } => write!(f, "lb {dest},{offset}({base})"),
+            Instruction::Lh { dest, base, offset } => write!(f, "lh {dest},{offset}({base})"),
+            Instruction::Lw { dest, base, offset } => write!(f, "lw {dest},{offset}({base})"),
+            Instruction::Lbu { dest, base, offset } => write!(f, "lbu {dest},{offset}({base})"),
+            Instruction::Lhu { dest, base, offset } => write!(f, "lhu {dest},{offset}({base})"),
+            Instruction::Sb { src, base, offset } => write!(f, "sb {src},{offset}({base})"),
+            Instruction::Sh { src, base, offset } => write!(f, "sh {src},{offset}({base})"),
+            Instruction::Sw { src, base, offset } => write!(f, "sw {src},{offset}({base})"),
+            Instruction::Addi { dest, src, imm } => write!(f, "addi {dest},{src},{imm}"),
+            Instruction::Slti { dest, src, imm } => write!(f, "slti {dest},{src},{imm}"),
+            Instruction::Sltiu { dest, src, imm } => write!(f, "sltiu {dest},{src},{imm}"),
+            Instruction::Xori { dest, src, imm } => write!(f, "xori {dest},{src},{imm}"),
+            Instruction::Ori { dest, src, imm } => write!(f, "ori {dest},{src},{imm}"),
+            Instruction::Andi { dest, src, imm } => write!(f, "andi {dest},{src},{imm}"),
+            Instruction::Slli { dest, src, shamt } => write!(f, "slli {dest},{src},{shamt}"),
+            Instruction::Srli { dest, src, shamt } => write!(f, "srli {dest},{src},{shamt}"),
+            Instruction::Srai { dest, src, shamt } => write!(f, "srai {dest},{src},{shamt}"),
+            Instruction::Add { dest, src1, src2 } => write!(f, "add {dest},{src1},{src2}"),
+            Instruction::Sub { dest, src1, src2 } => write!(f, "sub {dest},{src1},{src2}"),
+            Instruction::Sll { dest, src1, src2 } => write!(f, "sll {dest},{src1},{src2}"),
+            Instruction::Slt { dest, src1, src2 } => write!(f, "slt {dest},{src1},{src2}"),
+            Instruction::Sltu { dest, src1, src2 } => write!(f, "sltu {dest},{src1},{src2}"),
+            Instruction::Xor { dest, src1, src2 } => write!(f, "xor {dest},{src1},{src2}"),
+            Instruction::Srl { dest, src1, src2 } => write!(f, "srl {dest},{src1},{src2}"),
+            Instruction::Sra { dest, src1, src2 } => write!(f, "sra {dest},{src1},{src2}"),
+            Instruction::Or { dest, src1, src2 } => write!(f, "or {dest},{src1},{src2}"),
+            Instruction::And { dest, src1, src2 } => write!(f, "and {dest},{src1},{src2}"),
+            Instruction::Fence { .. } => write!(f, "{}", self.fmt_fence()),
+            Instruction::Ecall => write!(f, "ecall"),
+            Instruction::Ebreak => write!(f, "ebreak"),
+            Instruction::Lwu { dest, base, offset } => write!(f, "lwu {dest},{offset}({base})"),
+            Instruction::Ld { dest, base, offset } => write!(f, "ld {dest},{offset}({base})"),
+            Instruction::Sd { src, base, offset } => write!(f, "sd {src},{offset}({base})"),
+            Instruction::Addiw { dest, src, imm } => write!(f, "addiw {dest},{src},{imm}"),
+            Instruction::Slliw { dest, src, shamt } => write!(f, "slliw {dest},{src},{shamt}"),
+            Instruction::Srliw { dest, src, shamt } => write!(f, "srliw {dest},{src},{shamt}"),
+            Instruction::Sraiw { dest, src, shamt } => write!(f, "sraiw {dest},{src},{shamt}"),
+            Instruction::Addw { dest, src1, src2 } => write!(f, "addw {dest},{src1},{src2}"),
+            Instruction::Subw { dest, src1, src2 } => write!(f, "subw {dest},{src1},{src2}"),
+            Instruction::Sllw { dest, src1, src2 } => write!(f, "sllw {dest},{src1},{src2}"),
+            Instruction::Srlw { dest, src1, src2 } => write!(f, "srlw {dest},{src1},{src2}"),
+            Instruction::Sraw { dest, src1, src2 } => write!(f, "sraw {dest},{src1},{src2}"),
+            Instruction::Mul { dest, src1, src2 } => write!(f, "mul {dest},{src1},{src2}"),
+            Instruction::Mulh { dest, src1, src2 } => write!(f, "mulh {dest},{src1},{src2}"),
+            Instruction::Mulhsu { dest, src1, src2 } => write!(f, "mulhsu {dest},{src1},{src2}"),
+            Instruction::Mulhu { dest, src1, src2 } => write!(f, "mulhu {dest},{src1},{src2}"),
+            Instruction::Div { dest, src1, src2 } => write!(f, "div {dest},{src1},{src2}"),
+            Instruction::Divu { dest, src1, src2 } => write!(f, "divu {dest},{src1},{src2}"),
+            Instruction::Rem { dest, src1, src2 } => write!(f, "rem {dest},{src1},{src2}"),
+            Instruction::Remu { dest, src1, src2 } => write!(f, "remu {dest},{src1},{src2}"),
+            Instruction::Mulw { dest, src1, src2 } => write!(f, "mulw {dest},{src1},{src2}"),
+            Instruction::Divw { dest, src1, src2 } => write!(f, "divw {dest},{src1},{src2}"),
+            Instruction::Divuw { dest, src1, src2 } => write!(f, "divuw {dest},{src1},{src2}"),
+            Instruction::Remw { dest, src1, src2 } => write!(f, "remw {dest},{src1},{src2}"),
+            Instruction::Remuw { dest, src1, src2 } => write!(f, "remuw {dest},{src1},{src2}"),
             Instruction::LRW { dest, addr, aq, rl } => {
                 write!(f, "lr.w{} {dest},{addr}", aq_rl_suffix(aq, rl))
             }
@@ -1409,8 +1408,16 @@ impl Display for Instruction {
             Instruction::FcvtLD { dest, src1, rm } => write!(f, "fcvt.l.d {dest},{src1},{rm}"),
             Instruction::FcvtLuD { dest, src1, rm } => write!(f, "fcvt.lu.d {dest},{src1},{rm}"),
             Instruction::FmvXD { dest, src } => write!(f, "fmv.x.d {dest},{src}"),
-            Instruction::FcvtDL { dest, src: src1, rm } => write!(f, "fcvt.d.l {dest},{src1},{rm}"),
-            Instruction::FcvtDLu { dest, src: src1, rm } => write!(f, "fcvt.d.lu {dest},{src1},{rm}"),
+            Instruction::FcvtDL {
+                dest,
+                src: src1,
+                rm,
+            } => write!(f, "fcvt.d.l {dest},{src1},{rm}"),
+            Instruction::FcvtDLu {
+                dest,
+                src: src1,
+                rm,
+            } => write!(f, "fcvt.d.lu {dest},{src1},{rm}"),
             Instruction::FmvDX { dest, src } => write!(f, "fmv.d.x {dest},{src}"),
         }
     }
@@ -1418,7 +1425,7 @@ impl Display for Instruction {
 
 impl Instruction {
     fn fmt_fence(&self) -> String {
-        if let Instruction::FENCE {
+        if let Instruction::Fence {
             rd: _,
             rs1: _,
             ops,
@@ -1477,37 +1484,37 @@ impl Instruction {
 
         match opcode {
             Opcode::Load => match func3 {
-                0b000 => Ok(Instruction::LB {
+                0b000 => Ok(Instruction::Lb {
                     dest: rd,
                     base: rs1,
                     offset: i_immediate,
                 }),
-                0b001 => Ok(Instruction::LH {
+                0b001 => Ok(Instruction::Lh {
                     dest: rd,
                     base: rs1,
                     offset: i_immediate,
                 }),
-                0b010 => Ok(Instruction::LW {
+                0b010 => Ok(Instruction::Lw {
                     dest: rd,
                     base: rs1,
                     offset: i_immediate,
                 }),
-                0b011 => Ok(Instruction::LD {
+                0b011 => Ok(Instruction::Ld {
                     dest: rd,
                     base: rs1,
                     offset: i_immediate,
                 }),
-                0b100 => Ok(Instruction::LBU {
+                0b100 => Ok(Instruction::Lbu {
                     dest: rd,
                     base: rs1,
                     offset: i_immediate,
                 }),
-                0b101 => Ok(Instruction::LHU {
+                0b101 => Ok(Instruction::Lhu {
                     dest: rd,
                     base: rs1,
                     offset: i_immediate,
                 }),
-                0b110 => Ok(Instruction::LWU {
+                0b110 => Ok(Instruction::Lwu {
                     dest: rd,
                     base: rs1,
                     offset: i_immediate,
@@ -1515,124 +1522,124 @@ impl Instruction {
                 0b111 => Err("Invalid load func3".to_owned()),
                 _ => unreachable!(),
             },
-            Opcode::Auipc => Ok(Instruction::AUIPC {
+            Opcode::Auipc => Ok(Instruction::Auipc {
                 dest: rd,
                 imm: u_immediate,
             }),
             Opcode::Store => match func3 {
-                0b000 => Ok(Instruction::SB {
+                0b000 => Ok(Instruction::Sb {
                     src: rs2,
                     base: rs1,
                     offset: s_immediate,
                 }),
-                0b001 => Ok(Instruction::SH {
+                0b001 => Ok(Instruction::Sh {
                     src: rs2,
                     base: rs1,
                     offset: s_immediate,
                 }),
-                0b010 => Ok(Instruction::SW {
+                0b010 => Ok(Instruction::Sw {
                     src: rs2,
                     base: rs1,
                     offset: s_immediate,
                 }),
-                0b011 => Ok(Instruction::SD {
+                0b011 => Ok(Instruction::Sd {
                     src: rs2,
                     base: rs1,
                     offset: s_immediate,
                 }),
                 x => Err(format!("invalid store func3: {}", x)),
             },
-            Opcode::Lui => Ok(Instruction::LUI {
+            Opcode::Lui => Ok(Instruction::Lui {
                 dest: rd,
                 imm: u_immediate,
             }),
             Opcode::Op => match (func7, func3) {
-                (0b000_0000, 0b000) => Ok(Instruction::ADD {
+                (0b000_0000, 0b000) => Ok(Instruction::Add {
                     dest: rd,
                     src1: rs1,
                     src2: rs2,
                 }),
-                (0b000_0000, 0b001) => Ok(Instruction::SLL {
+                (0b000_0000, 0b001) => Ok(Instruction::Sll {
                     dest: rd,
                     src1: rs1,
                     src2: rs2,
                 }),
-                (0b000_0000, 0b010) => Ok(Instruction::SLT {
+                (0b000_0000, 0b010) => Ok(Instruction::Slt {
                     dest: rd,
                     src1: rs1,
                     src2: rs2,
                 }),
-                (0b000_0000, 0b011) => Ok(Instruction::SLTU {
+                (0b000_0000, 0b011) => Ok(Instruction::Sltu {
                     dest: rd,
                     src1: rs1,
                     src2: rs2,
                 }),
-                (0b000_0000, 0b100) => Ok(Instruction::XOR {
+                (0b000_0000, 0b100) => Ok(Instruction::Xor {
                     dest: rd,
                     src1: rs1,
                     src2: rs2,
                 }),
-                (0b000_0000, 0b101) => Ok(Instruction::SRL {
+                (0b000_0000, 0b101) => Ok(Instruction::Srl {
                     dest: rd,
                     src1: rs1,
                     src2: rs2,
                 }),
-                (0b000_0000, 0b110) => Ok(Instruction::OR {
+                (0b000_0000, 0b110) => Ok(Instruction::Or {
                     dest: rd,
                     src1: rs1,
                     src2: rs2,
                 }),
-                (0b000_0000, 0b111) => Ok(Instruction::AND {
+                (0b000_0000, 0b111) => Ok(Instruction::And {
                     dest: rd,
                     src1: rs1,
                     src2: rs2,
                 }),
-                (0b010_0000, 0b000) => Ok(Instruction::SUB {
+                (0b010_0000, 0b000) => Ok(Instruction::Sub {
                     dest: rd,
                     src1: rs1,
                     src2: rs2,
                 }),
-                (0b010_0000, 0b101) => Ok(Instruction::SRA {
+                (0b010_0000, 0b101) => Ok(Instruction::Sra {
                     dest: rd,
                     src1: rs1,
                     src2: rs2,
                 }),
-                (0b000_0001, 0b000) => Ok(Instruction::MUL {
+                (0b000_0001, 0b000) => Ok(Instruction::Mul {
                     dest: rd,
                     src1: rs1,
                     src2: rs2,
                 }),
-                (0b000_0001, 0b001) => Ok(Instruction::MULH {
+                (0b000_0001, 0b001) => Ok(Instruction::Mulh {
                     dest: rd,
                     src1: rs1,
                     src2: rs2,
                 }),
-                (0b000_0001, 0b010) => Ok(Instruction::MULHSU {
+                (0b000_0001, 0b010) => Ok(Instruction::Mulhsu {
                     dest: rd,
                     src1: rs1,
                     src2: rs2,
                 }),
-                (0b000_0001, 0b011) => Ok(Instruction::MULHU {
+                (0b000_0001, 0b011) => Ok(Instruction::Mulhu {
                     dest: rd,
                     src1: rs1,
                     src2: rs2,
                 }),
-                (0b000_0001, 0b100) => Ok(Instruction::DIV {
+                (0b000_0001, 0b100) => Ok(Instruction::Div {
                     dest: rd,
                     src1: rs1,
                     src2: rs2,
                 }),
-                (0b000_0001, 0b101) => Ok(Instruction::DIVU {
+                (0b000_0001, 0b101) => Ok(Instruction::Divu {
                     dest: rd,
                     src1: rs1,
                     src2: rs2,
                 }),
-                (0b000_0001, 0b110) => Ok(Instruction::REM {
+                (0b000_0001, 0b110) => Ok(Instruction::Rem {
                     dest: rd,
                     src1: rs1,
                     src2: rs2,
                 }),
-                (0b000_0001, 0b111) => Ok(Instruction::REMU {
+                (0b000_0001, 0b111) => Ok(Instruction::Remu {
                     dest: rd,
                     src1: rs1,
                     src2: rs2,
@@ -1640,52 +1647,52 @@ impl Instruction {
                 _ => Err(format!("unknown Op. func3: {}, func7: {}", func3, func7)),
             },
             Opcode::Op32 => match (func3, func7) {
-                (0b000, 0b000_0000) => Ok(Instruction::ADDW {
+                (0b000, 0b000_0000) => Ok(Instruction::Addw {
                     dest: rd,
                     src1: rs1,
                     src2: rs2,
                 }),
-                (0b000, 0b000_0001) => Ok(Instruction::MULW {
+                (0b000, 0b000_0001) => Ok(Instruction::Mulw {
                     dest: rd,
                     src1: rs1,
                     src2: rs2,
                 }),
-                (0b000, 0b010_0000) => Ok(Instruction::SUBW {
+                (0b000, 0b010_0000) => Ok(Instruction::Subw {
                     dest: rd,
                     src1: rs1,
                     src2: rs2,
                 }),
-                (0b001, 0b000_0000) => Ok(Instruction::SLLW {
+                (0b001, 0b000_0000) => Ok(Instruction::Sllw {
                     dest: rd,
                     src1: rs1,
                     src2: rs2,
                 }),
-                (0b100, 0b0000_001) => Ok(Instruction::DIVW {
+                (0b100, 0b0000_001) => Ok(Instruction::Divw {
                     dest: rd,
                     src1: rs1,
                     src2: rs2,
                 }),
-                (0b101, 0b000_0000) => Ok(Instruction::SRLW {
+                (0b101, 0b000_0000) => Ok(Instruction::Srlw {
                     dest: rd,
                     src1: rs1,
                     src2: rs2,
                 }),
-                (0b101, 0b000_0001) => Ok(Instruction::DIVUW {
+                (0b101, 0b000_0001) => Ok(Instruction::Divuw {
                     dest: rd,
                     src1: rs1,
                     src2: rs2,
                 }),
-                (0b101, 0b010_0000) => Ok(Instruction::SRAW {
+                (0b101, 0b010_0000) => Ok(Instruction::Sraw {
                     dest: rd,
                     src1: rs1,
                     src2: rs2,
                 }),
-                (0b110, 0b000_0001) => Ok(Instruction::REMW {
+                (0b110, 0b000_0001) => Ok(Instruction::Remw {
                     dest: rd,
                     src1: rs1,
                     src2: rs2,
                 }),
-                (0b111, 0b000_0001) => Ok(Instruction::REMUW {
+                (0b111, 0b000_0001) => Ok(Instruction::Remuw {
                     dest: rd,
                     src1: rs1,
                     src2: rs2,
@@ -1693,55 +1700,55 @@ impl Instruction {
                 _ => Err(format!("unknown Op32. func3: {}, func7: {}", func3, func7)),
             },
             Opcode::OpImm => match func3 {
-                0b000 => Ok(Instruction::ADDI {
+                0b000 => Ok(Instruction::Addi {
                     dest: rd,
                     src: rs1,
                     imm: i_immediate,
                 }),
                 // SLLi requires special handling because shamt uses the bottom bit of func7
                 0b001 => match func7 | 0b1 {
-                    0b000000_1 => Ok(Instruction::SLLI {
+                    0b000000_1 => Ok(Instruction::Slli {
                         dest: rd,
                         src: rs1,
                         shamt,
                     }),
                     _ => Err(format!("unknown OpImm. func3: {}, func7: {}", func3, func7)),
                 },
-                0b010 => Ok(Instruction::SLTI {
+                0b010 => Ok(Instruction::Slti {
                     dest: rd,
                     src: rs1,
                     imm: i_immediate,
                 }),
-                0b011 => Ok(Instruction::SLTIU {
+                0b011 => Ok(Instruction::Sltiu {
                     dest: rd,
                     src: rs1,
                     imm: i_immediate,
                 }),
-                0b100 => Ok(Instruction::XORI {
+                0b100 => Ok(Instruction::Xori {
                     dest: rd,
                     src: rs1,
                     imm: i_immediate,
                 }),
                 // SRLI SRAI require special handling because shamt uses the bottom bit of func7
                 0b101 => match func7 | 0b1 {
-                    0b000000_1 => Ok(Instruction::SRLI {
+                    0b000000_1 => Ok(Instruction::Srli {
                         dest: rd,
                         src: rs1,
                         shamt,
                     }),
-                    0b010000_1 => Ok(Instruction::SRAI {
+                    0b010000_1 => Ok(Instruction::Srai {
                         dest: rd,
                         src: rs1,
                         shamt,
                     }),
                     _ => Err(format!("unknown OpImm. func3: {}, func7: {}", func3, func7)),
                 },
-                0b110 => Ok(Instruction::ORI {
+                0b110 => Ok(Instruction::Ori {
                     dest: rd,
                     src: rs1,
                     imm: i_immediate,
                 }),
-                0b111 => Ok(Instruction::ANDI {
+                0b111 => Ok(Instruction::Andi {
                     dest: rd,
                     src: rs1,
                     imm: i_immediate,
@@ -1749,23 +1756,26 @@ impl Instruction {
                 _ => Err(format!("unknown OpImm. func3: {}, func7: {}", func3, func7)),
             },
             Opcode::OpImm32 => match func3 {
-                0b000 => Ok(Instruction::ADDIW {
+                0b000 => Ok(Instruction::Addiw {
                     dest: rd,
                     src: rs1,
                     imm: i_immediate,
                 }),
-                0b001 => Ok(Instruction::SLLIW {
-                    dest: rd,
-                    src: rs1,
-                    shamt: shamtw,
-                }),
-                0b101 => match func7 {
-                    0b000_0000 => Ok(Instruction::SRLIW {
+                0b001 => match func7 {
+                    0b000_0000 => Ok(Instruction::Slliw {
                         dest: rd,
                         src: rs1,
                         shamt: shamtw,
                     }),
-                    0b010_0000 => Ok(Instruction::SRAIW {
+                    x => Err(format!("unknown OpImm32(001) func7: {}", x).to_owned()),
+                },
+                0b101 => match func7 {
+                    0b000_0000 => Ok(Instruction::Srliw {
+                        dest: rd,
+                        src: rs1,
+                        shamt: shamtw,
+                    }),
+                    0b010_0000 => Ok(Instruction::Sraiw {
                         dest: rd,
                         src: rs1,
                         shamt: shamtw,
@@ -1774,42 +1784,45 @@ impl Instruction {
                 },
                 x => Err(format!("unkown OpImm32 func3: {}", x).to_owned()),
             },
-            Opcode::Jalr => Ok(Instruction::JALR {
-                dest: rd,
-                base: rs1,
-                offset: i_immediate,
-            }),
-            Opcode::Jal => Ok(Instruction::JAL {
+            Opcode::Jalr => match func3 {
+                0b000 => Ok(Instruction::Jalr {
+                    dest: rd,
+                    base: rs1,
+                    offset: i_immediate,
+                }),
+                x => Err(format!("unknown Jalr func3: {}", x)),
+            },
+            Opcode::Jal => Ok(Instruction::Jal {
                 dest: rd,
                 offset: JImmediate::from_u32(instruction),
             }),
             Opcode::Branch => match func3 {
-                0b000 => Ok(Instruction::BEQ {
+                0b000 => Ok(Instruction::Beq {
                     src1: rs1,
                     src2: rs2,
                     offset: b_immediate,
                 }),
-                0b001 => Ok(Instruction::BNE {
+                0b001 => Ok(Instruction::Bne {
                     src1: rs1,
                     src2: rs2,
                     offset: b_immediate,
                 }),
-                0b100 => Ok(Instruction::BLT {
+                0b100 => Ok(Instruction::Blt {
                     src1: rs1,
                     src2: rs2,
                     offset: b_immediate,
                 }),
-                0b101 => Ok(Instruction::BGE {
+                0b101 => Ok(Instruction::Bge {
                     src1: rs1,
                     src2: rs2,
                     offset: b_immediate,
                 }),
-                0b110 => Ok(Instruction::BLTU {
+                0b110 => Ok(Instruction::Bltu {
                     src1: rs1,
                     src2: rs2,
                     offset: b_immediate,
                 }),
-                0b111 => Ok(Instruction::BGEU {
+                0b111 => Ok(Instruction::Bgeu {
                     src1: rs1,
                     src2: rs2,
                     offset: b_immediate,
@@ -1828,7 +1841,7 @@ impl Instruction {
                         } else if fm == 0b1000 && ((instruction >> 20) & 0xFF) != 0b0011_0011 {
                             Err("fence.tso must be rw,rw".to_owned())
                         } else {
-                            Ok(Instruction::FENCE {
+                            Ok(Instruction::Fence {
                                 rd,
                                 rs1,
                                 ops: ((instruction >> 20) & 0xFF) as u8,
@@ -2097,27 +2110,47 @@ impl Instruction {
                 0b010_0000 => {
                     if instruction >> 20 & 0b11111 != 0b0_0001 {
                         Err("expected rs2=0b0_0001 in OpFp func7=0b010_0000".to_owned())
-                    }else {
-                        Ok(Instruction::FcvtSD { dest: frd, src: frs1, rm: RoundingMode::from_int(func3)? })
+                    } else {
+                        Ok(Instruction::FcvtSD {
+                            dest: frd,
+                            src: frs1,
+                            rm: RoundingMode::from_int(func3)?,
+                        })
                     }
                 }
                 0b010_0001 => {
                     if instruction >> 20 & 0b11111 != 0b0_0000 {
                         Err("expected rs2=0b0_0000 in OpFp func7=0b010_0001".to_owned())
-                    }else {
-                        Ok(Instruction::FcvtDS { dest: frd, src: frs1, rm: RoundingMode::from_int(func3)? })
+                    } else {
+                        Ok(Instruction::FcvtDS {
+                            dest: frd,
+                            src: frs1,
+                            rm: RoundingMode::from_int(func3)?,
+                        })
                     }
                 }
-                0b010_1100 => Ok(Instruction::FsqrtS {
-                    dest: frd,
-                    src: frs1,
-                    rm: RoundingMode::from_int(func3)?,
-                }),
-                0b010_1101 => Ok(Instruction::FsqrtD {
-                    dest: frd,
-                    src: frs1,
-                    rm: RoundingMode::from_int(func3)?,
-                }),
+                0b010_1100 => {
+                    if instruction >> 20 & 0b11111 != 0b0_0000 {
+                        Err("expected rs2=0b0_0000 in OpFp func7=0b010_1100".to_owned())
+                    } else {
+                        Ok(Instruction::FsqrtS {
+                            dest: frd,
+                            src: frs1,
+                            rm: RoundingMode::from_int(func3)?,
+                        })
+                    }
+                }
+                0b010_1101 => {
+                    if instruction >> 20 & 0b11111 != 0b0_0000 {
+                        Err("expected rs2=0b0_0000 in OpFp func7=0b010_1101".to_owned())
+                    } else {
+                        Ok(Instruction::FsqrtD {
+                            dest: frd,
+                            src: frs1,
+                            rm: RoundingMode::from_int(func3)?,
+                        })
+                    }
+                },
                 0b001_0000 => match func3 {
                     0b000 => Ok(Instruction::FsgnjS {
                         dest: frd,
@@ -2239,7 +2272,7 @@ impl Instruction {
                     }),
                     x => Err(format!("unknown OpFp func7=0b001_0100 rs2: {}", x)),
                 },
-                 0b110_0001 => match (instruction >> 20) & 0b1_1111 {
+                0b110_0001 => match (instruction >> 20) & 0b1_1111 {
                     0b0_0000 => Ok(Instruction::FcvtWD {
                         dest: rd,
                         src1: frs1,
@@ -2525,189 +2558,189 @@ impl Instruction {
 
     pub fn encode(instruction: &Instruction) -> u32 {
         match instruction {
-            Instruction::LUI { dest, imm } => imm.to_u32() | dest.rd() | 0b0110111,
-            Instruction::AUIPC { dest, imm } => imm.to_u32() | dest.rd() | 0b0010111,
-            Instruction::JAL { dest, offset } => offset.to_u32() | dest.rd() | 0b1101111,
-            Instruction::JALR { dest, base, offset } => {
+            Instruction::Lui { dest, imm } => imm.to_u32() | dest.rd() | 0b0110111,
+            Instruction::Auipc { dest, imm } => imm.to_u32() | dest.rd() | 0b0010111,
+            Instruction::Jal { dest, offset } => offset.to_u32() | dest.rd() | 0b1101111,
+            Instruction::Jalr { dest, base, offset } => {
                 offset.to_u32() | base.rs1() | dest.rd() | 0b1100111
             }
-            Instruction::BEQ { src1, src2, offset } => {
+            Instruction::Beq { src1, src2, offset } => {
                 offset.to_u32() | src2.rs2() | src1.rs1() | 0b000 << 12 | 0b1100011
             }
-            Instruction::BNE { src1, src2, offset } => {
+            Instruction::Bne { src1, src2, offset } => {
                 offset.to_u32() | src2.rs2() | src1.rs1() | 0b001 << 12 | 0b1100011
             }
-            Instruction::BLT { src1, src2, offset } => {
+            Instruction::Blt { src1, src2, offset } => {
                 offset.to_u32() | src2.rs2() | src1.rs1() | 0b100 << 12 | 0b1100011
             }
-            Instruction::BGE { src1, src2, offset } => {
+            Instruction::Bge { src1, src2, offset } => {
                 offset.to_u32() | src2.rs2() | src1.rs1() | 0b101 << 12 | 0b1100011
             }
-            Instruction::BLTU { src1, src2, offset } => {
+            Instruction::Bltu { src1, src2, offset } => {
                 offset.to_u32() | src2.rs2() | src1.rs1() | 0b110 << 12 | 0b1100011
             }
-            Instruction::BGEU { src1, src2, offset } => {
+            Instruction::Bgeu { src1, src2, offset } => {
                 offset.to_u32() | src2.rs2() | src1.rs1() | 0b111 << 12 | 0b1100011
             }
-            Instruction::LB { dest, base, offset } => {
+            Instruction::Lb { dest, base, offset } => {
                 offset.to_u32() | base.rs1() | 0b000 << 12 | dest.rd() | 0b0000011
             }
-            Instruction::LH { dest, base, offset } => {
+            Instruction::Lh { dest, base, offset } => {
                 offset.to_u32() | base.rs1() | 0b001 << 12 | dest.rd() | 0b0000011
             }
-            Instruction::LW { dest, base, offset } => {
+            Instruction::Lw { dest, base, offset } => {
                 offset.to_u32() | base.rs1() | 0b010 << 12 | dest.rd() | 0b0000011
             }
-            Instruction::LBU { dest, base, offset } => {
+            Instruction::Lbu { dest, base, offset } => {
                 offset.to_u32() | base.rs1() | 0b100 << 12 | dest.rd() | 0b0000011
             }
-            Instruction::LHU { dest, base, offset } => {
+            Instruction::Lhu { dest, base, offset } => {
                 offset.to_u32() | base.rs1() | 0b101 << 12 | dest.rd() | 0b0000011
             }
-            Instruction::SB { src, base, offset } => {
+            Instruction::Sb { src, base, offset } => {
                 offset.to_u32() | src.rs2() | base.rs1() | 0b000 << 12 | 0b0100011
             }
-            Instruction::SH { src, base, offset } => {
+            Instruction::Sh { src, base, offset } => {
                 offset.to_u32() | src.rs2() | base.rs1() | 0b001 << 12 | 0b0100011
             }
-            Instruction::SW { src, base, offset } => {
+            Instruction::Sw { src, base, offset } => {
                 offset.to_u32() | src.rs2() | base.rs1() | 0b010 << 12 | 0b0100011
             }
-            Instruction::ADDI { dest, src, imm } => {
+            Instruction::Addi { dest, src, imm } => {
                 imm.to_u32() | src.rs1() | 0b000 << 12 | dest.rd() | 0b0010011
             }
-            Instruction::SLTI { dest, src, imm } => {
+            Instruction::Slti { dest, src, imm } => {
                 imm.to_u32() | src.rs1() | 0b010 << 12 | dest.rd() | 0b0010011
             }
-            Instruction::SLTIU { dest, src, imm } => {
+            Instruction::Sltiu { dest, src, imm } => {
                 imm.to_u32() | src.rs1() | 0b011 << 12 | dest.rd() | 0b0010011
             }
-            Instruction::XORI { dest, src, imm } => {
+            Instruction::Xori { dest, src, imm } => {
                 imm.to_u32() | src.rs1() | 0b100 << 12 | dest.rd() | 0b0010011
             }
-            Instruction::ORI { dest, src, imm } => {
+            Instruction::Ori { dest, src, imm } => {
                 imm.to_u32() | src.rs1() | 0b110 << 12 | dest.rd() | 0b0010011
             }
-            Instruction::ANDI { dest, src, imm } => {
+            Instruction::Andi { dest, src, imm } => {
                 imm.to_u32() | src.rs1() | 0b111 << 12 | dest.rd() | 0b0010011
             }
-            Instruction::SLLI { dest, src, shamt } => {
+            Instruction::Slli { dest, src, shamt } => {
                 shamt.to_u32() | src.rs1() | 0b001 << 12 | dest.rd() | 0b0010011
             }
-            Instruction::SRLI { dest, src, shamt } => {
+            Instruction::Srli { dest, src, shamt } => {
                 shamt.to_u32() | src.rs1() | 0b101 << 12 | dest.rd() | 0b0010011
             }
-            Instruction::SRAI { dest, src, shamt } => {
+            Instruction::Srai { dest, src, shamt } => {
                 0b0100000 << 25 | shamt.to_u32() | src.rs1() | 0b101 << 12 | dest.rd() | 0b0010011
             }
-            Instruction::ADD { dest, src1, src2 } => {
+            Instruction::Add { dest, src1, src2 } => {
                 src2.rs2() | src1.rs1() | 0b000 << 12 | dest.rd() | 0b0110011
             }
-            Instruction::SUB { dest, src1, src2 } => {
+            Instruction::Sub { dest, src1, src2 } => {
                 0b0100000 << 25 | src2.rs2() | src1.rs1() | 0b000 << 12 | dest.rd() | 0b0110011
             }
-            Instruction::SLL { dest, src1, src2 } => {
+            Instruction::Sll { dest, src1, src2 } => {
                 src2.rs2() | src1.rs1() | 0b001 << 12 | dest.rd() | 0b0110011
             }
-            Instruction::SLT { dest, src1, src2 } => {
+            Instruction::Slt { dest, src1, src2 } => {
                 src2.rs2() | src1.rs1() | 0b010 << 12 | dest.rd() | 0b0110011
             }
-            Instruction::SLTU { dest, src1, src2 } => {
+            Instruction::Sltu { dest, src1, src2 } => {
                 src2.rs2() | src1.rs1() | 0b011 << 12 | dest.rd() | 0b0110011
             }
-            Instruction::XOR { dest, src1, src2 } => {
+            Instruction::Xor { dest, src1, src2 } => {
                 src2.rs2() | src1.rs1() | 0b100 << 12 | dest.rd() | 0b0110011
             }
-            Instruction::SRL { dest, src1, src2 } => {
+            Instruction::Srl { dest, src1, src2 } => {
                 src2.rs2() | src1.rs1() | 0b101 << 12 | dest.rd() | 0b0110011
             }
-            Instruction::SRA { dest, src1, src2 } => {
+            Instruction::Sra { dest, src1, src2 } => {
                 0b0100000 << 25 | src2.rs2() | src1.rs1() | 0b0101 << 12 | dest.rd() | 0b0110011
             }
-            Instruction::OR { dest, src1, src2 } => {
+            Instruction::Or { dest, src1, src2 } => {
                 src2.rs2() | src1.rs1() | 0b110 << 12 | dest.rd() | 0b0110011
             }
-            Instruction::AND { dest, src1, src2 } => {
+            Instruction::And { dest, src1, src2 } => {
                 src2.rs2() | src1.rs1() | 0b111 << 12 | dest.rd() | 0b0110011
             }
-            Instruction::FENCE { rd, rs1, ops, fm } => {
+            Instruction::Fence { rd, rs1, ops, fm } => {
                 (*fm as u32) << 28 | (*ops as u32) << 20 | rs1.rs1() | rd.rd() | 0b0001111
             }
-            Instruction::ECALL => 0b1110011,
-            Instruction::EBREAK => 0b1 << 20 | 0b1110011,
-            Instruction::LWU { dest, base, offset } => {
+            Instruction::Ecall => 0b1110011,
+            Instruction::Ebreak => 0b1 << 20 | 0b1110011,
+            Instruction::Lwu { dest, base, offset } => {
                 offset.to_u32() | base.rs1() | 0b110 << 12 | dest.rd() | 0b0000011
             }
-            Instruction::LD { dest, base, offset } => {
+            Instruction::Ld { dest, base, offset } => {
                 offset.to_u32() | base.rs1() | 0b011 << 12 | dest.rd() | 0b0000011
             }
-            Instruction::SD { src, base, offset } => {
+            Instruction::Sd { src, base, offset } => {
                 offset.to_u32() | src.rs2() | base.rs1() | 0b011 << 12 | 0b0100011
             }
-            Instruction::ADDIW { dest, src, imm } => {
+            Instruction::Addiw { dest, src, imm } => {
                 imm.to_u32() | src.rs1() | 0b000 << 12 | dest.rd() | 0b0011011
             }
-            Instruction::SLLIW { dest, src, shamt } => {
+            Instruction::Slliw { dest, src, shamt } => {
                 shamt.to_u32() | src.rs1() | 0b001 << 12 | dest.rd() | 0b0011011
             }
-            Instruction::SRLIW { dest, src, shamt } => {
+            Instruction::Srliw { dest, src, shamt } => {
                 shamt.to_u32() | src.rs1() | 0b101 << 12 | dest.rd() | 0b0011011
             }
-            Instruction::SRAIW { dest, src, shamt } => {
+            Instruction::Sraiw { dest, src, shamt } => {
                 0b0100000 << 25 | shamt.to_u32() | src.rs1() | 0b101 << 12 | dest.rd() | 0b0011011
             }
-            Instruction::ADDW { dest, src1, src2 } => {
+            Instruction::Addw { dest, src1, src2 } => {
                 src2.rs2() | src1.rs1() | 0b000 << 12 | dest.rd() | 0b0111011
             }
-            Instruction::SUBW { dest, src1, src2 } => {
+            Instruction::Subw { dest, src1, src2 } => {
                 0b0100000 << 25 | src2.rs2() | src1.rs1() | 0b000 << 12 | dest.rd() | 0b0111011
             }
-            Instruction::SLLW { dest, src1, src2 } => {
+            Instruction::Sllw { dest, src1, src2 } => {
                 src2.rs2() | src1.rs1() | 0b001 << 12 | dest.rd() | 0b0111011
             }
-            Instruction::SRLW { dest, src1, src2 } => {
+            Instruction::Srlw { dest, src1, src2 } => {
                 src2.rs2() | src1.rs1() | 0b101 << 12 | dest.rd() | 0b0111011
             }
-            Instruction::SRAW { dest, src1, src2 } => {
+            Instruction::Sraw { dest, src1, src2 } => {
                 0b0100000 << 25 | src2.rs2() | src1.rs1() | 0b101 << 12 | dest.rd() | 0b0111011
             }
-            Instruction::MUL { dest, src1, src2 } => {
+            Instruction::Mul { dest, src1, src2 } => {
                 0b0000001 << 25 | src2.rs2() | src1.rs1() | 0b000 << 12 | dest.rd() | 0b0110011
             }
-            Instruction::MULH { dest, src1, src2 } => {
+            Instruction::Mulh { dest, src1, src2 } => {
                 0b0000001 << 25 | src2.rs2() | src1.rs1() | 0b001 << 12 | dest.rd() | 0b0110011
             }
-            Instruction::MULHSU { dest, src1, src2 } => {
+            Instruction::Mulhsu { dest, src1, src2 } => {
                 0b0000001 << 25 | src2.rs2() | src1.rs1() | 0b010 << 12 | dest.rd() | 0b0110011
             }
-            Instruction::MULHU { dest, src1, src2 } => {
+            Instruction::Mulhu { dest, src1, src2 } => {
                 0b0000001 << 25 | src2.rs2() | src1.rs1() | 0b011 << 12 | dest.rd() | 0b0110011
             }
-            Instruction::DIV { dest, src1, src2 } => {
+            Instruction::Div { dest, src1, src2 } => {
                 0b0000001 << 25 | src2.rs2() | src1.rs1() | 0b100 << 12 | dest.rd() | 0b0110011
             }
-            Instruction::DIVU { dest, src1, src2 } => {
+            Instruction::Divu { dest, src1, src2 } => {
                 0b0000001 << 25 | src2.rs2() | src1.rs1() | 0b101 << 12 | dest.rd() | 0b0110011
             }
-            Instruction::REM { dest, src1, src2 } => {
+            Instruction::Rem { dest, src1, src2 } => {
                 0b0000001 << 25 | src2.rs2() | src1.rs1() | 0b110 << 12 | dest.rd() | 0b0110011
             }
-            Instruction::REMU { dest, src1, src2 } => {
+            Instruction::Remu { dest, src1, src2 } => {
                 0b0000001 << 25 | src2.rs2() | src1.rs1() | 0b111 << 12 | dest.rd() | 0b0110011
             }
-            Instruction::MULW { dest, src1, src2 } => {
+            Instruction::Mulw { dest, src1, src2 } => {
                 0b0000001 << 25 | src2.rs2() | src1.rs1() | 0b000 << 12 | dest.rd() | 0b0111011
             }
-            Instruction::DIVW { dest, src1, src2 } => {
+            Instruction::Divw { dest, src1, src2 } => {
                 0b0000001 << 25 | src2.rs2() | src1.rs1() | 0b100 << 12 | dest.rd() | 0b0111011
             }
-            Instruction::DIVUW { dest, src1, src2 } => {
+            Instruction::Divuw { dest, src1, src2 } => {
                 0b0000001 << 25 | src2.rs2() | src1.rs1() | 0b101 << 12 | dest.rd() | 0b0111011
             }
-            Instruction::REMW { dest, src1, src2 } => {
+            Instruction::Remw { dest, src1, src2 } => {
                 0b0000001 << 25 | src2.rs2() | src1.rs1() | 0b110 << 12 | dest.rd() | 0b0111011
             }
-            Instruction::REMUW { dest, src1, src2 } => {
+            Instruction::Remuw { dest, src1, src2 } => {
                 0b0000001 << 25 | src2.rs2() | src1.rs1() | 0b111 << 12 | dest.rd() | 0b0111011
             }
             Instruction::LRW { dest, addr, aq, rl } => {
@@ -3330,12 +3363,16 @@ impl Instruction {
             Instruction::FmvXD { dest, src } => {
                 0b1110001 << 25 | 0b00000 << 20 | src.rs1() | 0b000 << 12 | dest.rd() | 0b1010011
             }
-            Instruction::FcvtDL { dest, src: src1, rm } => {
-                0b1101001 << 25 | 0b00010 << 20 | src1.rs1() | rm.to_u32() | dest.rd() | 0b1010011
-            }
-            Instruction::FcvtDLu { dest, src: src1, rm } => {
-                0b1101001 << 25 | 0b00011 << 20 | src1.rs1() | rm.to_u32() | dest.rd() | 0b1010011
-            }
+            Instruction::FcvtDL {
+                dest,
+                src: src1,
+                rm,
+            } => 0b1101001 << 25 | 0b00010 << 20 | src1.rs1() | rm.to_u32() | dest.rd() | 0b1010011,
+            Instruction::FcvtDLu {
+                dest,
+                src: src1,
+                rm,
+            } => 0b1101001 << 25 | 0b00011 << 20 | src1.rs1() | rm.to_u32() | dest.rd() | 0b1010011,
             Instruction::FmvDX { dest, src } => {
                 0b1111001 << 25 | 0b00000 << 20 | src.rs1() | 0b000 << 12 | dest.rd() | 0b1010011
             }
