@@ -7,7 +7,7 @@ use riscv_codec::{
 
 #[test]
 fn read_write_csr() {
-    let expected = Instruction::CSRRW {
+    let expected = Instruction::Csrrw {
         dest: IRegister::T1,
         src: IRegister::T2,
         csr: CSR::try_from(100).unwrap(),
@@ -33,7 +33,7 @@ fn read_write_csr() {
 
 #[test]
 fn read_set_csr() {
-    let expected = Instruction::CSRRS {
+    let expected = Instruction::Csrrs {
         dest: IRegister::ThreadPointer,
         src: IRegister::S6,
         csr: CSR::try_from(4000).unwrap(),
@@ -59,7 +59,7 @@ fn read_set_csr() {
 
 #[test]
 fn read_clear_csr() {
-    let expected = Instruction::CSRRC {
+    let expected = Instruction::Csrrc {
         dest: IRegister::A0,
         src: IRegister::A5,
         csr: CSR::try_from(1).unwrap(),
@@ -85,7 +85,7 @@ fn read_clear_csr() {
 
 #[test]
 fn read_write_csr_immediate() {
-    let expected = Instruction::CSRRWI {
+    let expected = Instruction::Csrrwi {
         dest: IRegister::S11,
         imm: CSRImmediate::try_from(31).unwrap(),
         csr: CSR::try_from(100).unwrap(),
@@ -111,7 +111,7 @@ fn read_write_csr_immediate() {
 
 #[test]
 fn read_set_csr_immediate() {
-    let expected = Instruction::CSRRSI {
+    let expected = Instruction::Csrrsi {
         dest: IRegister::S4,
         imm: CSRImmediate::try_from(1).unwrap(),
         csr: CSR::try_from(1001).unwrap(),
@@ -137,7 +137,7 @@ fn read_set_csr_immediate() {
 
 #[test]
 fn read_clear_csr_immediate() {
-    let expected = Instruction::CSRRCI {
+    let expected = Instruction::Csrrci {
         dest: IRegister::A1,
         imm: CSRImmediate::try_from(23).unwrap(),
         csr: CSR::try_from(24).unwrap(),

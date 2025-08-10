@@ -440,76 +440,76 @@ pub enum Instruction {
     //
     /// Load Reserved Word
     // rd, rs1, ac, rl
-    LRW {
+    LrW {
         dest: IRegister,
         addr: IRegister,
         aq: bool,
         rl: bool,
     },
-    SCW {
-        dest: IRegister,
-        addr: IRegister,
-        src: IRegister,
-        aq: bool,
-        rl: bool,
-    },
-    AMOSWAPW {
+    ScW {
         dest: IRegister,
         addr: IRegister,
         src: IRegister,
         aq: bool,
         rl: bool,
     },
-    AMOADDW {
+    AmoswapW {
         dest: IRegister,
         addr: IRegister,
         src: IRegister,
         aq: bool,
         rl: bool,
     },
-    AMOXORW {
+    AmoaddW {
         dest: IRegister,
         addr: IRegister,
         src: IRegister,
         aq: bool,
         rl: bool,
     },
-    AMOANDW {
+    AmoxorW {
         dest: IRegister,
         addr: IRegister,
         src: IRegister,
         aq: bool,
         rl: bool,
     },
-    AMOORW {
+    AmoandW {
         dest: IRegister,
         addr: IRegister,
         src: IRegister,
         aq: bool,
         rl: bool,
     },
-    AMOMINW {
+    AmoorW {
         dest: IRegister,
         addr: IRegister,
         src: IRegister,
         aq: bool,
         rl: bool,
     },
-    AMOMAXW {
+    AmominW {
         dest: IRegister,
         addr: IRegister,
         src: IRegister,
         aq: bool,
         rl: bool,
     },
-    AMOMINUW {
+    AmomaxW {
         dest: IRegister,
         addr: IRegister,
         src: IRegister,
         aq: bool,
         rl: bool,
     },
-    AMOMAXUW {
+    AmominuW {
+        dest: IRegister,
+        addr: IRegister,
+        src: IRegister,
+        aq: bool,
+        rl: bool,
+    },
+    AmomaxuW {
         dest: IRegister,
         addr: IRegister,
         src: IRegister,
@@ -517,76 +517,76 @@ pub enum Instruction {
         rl: bool,
     },
     //
-    LRD {
+    LrD {
         dest: IRegister,
         addr: IRegister,
         aq: bool,
         rl: bool,
     },
-    SCD {
-        dest: IRegister,
-        addr: IRegister,
-        src: IRegister,
-        aq: bool,
-        rl: bool,
-    },
-    AMOSWAPD {
+    ScD {
         dest: IRegister,
         addr: IRegister,
         src: IRegister,
         aq: bool,
         rl: bool,
     },
-    AMOADDD {
+    AmoswapD {
         dest: IRegister,
         addr: IRegister,
         src: IRegister,
         aq: bool,
         rl: bool,
     },
-    AMOXORD {
+    AmoaddD {
         dest: IRegister,
         addr: IRegister,
         src: IRegister,
         aq: bool,
         rl: bool,
     },
-    AMOANDD {
+    AmoxorD {
         dest: IRegister,
         addr: IRegister,
         src: IRegister,
         aq: bool,
         rl: bool,
     },
-    AMOORD {
+    AmoandD {
         dest: IRegister,
         addr: IRegister,
         src: IRegister,
         aq: bool,
         rl: bool,
     },
-    AMOMIND {
+    AmoorD {
         dest: IRegister,
         addr: IRegister,
         src: IRegister,
         aq: bool,
         rl: bool,
     },
-    AMOMAXD {
+    AmominD {
         dest: IRegister,
         addr: IRegister,
         src: IRegister,
         aq: bool,
         rl: bool,
     },
-    AMOMINUD {
+    AmomaxD {
         dest: IRegister,
         addr: IRegister,
         src: IRegister,
         aq: bool,
         rl: bool,
     },
-    AMOMAXUD {
+    AmominuD {
+        dest: IRegister,
+        addr: IRegister,
+        src: IRegister,
+        aq: bool,
+        rl: bool,
+    },
+    AmomaxuD {
         dest: IRegister,
         addr: IRegister,
         src: IRegister,
@@ -596,12 +596,12 @@ pub enum Instruction {
     //
     // Instructions in F Extension
     //
-    FLW {
+    Flw {
         dest: FRegister,
         base: IRegister,
         offset: IImmediate,
     },
-    FSW {
+    Fsw {
         base: IRegister,
         src: FRegister,
         offset: SImmediate,
@@ -738,22 +738,22 @@ pub enum Instruction {
     //
     // Instructions in F Extension (RV64)
     //
-    FCVTLS {
+    FcvtLS {
         dest: IRegister,
         src: FRegister,
         rm: RoundingMode,
     },
-    FCVTLUS {
+    FcvtLuS {
         dest: IRegister,
         src: FRegister,
         rm: RoundingMode,
     },
-    FCVTSL {
+    FcvtSL {
         dest: FRegister,
         src: IRegister,
         rm: RoundingMode,
     },
-    FCVTSLU {
+    FcvtSLu {
         dest: FRegister,
         src: IRegister,
         rm: RoundingMode,
@@ -761,32 +761,32 @@ pub enum Instruction {
     //
     // Instructions in Zicsr Extension
     //
-    CSRRW {
+    Csrrw {
         dest: IRegister,
         src: IRegister,
         csr: CSR,
     },
-    CSRRS {
+    Csrrs {
         dest: IRegister,
         src: IRegister,
         csr: CSR,
     },
-    CSRRC {
+    Csrrc {
         dest: IRegister,
         src: IRegister,
         csr: CSR,
     },
-    CSRRWI {
+    Csrrwi {
         dest: IRegister,
         imm: CSRImmediate,
         csr: CSR,
     },
-    CSRRSI {
+    Csrrsi {
         dest: IRegister,
         imm: CSRImmediate,
         csr: CSR,
     },
-    CSRRCI {
+    Csrrci {
         dest: IRegister,
         imm: CSRImmediate,
         csr: CSR,
@@ -794,7 +794,7 @@ pub enum Instruction {
     //
     // Instructions in Zifencei Extension
     //
-    FENCEI,
+    FenceI,
     //
     // Instructions in D Extension
     //
@@ -1056,10 +1056,10 @@ impl Display for Instruction {
             Instruction::Divuw { dest, src1, src2 } => write!(f, "divuw {dest},{src1},{src2}"),
             Instruction::Remw { dest, src1, src2 } => write!(f, "remw {dest},{src1},{src2}"),
             Instruction::Remuw { dest, src1, src2 } => write!(f, "remuw {dest},{src1},{src2}"),
-            Instruction::LRW { dest, addr, aq, rl } => {
+            Instruction::LrW { dest, addr, aq, rl } => {
                 write!(f, "lr.w{} {dest},{addr}", aq_rl_suffix(aq, rl))
             }
-            Instruction::SCW {
+            Instruction::ScW {
                 dest,
                 addr,
                 src,
@@ -1068,7 +1068,7 @@ impl Display for Instruction {
             } => {
                 write!(f, "sc.w{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
             }
-            Instruction::AMOSWAPW {
+            Instruction::AmoswapW {
                 dest,
                 addr,
                 src,
@@ -1077,7 +1077,7 @@ impl Display for Instruction {
             } => {
                 write!(f, "amoswap.w{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
             }
-            Instruction::AMOADDW {
+            Instruction::AmoaddW {
                 dest,
                 addr,
                 src,
@@ -1086,7 +1086,7 @@ impl Display for Instruction {
             } => {
                 write!(f, "amoadd.w{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
             }
-            Instruction::AMOXORW {
+            Instruction::AmoxorW {
                 dest,
                 addr,
                 src,
@@ -1095,7 +1095,7 @@ impl Display for Instruction {
             } => {
                 write!(f, "amoxor.w{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
             }
-            Instruction::AMOANDW {
+            Instruction::AmoandW {
                 dest,
                 addr,
                 src,
@@ -1104,7 +1104,7 @@ impl Display for Instruction {
             } => {
                 write!(f, "amoand.w{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
             }
-            Instruction::AMOORW {
+            Instruction::AmoorW {
                 dest,
                 addr,
                 src,
@@ -1113,7 +1113,7 @@ impl Display for Instruction {
             } => {
                 write!(f, "amoor.w{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
             }
-            Instruction::AMOMINW {
+            Instruction::AmominW {
                 dest,
                 addr,
                 src,
@@ -1122,7 +1122,7 @@ impl Display for Instruction {
             } => {
                 write!(f, "amomin.w{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
             }
-            Instruction::AMOMAXW {
+            Instruction::AmomaxW {
                 dest,
                 addr,
                 src,
@@ -1131,7 +1131,7 @@ impl Display for Instruction {
             } => {
                 write!(f, "amomax.w{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
             }
-            Instruction::AMOMINUW {
+            Instruction::AmominuW {
                 dest,
                 addr,
                 src,
@@ -1140,7 +1140,7 @@ impl Display for Instruction {
             } => {
                 write!(f, "amominu.w{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
             }
-            Instruction::AMOMAXUW {
+            Instruction::AmomaxuW {
                 dest,
                 addr,
                 src,
@@ -1149,10 +1149,10 @@ impl Display for Instruction {
             } => {
                 write!(f, "amomaxu.w{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
             }
-            Instruction::LRD { dest, addr, aq, rl } => {
+            Instruction::LrD { dest, addr, aq, rl } => {
                 write!(f, "lr.d{} {dest},{addr}", aq_rl_suffix(aq, rl))
             }
-            Instruction::SCD {
+            Instruction::ScD {
                 dest,
                 addr,
                 src,
@@ -1161,7 +1161,7 @@ impl Display for Instruction {
             } => {
                 write!(f, "sc.d{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
             }
-            Instruction::AMOSWAPD {
+            Instruction::AmoswapD {
                 dest,
                 addr,
                 src,
@@ -1170,7 +1170,7 @@ impl Display for Instruction {
             } => {
                 write!(f, "amoswap.d{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
             }
-            Instruction::AMOADDD {
+            Instruction::AmoaddD {
                 dest,
                 addr,
                 src,
@@ -1179,7 +1179,7 @@ impl Display for Instruction {
             } => {
                 write!(f, "amoadd.d{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
             }
-            Instruction::AMOXORD {
+            Instruction::AmoxorD {
                 dest,
                 addr,
                 src,
@@ -1188,7 +1188,7 @@ impl Display for Instruction {
             } => {
                 write!(f, "amoxor.d{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
             }
-            Instruction::AMOANDD {
+            Instruction::AmoandD {
                 dest,
                 addr,
                 src,
@@ -1197,7 +1197,7 @@ impl Display for Instruction {
             } => {
                 write!(f, "amoand.d{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
             }
-            Instruction::AMOORD {
+            Instruction::AmoorD {
                 dest,
                 addr,
                 src,
@@ -1206,7 +1206,7 @@ impl Display for Instruction {
             } => {
                 write!(f, "amoor.d{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
             }
-            Instruction::AMOMIND {
+            Instruction::AmominD {
                 dest,
                 addr,
                 src,
@@ -1215,7 +1215,7 @@ impl Display for Instruction {
             } => {
                 write!(f, "amomin.d{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
             }
-            Instruction::AMOMAXD {
+            Instruction::AmomaxD {
                 dest,
                 addr,
                 src,
@@ -1224,7 +1224,7 @@ impl Display for Instruction {
             } => {
                 write!(f, "amomax.d{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
             }
-            Instruction::AMOMINUD {
+            Instruction::AmominuD {
                 dest,
                 addr,
                 src,
@@ -1233,7 +1233,7 @@ impl Display for Instruction {
             } => {
                 write!(f, "amominu.d{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
             }
-            Instruction::AMOMAXUD {
+            Instruction::AmomaxuD {
                 dest,
                 addr,
                 src,
@@ -1242,8 +1242,8 @@ impl Display for Instruction {
             } => {
                 write!(f, "amomaxu.d{} {dest},{addr},{src}", aq_rl_suffix(aq, rl))
             }
-            Instruction::FLW { dest, base, offset } => write!(f, "flw {dest},{offset}({base})"),
-            Instruction::FSW { base, src, offset } => write!(f, "fsw {src},{offset}({base})"),
+            Instruction::Flw { dest, base, offset } => write!(f, "flw {dest},{offset}({base})"),
+            Instruction::Fsw { base, src, offset } => write!(f, "fsw {src},{offset}({base})"),
             Instruction::FmaddS {
                 dest,
                 src1,
@@ -1320,17 +1320,17 @@ impl Display for Instruction {
             Instruction::FcvtSW { dest, src, rm } => write!(f, "fcvt.s.w {dest},{src},{rm}"),
             Instruction::FcvtSWu { dest, src, rm } => write!(f, "fcvt.s.wu {dest},{src},{rm}"),
             Instruction::FmvWX { dest, src } => write!(f, "fmv.w.x {dest},{src}"),
-            Instruction::FCVTLS { dest, src, rm } => write!(f, "fcvt.l.s {dest},{src},{rm}"),
-            Instruction::FCVTLUS { dest, src, rm } => write!(f, "fcvt.lu.s {dest},{src},{rm}"),
-            Instruction::FCVTSL { dest, src, rm } => write!(f, "fcvt.s.l {dest},{src},{rm}"),
-            Instruction::FCVTSLU { dest, src, rm } => write!(f, "fcvt.s.lu {dest},{src},{rm}"),
-            Instruction::CSRRW { dest, src, csr } => write!(f, "csrrw {dest},{csr},{src}"),
-            Instruction::CSRRS { dest, src, csr } => write!(f, "csrrs {dest},{csr},{src}"),
-            Instruction::CSRRC { dest, src, csr } => write!(f, "csrrc {dest},{csr},{src}"),
-            Instruction::CSRRWI { dest, imm, csr } => write!(f, "csrrwi {dest},{csr},{imm}"),
-            Instruction::CSRRSI { dest, imm, csr } => write!(f, "csrrsi {dest},{csr},{imm}"),
-            Instruction::CSRRCI { dest, imm, csr } => write!(f, "csrrci {dest},{csr},{imm}"),
-            Instruction::FENCEI => write!(f, "fence.i"),
+            Instruction::FcvtLS { dest, src, rm } => write!(f, "fcvt.l.s {dest},{src},{rm}"),
+            Instruction::FcvtLuS { dest, src, rm } => write!(f, "fcvt.lu.s {dest},{src},{rm}"),
+            Instruction::FcvtSL { dest, src, rm } => write!(f, "fcvt.s.l {dest},{src},{rm}"),
+            Instruction::FcvtSLu { dest, src, rm } => write!(f, "fcvt.s.lu {dest},{src},{rm}"),
+            Instruction::Csrrw { dest, src, csr } => write!(f, "csrrw {dest},{csr},{src}"),
+            Instruction::Csrrs { dest, src, csr } => write!(f, "csrrs {dest},{csr},{src}"),
+            Instruction::Csrrc { dest, src, csr } => write!(f, "csrrc {dest},{csr},{src}"),
+            Instruction::Csrrwi { dest, imm, csr } => write!(f, "csrrwi {dest},{csr},{imm}"),
+            Instruction::Csrrsi { dest, imm, csr } => write!(f, "csrrsi {dest},{csr},{imm}"),
+            Instruction::Csrrci { dest, imm, csr } => write!(f, "csrrci {dest},{csr},{imm}"),
+            Instruction::FenceI => write!(f, "fence.i"),
             Instruction::Fld { dest, base, offset } => write!(f, "fld {dest},{offset}({base})"),
             Instruction::Fsd { src, base, offset } => write!(f, "fsd {src},{offset}({base})"),
             Instruction::FmaddD {
@@ -1859,7 +1859,7 @@ impl Instruction {
                         if func12 != 0 {
                             Err("reserved register fields not set to zero".to_owned())
                         } else {
-                            Ok(Instruction::FENCEI)
+                            Ok(Instruction::FenceI)
                         }
                     }
                 }
@@ -1870,7 +1870,7 @@ impl Instruction {
                     if rs2 != IRegister::Zero {
                         Err("LR.W expects rs2 to be 0".to_owned())
                     } else {
-                        Ok(Instruction::LRW {
+                        Ok(Instruction::LrW {
                             dest: rd,
                             addr: rs1,
                             aq,
@@ -1882,7 +1882,7 @@ impl Instruction {
                     if rs2 != IRegister::Zero {
                         Err("LR.D expects rs2 to be 0".to_owned())
                     } else {
-                        Ok(Instruction::LRD {
+                        Ok(Instruction::LrD {
                             dest: rd,
                             addr: rs1,
                             aq,
@@ -1890,140 +1890,140 @@ impl Instruction {
                         })
                     }
                 }
-                (0b010, 0b00011) => Ok(Instruction::SCW {
+                (0b010, 0b00011) => Ok(Instruction::ScW {
                     dest: rd,
                     addr: rs1,
                     src: rs2,
                     aq,
                     rl,
                 }),
-                (0b011, 0b00011) => Ok(Instruction::SCD {
+                (0b011, 0b00011) => Ok(Instruction::ScD {
                     dest: rd,
                     addr: rs1,
                     src: rs2,
                     aq,
                     rl,
                 }),
-                (0b010, 0b00001) => Ok(Instruction::AMOSWAPW {
+                (0b010, 0b00001) => Ok(Instruction::AmoswapW {
                     dest: rd,
                     addr: rs1,
                     src: rs2,
                     aq,
                     rl,
                 }),
-                (0b011, 0b00001) => Ok(Instruction::AMOSWAPD {
+                (0b011, 0b00001) => Ok(Instruction::AmoswapD {
                     dest: rd,
                     addr: rs1,
                     src: rs2,
                     aq,
                     rl,
                 }),
-                (0b010, 0b00000) => Ok(Instruction::AMOADDW {
+                (0b010, 0b00000) => Ok(Instruction::AmoaddW {
                     dest: rd,
                     addr: rs1,
                     src: rs2,
                     aq,
                     rl,
                 }),
-                (0b011, 0b00000) => Ok(Instruction::AMOADDD {
+                (0b011, 0b00000) => Ok(Instruction::AmoaddD {
                     dest: rd,
                     addr: rs1,
                     src: rs2,
                     aq,
                     rl,
                 }),
-                (0b010, 0b00100) => Ok(Instruction::AMOXORW {
+                (0b010, 0b00100) => Ok(Instruction::AmoxorW {
                     dest: rd,
                     addr: rs1,
                     src: rs2,
                     aq,
                     rl,
                 }),
-                (0b011, 0b00100) => Ok(Instruction::AMOXORD {
+                (0b011, 0b00100) => Ok(Instruction::AmoxorD {
                     dest: rd,
                     addr: rs1,
                     src: rs2,
                     aq,
                     rl,
                 }),
-                (0b010, 0b01100) => Ok(Instruction::AMOANDW {
+                (0b010, 0b01100) => Ok(Instruction::AmoandW {
                     dest: rd,
                     addr: rs1,
                     src: rs2,
                     aq,
                     rl,
                 }),
-                (0b011, 0b01100) => Ok(Instruction::AMOANDD {
+                (0b011, 0b01100) => Ok(Instruction::AmoandD {
                     dest: rd,
                     addr: rs1,
                     src: rs2,
                     aq,
                     rl,
                 }),
-                (0b010, 0b01000) => Ok(Instruction::AMOORW {
+                (0b010, 0b01000) => Ok(Instruction::AmoorW {
                     dest: rd,
                     addr: rs1,
                     src: rs2,
                     aq,
                     rl,
                 }),
-                (0b011, 0b01000) => Ok(Instruction::AMOORD {
+                (0b011, 0b01000) => Ok(Instruction::AmoorD {
                     dest: rd,
                     addr: rs1,
                     src: rs2,
                     aq,
                     rl,
                 }),
-                (0b010, 0b10000) => Ok(Instruction::AMOMINW {
+                (0b010, 0b10000) => Ok(Instruction::AmominW {
                     dest: rd,
                     addr: rs1,
                     src: rs2,
                     aq,
                     rl,
                 }),
-                (0b011, 0b10000) => Ok(Instruction::AMOMIND {
+                (0b011, 0b10000) => Ok(Instruction::AmominD {
                     dest: rd,
                     addr: rs1,
                     src: rs2,
                     aq,
                     rl,
                 }),
-                (0b010, 0b10100) => Ok(Instruction::AMOMAXW {
+                (0b010, 0b10100) => Ok(Instruction::AmomaxW {
                     dest: rd,
                     addr: rs1,
                     src: rs2,
                     aq,
                     rl,
                 }),
-                (0b011, 0b10100) => Ok(Instruction::AMOMAXD {
+                (0b011, 0b10100) => Ok(Instruction::AmomaxD {
                     dest: rd,
                     addr: rs1,
                     src: rs2,
                     aq,
                     rl,
                 }),
-                (0b010, 0b11000) => Ok(Instruction::AMOMINUW {
+                (0b010, 0b11000) => Ok(Instruction::AmominuW {
                     dest: rd,
                     addr: rs1,
                     src: rs2,
                     aq,
                     rl,
                 }),
-                (0b011, 0b11000) => Ok(Instruction::AMOMINUD {
+                (0b011, 0b11000) => Ok(Instruction::AmominuD {
                     dest: rd,
                     addr: rs1,
                     src: rs2,
                     aq,
                     rl,
                 }),
-                (0b010, 0b11100) => Ok(Instruction::AMOMAXUW {
+                (0b010, 0b11100) => Ok(Instruction::AmomaxuW {
                     dest: rd,
                     addr: rs1,
                     src: rs2,
                     aq,
                     rl,
                 }),
-                (0b011, 0b11100) => Ok(Instruction::AMOMAXUD {
+                (0b011, 0b11100) => Ok(Instruction::AmomaxuD {
                     dest: rd,
                     addr: rs1,
                     src: rs2,
@@ -2033,7 +2033,7 @@ impl Instruction {
                 _ => Err(format!("unknown AMO. func3: {func3}, func7: {func7}")),
             },
             Opcode::LoadFp => match func3 {
-                0b010 => Ok(Instruction::FLW {
+                0b010 => Ok(Instruction::Flw {
                     dest: frd,
                     base: rs1,
                     offset: i_immediate,
@@ -2046,7 +2046,7 @@ impl Instruction {
                 _ => Err(format!("unknown func3: {func3} in opcode LoadFp")),
             },
             Opcode::StoreFp => match func3 {
-                0b010 => Ok(Instruction::FSW {
+                0b010 => Ok(Instruction::Fsw {
                     src: frs2,
                     base: rs1,
                     offset: s_immediate,
@@ -2260,12 +2260,12 @@ impl Instruction {
                         src: frs1,
                         rm: RoundingMode::from_int(func3)?,
                     }),
-                    0b0_0010 => Ok(Instruction::FCVTLS {
+                    0b0_0010 => Ok(Instruction::FcvtLS {
                         dest: rd,
                         src: frs1,
                         rm: RoundingMode::from_int(func3)?,
                     }),
-                    0b0_0011 => Ok(Instruction::FCVTLUS {
+                    0b0_0011 => Ok(Instruction::FcvtLuS {
                         dest: rd,
                         src: frs1,
                         rm: RoundingMode::from_int(func3)?,
@@ -2306,12 +2306,12 @@ impl Instruction {
                         src: rs1,
                         rm: RoundingMode::from_int(func3)?,
                     }),
-                    0b0_0010 => Ok(Instruction::FCVTSL {
+                    0b0_0010 => Ok(Instruction::FcvtSL {
                         dest: frd,
                         src: rs1,
                         rm: RoundingMode::from_int(func3)?,
                     }),
-                    0b0_0011 => Ok(Instruction::FCVTSLU {
+                    0b0_0011 => Ok(Instruction::FcvtSLu {
                         dest: frd,
                         src: rs1,
                         rm: RoundingMode::from_int(func3)?,
@@ -2520,33 +2520,33 @@ impl Instruction {
             },
             Opcode::System => match func3 {
                 0b000 => Err("Reserved func3 in Opcode SYSTEM".to_owned()),
-                0b001 => Ok(Instruction::CSRRW {
+                0b001 => Ok(Instruction::Csrrw {
                     dest: rd,
                     src: rs1,
                     csr: CSR::from_u32(instruction),
                 }),
-                0b010 => Ok(Instruction::CSRRS {
+                0b010 => Ok(Instruction::Csrrs {
                     dest: rd,
                     src: rs1,
                     csr: CSR::from_u32(instruction),
                 }),
-                0b011 => Ok(Instruction::CSRRC {
+                0b011 => Ok(Instruction::Csrrc {
                     dest: rd,
                     src: rs1,
                     csr: CSR::from_u32(instruction),
                 }),
                 0b100 => Err("Reserved func3 in Opcode SYSTEM".to_owned()),
-                0b101 => Ok(Instruction::CSRRWI {
+                0b101 => Ok(Instruction::Csrrwi {
                     dest: rd,
                     imm: CSRImmediate::from_u32(instruction),
                     csr: CSR::from_u32(instruction),
                 }),
-                0b110 => Ok(Instruction::CSRRSI {
+                0b110 => Ok(Instruction::Csrrsi {
                     dest: rd,
                     imm: CSRImmediate::from_u32(instruction),
                     csr: CSR::from_u32(instruction),
                 }),
-                0b111 => Ok(Instruction::CSRRCI {
+                0b111 => Ok(Instruction::Csrrci {
                     dest: rd,
                     imm: CSRImmediate::from_u32(instruction),
                     csr: CSR::from_u32(instruction),
@@ -2743,7 +2743,7 @@ impl Instruction {
             Instruction::Remuw { dest, src1, src2 } => {
                 0b0000001 << 25 | src2.rs2() | src1.rs1() | 0b111 << 12 | dest.rd() | 0b0111011
             }
-            Instruction::LRW { dest, addr, aq, rl } => {
+            Instruction::LrW { dest, addr, aq, rl } => {
                 0b00010 << 27
                     | aqb(*aq)
                     | rlb(*rl)
@@ -2752,7 +2752,7 @@ impl Instruction {
                     | dest.rd()
                     | 0b0101111
             }
-            Instruction::SCW {
+            Instruction::ScW {
                 dest,
                 addr,
                 src,
@@ -2768,7 +2768,7 @@ impl Instruction {
                     | dest.rd()
                     | 0b0101111
             }
-            Instruction::AMOSWAPW {
+            Instruction::AmoswapW {
                 dest,
                 addr,
                 src,
@@ -2784,7 +2784,7 @@ impl Instruction {
                     | dest.rd()
                     | 0b0101111
             }
-            Instruction::AMOADDW {
+            Instruction::AmoaddW {
                 dest,
                 addr,
                 src,
@@ -2800,7 +2800,7 @@ impl Instruction {
                     | dest.rd()
                     | 0b0101111
             }
-            Instruction::AMOXORW {
+            Instruction::AmoxorW {
                 dest,
                 addr,
                 src,
@@ -2816,7 +2816,7 @@ impl Instruction {
                     | dest.rd()
                     | 0b0101111
             }
-            Instruction::AMOANDW {
+            Instruction::AmoandW {
                 dest,
                 addr,
                 src,
@@ -2832,7 +2832,7 @@ impl Instruction {
                     | dest.rd()
                     | 0b0101111
             }
-            Instruction::AMOORW {
+            Instruction::AmoorW {
                 dest,
                 addr,
                 src,
@@ -2848,7 +2848,7 @@ impl Instruction {
                     | dest.rd()
                     | 0b0101111
             }
-            Instruction::AMOMINW {
+            Instruction::AmominW {
                 dest,
                 addr,
                 src,
@@ -2864,7 +2864,7 @@ impl Instruction {
                     | dest.rd()
                     | 0b0101111
             }
-            Instruction::AMOMAXW {
+            Instruction::AmomaxW {
                 dest,
                 addr,
                 src,
@@ -2880,7 +2880,7 @@ impl Instruction {
                     | dest.rd()
                     | 0b0101111
             }
-            Instruction::AMOMINUW {
+            Instruction::AmominuW {
                 dest,
                 addr,
                 src,
@@ -2896,7 +2896,7 @@ impl Instruction {
                     | dest.rd()
                     | 0b0101111
             }
-            Instruction::AMOMAXUW {
+            Instruction::AmomaxuW {
                 dest,
                 addr,
                 src,
@@ -2912,7 +2912,7 @@ impl Instruction {
                     | dest.rd()
                     | 0b0101111
             }
-            Instruction::LRD { dest, addr, aq, rl } => {
+            Instruction::LrD { dest, addr, aq, rl } => {
                 0b00010 << 27
                     | aqb(*aq)
                     | rlb(*rl)
@@ -2921,7 +2921,7 @@ impl Instruction {
                     | dest.rd()
                     | 0b0101111
             }
-            Instruction::SCD {
+            Instruction::ScD {
                 dest,
                 addr,
                 src,
@@ -2937,7 +2937,7 @@ impl Instruction {
                     | dest.rd()
                     | 0b0101111
             }
-            Instruction::AMOSWAPD {
+            Instruction::AmoswapD {
                 dest,
                 addr,
                 src,
@@ -2953,7 +2953,7 @@ impl Instruction {
                     | dest.rd()
                     | 0b0101111
             }
-            Instruction::AMOADDD {
+            Instruction::AmoaddD {
                 dest,
                 addr,
                 src,
@@ -2969,7 +2969,7 @@ impl Instruction {
                     | dest.rd()
                     | 0b0101111
             }
-            Instruction::AMOXORD {
+            Instruction::AmoxorD {
                 dest,
                 addr,
                 src,
@@ -2985,7 +2985,7 @@ impl Instruction {
                     | dest.rd()
                     | 0b0101111
             }
-            Instruction::AMOANDD {
+            Instruction::AmoandD {
                 dest,
                 addr,
                 src,
@@ -3001,7 +3001,7 @@ impl Instruction {
                     | dest.rd()
                     | 0b0101111
             }
-            Instruction::AMOORD {
+            Instruction::AmoorD {
                 dest,
                 addr,
                 src,
@@ -3017,7 +3017,7 @@ impl Instruction {
                     | dest.rd()
                     | 0b0101111
             }
-            Instruction::AMOMIND {
+            Instruction::AmominD {
                 dest,
                 addr,
                 src,
@@ -3033,7 +3033,7 @@ impl Instruction {
                     | dest.rd()
                     | 0b0101111
             }
-            Instruction::AMOMAXD {
+            Instruction::AmomaxD {
                 dest,
                 addr,
                 src,
@@ -3049,7 +3049,7 @@ impl Instruction {
                     | dest.rd()
                     | 0b0101111
             }
-            Instruction::AMOMINUD {
+            Instruction::AmominuD {
                 dest,
                 addr,
                 src,
@@ -3065,7 +3065,7 @@ impl Instruction {
                     | dest.rd()
                     | 0b0101111
             }
-            Instruction::AMOMAXUD {
+            Instruction::AmomaxuD {
                 dest,
                 addr,
                 src,
@@ -3081,10 +3081,10 @@ impl Instruction {
                     | dest.rd()
                     | 0b0101111
             }
-            Instruction::FLW { dest, base, offset } => {
+            Instruction::Flw { dest, base, offset } => {
                 offset.to_u32() | base.rs1() | 0b010 << 12 | dest.rd() | 0b0000111
             }
-            Instruction::FSW { base, src, offset } => {
+            Instruction::Fsw { base, src, offset } => {
                 offset.to_u32() | src.rs2() | base.rs1() | 0b010 << 12 | 0b0100111
             }
             Instruction::FmaddS {
@@ -3183,37 +3183,37 @@ impl Instruction {
                 0b1101000 << 25 | 0b00001 << 20 | src.rs1() | rm.to_u32() | dest.rd() | 0b1010011
             }
             Instruction::FmvWX { dest, src } => 0b1111000 << 25 | src.rs1() | dest.rd() | 0b1010011,
-            Instruction::FCVTLS { dest, src, rm } => {
+            Instruction::FcvtLS { dest, src, rm } => {
                 0b1100000 << 25 | 0b00010 << 20 | src.rs1() | rm.to_u32() | dest.rd() | 0b1010011
             }
-            Instruction::FCVTLUS { dest, src, rm } => {
+            Instruction::FcvtLuS { dest, src, rm } => {
                 0b1100000 << 25 | 0b00011 << 20 | src.rs1() | rm.to_u32() | dest.rd() | 0b1010011
             }
-            Instruction::FCVTSL { dest, src, rm } => {
+            Instruction::FcvtSL { dest, src, rm } => {
                 0b1101000 << 25 | 0b00010 << 20 | src.rs1() | rm.to_u32() | dest.rd() | 0b1010011
             }
-            Instruction::FCVTSLU { dest, src, rm } => {
+            Instruction::FcvtSLu { dest, src, rm } => {
                 0b1101000 << 25 | 0b00011 << 20 | src.rs1() | rm.to_u32() | dest.rd() | 0b1010011
             }
-            Instruction::CSRRW { dest, src, csr } => {
+            Instruction::Csrrw { dest, src, csr } => {
                 csr.to_u32() | src.rs1() | 0b001 << 12 | dest.rd() | 0b1110011
             }
-            Instruction::CSRRS { dest, src, csr } => {
+            Instruction::Csrrs { dest, src, csr } => {
                 csr.to_u32() | src.rs1() | 0b010 << 12 | dest.rd() | 0b1110011
             }
-            Instruction::CSRRC { dest, src, csr } => {
+            Instruction::Csrrc { dest, src, csr } => {
                 csr.to_u32() | src.rs1() | 0b011 << 12 | dest.rd() | 0b1110011
             }
-            Instruction::CSRRWI { dest, imm, csr } => {
+            Instruction::Csrrwi { dest, imm, csr } => {
                 csr.to_u32() | imm.to_u32() | 0b101 << 12 | dest.rd() | 0b1110011
             }
-            Instruction::CSRRSI { dest, imm, csr } => {
+            Instruction::Csrrsi { dest, imm, csr } => {
                 csr.to_u32() | imm.to_u32() | 0b110 << 12 | dest.rd() | 0b1110011
             }
-            Instruction::CSRRCI { dest, imm, csr } => {
+            Instruction::Csrrci { dest, imm, csr } => {
                 csr.to_u32() | imm.to_u32() | 0b111 << 12 | dest.rd() | 0b1110011
             }
-            Instruction::FENCEI => 0b001 << 12 | 0b0001111,
+            Instruction::FenceI => 0b001 << 12 | 0b0001111,
             Instruction::Fld { dest, base, offset } => {
                 offset.to_u32() | base.rs1() | 0b011 << 12 | dest.rd() | 0b0000111
             }

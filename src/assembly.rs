@@ -269,7 +269,7 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                     if operands.len() != 0 {
                         Err("fence.i requires 0 operands".to_owned())
                     } else {
-                        Ok(Instruction::FENCEI)
+                        Ok(Instruction::FenceI)
                     }
                 } else {
                     Err("invalid fence".to_owned())
@@ -281,14 +281,14 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                     Err("lr must have size (w/d)".to_owned())
                 } else if mnemonics.len() == 2 {
                     if mnemonics[1] == "w" {
-                        Ok(Instruction::LRW {
+                        Ok(Instruction::LrW {
                             dest: IRegister::try_from(operands[0])?,
                             addr: IRegister::try_from(operands[1])?,
                             aq: false,
                             rl: false,
                         })
                     } else if mnemonics[1] == "d" {
-                        Ok(Instruction::LRD {
+                        Ok(Instruction::LrD {
                             dest: IRegister::try_from(operands[0])?,
                             addr: IRegister::try_from(operands[1])?,
                             aq: false,
@@ -306,14 +306,14 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                         _ => return Err("ordering should be (aq)(rl)".to_owned()),
                     };
                     if mnemonics[1] == "w" {
-                        Ok(Instruction::LRW {
+                        Ok(Instruction::LrW {
                             dest: IRegister::try_from(operands[0])?,
                             addr: IRegister::try_from(operands[1])?,
                             aq,
                             rl,
                         })
                     } else if mnemonics[1] == "d" {
-                        Ok(Instruction::LRD {
+                        Ok(Instruction::LrD {
                             dest: IRegister::try_from(operands[0])?,
                             addr: IRegister::try_from(operands[1])?,
                             aq,
@@ -329,22 +329,22 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                     )
                 }
             }
-            "sc" => amo_assemble!(SC),
-            "amoswap" => amo_assemble!(AMOSWAP),
-            "amoadd" => amo_assemble!(AMOADD),
-            "amoxor" => amo_assemble!(AMOXOR),
-            "amoand" => amo_assemble!(AMOAND),
-            "amoor" => amo_assemble!(AMOOR),
-            "amomin" => amo_assemble!(AMOMIN),
-            "amomax" => amo_assemble!(AMOMAX),
-            "amominu" => amo_assemble!(AMOMINU),
-            "amomaxu" => amo_assemble!(AMOMAXU),
+            "sc" => amo_assemble!(Sc),
+            "amoswap" => amo_assemble!(Amoswap),
+            "amoadd" => amo_assemble!(Amoadd),
+            "amoxor" => amo_assemble!(Amoxor),
+            "amoand" => amo_assemble!(Amoand),
+            "amoor" => amo_assemble!(Amoor),
+            "amomin" => amo_assemble!(Amomin),
+            "amomax" => amo_assemble!(Amomax),
+            "amominu" => amo_assemble!(Amominu),
+            "amomaxu" => amo_assemble!(Amomaxu),
             "flw" => {
                 if operands.len() != 2 {
                     Err("flw instruction requires 2 operands".to_owned())
                 } else {
                     let (base, offset) = parse_address_expression(operands[1])?;
-                    Ok(Instruction::FLW {
+                    Ok(Instruction::Flw {
                         dest: FRegister::try_from(operands[0])?,
                         base,
                         offset: IImmediate::try_from(offset)?,
@@ -356,7 +356,7 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                     Err("fsw instruction requires 2 operands".to_owned())
                 } else {
                     let (base, offset) = parse_address_expression(operands[1])?;
-                    Ok(Instruction::FSW {
+                    Ok(Instruction::Fsw {
                         base,
                         src: FRegister::try_from(operands[0])?,
                         offset: SImmediate::try_from(offset)?,
@@ -432,22 +432,22 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                             src: IRegister::try_from(operands[1])?,
                             rm,
                         }),
-                        ("l", "s") => Ok(Instruction::FCVTLS {
+                        ("l", "s") => Ok(Instruction::FcvtLS {
                             dest: IRegister::try_from(operands[0])?,
                             src: FRegister::try_from(operands[1])?,
                             rm,
                         }),
-                        ("lu", "s") => Ok(Instruction::FCVTLUS {
+                        ("lu", "s") => Ok(Instruction::FcvtLuS {
                             dest: IRegister::try_from(operands[0])?,
                             src: FRegister::try_from(operands[1])?,
                             rm,
                         }),
-                        ("s", "l") => Ok(Instruction::FCVTSL {
+                        ("s", "l") => Ok(Instruction::FcvtSL {
                             dest: FRegister::try_from(operands[0])?,
                             src: IRegister::try_from(operands[1])?,
                             rm,
                         }),
-                        ("s", "lu") => Ok(Instruction::FCVTSLU {
+                        ("s", "lu") => Ok(Instruction::FcvtSLu {
                             dest: FRegister::try_from(operands[0])?,
                             src: IRegister::try_from(operands[1])?,
                             rm,
@@ -629,7 +629,7 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                 if operands.len() != 3 {
                     Err("csrrw requires 3 operands".to_owned())
                 } else {
-                    Ok(Instruction::CSRRW {
+                    Ok(Instruction::Csrrw {
                         dest: IRegister::try_from(operands[0])?,
                         src: IRegister::try_from(operands[2])?,
                         csr: CSR::try_from(parse_int(operands[1])?)?,
@@ -640,7 +640,7 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                 if operands.len() != 3 {
                     Err("csrrs requires 3 operands".to_owned())
                 } else {
-                    Ok(Instruction::CSRRS {
+                    Ok(Instruction::Csrrs {
                         dest: IRegister::try_from(operands[0])?,
                         src: IRegister::try_from(operands[2])?,
                         csr: CSR::try_from(parse_int(operands[1])?)?,
@@ -651,7 +651,7 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                 if operands.len() != 3 {
                     Err("csrrc requires 3 operands".to_owned())
                 } else {
-                    Ok(Instruction::CSRRC {
+                    Ok(Instruction::Csrrc {
                         dest: IRegister::try_from(operands[0])?,
                         src: IRegister::try_from(operands[2])?,
                         csr: CSR::try_from(parse_int(operands[1])?)?,
@@ -662,7 +662,7 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                 if operands.len() != 3 {
                     Err("csrrwi requires 3 operands".to_owned())
                 } else {
-                    Ok(Instruction::CSRRWI {
+                    Ok(Instruction::Csrrwi {
                         dest: IRegister::try_from(operands[0])?,
                         imm: CSRImmediate::try_from(parse_int(operands[2])?)?,
                         csr: CSR::try_from(parse_int(operands[1])?)?,
@@ -673,7 +673,7 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                 if operands.len() != 3 {
                     Err("csrrsi requires 3 operands".to_owned())
                 } else {
-                    Ok(Instruction::CSRRSI {
+                    Ok(Instruction::Csrrsi {
                         dest: IRegister::try_from(operands[0])?,
                         imm: CSRImmediate::try_from(parse_int(operands[2])?)?,
                         csr: CSR::try_from(parse_int(operands[1])?)?,
@@ -684,7 +684,7 @@ pub fn assemble_line(line: &str) -> Result<AssemblyResult, String> {
                 if operands.len() != 3 {
                     Err("csrrci requires 3 operands".to_owned())
                 } else {
-                    Ok(Instruction::CSRRCI {
+                    Ok(Instruction::Csrrci {
                         dest: IRegister::try_from(operands[0])?,
                         imm: CSRImmediate::try_from(parse_int(operands[2])?)?,
                         csr: CSR::try_from(parse_int(operands[1])?)?,

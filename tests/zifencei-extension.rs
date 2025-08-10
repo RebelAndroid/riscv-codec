@@ -6,7 +6,7 @@ use riscv_codec::{
 #[test]
 fn fence_instruction() {
     let bin = 0x0000100f;
-    let expected = Instruction::FENCEI;
+    let expected = Instruction::FenceI;
 
     // check assembler
     let i = assemble_line("fence.i").unwrap().i();

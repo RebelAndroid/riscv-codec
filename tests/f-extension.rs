@@ -5,7 +5,7 @@ use riscv_codec::register::{FRegister, IRegister};
 
 #[test]
 fn float_load_word() {
-    let expected = Instruction::FLW {
+    let expected = Instruction::Flw {
         dest: FRegister::FA0,
         base: IRegister::A0,
         offset: IImmediate::try_from(64).unwrap(),
@@ -31,7 +31,7 @@ fn float_load_word() {
 
 #[test]
 fn float_store_word() {
-    let expected = Instruction::FSW {
+    let expected = Instruction::Fsw {
         base: IRegister::A5,
         src: FRegister::FS1,
         offset: SImmediate::try_from(-1).unwrap(),
@@ -686,7 +686,7 @@ fn float_move_word_from_x() {
 
 #[test]
 fn float_convert_long_from_single() {
-    let expected = Instruction::FCVTLS {
+    let expected = Instruction::FcvtLS {
         dest: IRegister::S4,
         src: FRegister::FA7,
         rm: RoundingMode::DYN,
@@ -712,7 +712,7 @@ fn float_convert_long_from_single() {
 
 #[test]
 fn float_convert_unsigned_long_from_single() {
-    let expected = Instruction::FCVTLUS {
+    let expected = Instruction::FcvtLuS {
         dest: IRegister::T2,
         src: FRegister::FT9,
         rm: RoundingMode::DYN,
@@ -738,7 +738,7 @@ fn float_convert_unsigned_long_from_single() {
 
 #[test]
 fn float_convert_single_from_long() {
-    let expected = Instruction::FCVTSL {
+    let expected = Instruction::FcvtSL {
         dest: FRegister::FS8,
         src: IRegister::S2,
         rm: RoundingMode::DYN,
@@ -764,7 +764,7 @@ fn float_convert_single_from_long() {
 
 #[test]
 fn float_convert_single_from_unsigned_long() {
-    let expected = Instruction::FCVTSLU {
+    let expected = Instruction::FcvtSLu {
         dest: FRegister::FT7,
         src: IRegister::FramePointer,
         rm: RoundingMode::DYN,

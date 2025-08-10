@@ -4,7 +4,7 @@ use riscv_codec::register::IRegister;
 
 #[test]
 fn load_reserved_word() {
-    let expected = Instruction::LRW {
+    let expected = Instruction::LrW {
         dest: IRegister::A0,
         addr: IRegister::A1,
         aq: true,
@@ -31,7 +31,7 @@ fn load_reserved_word() {
 
 #[test]
 fn store_conditional_word() {
-    let expected = Instruction::SCW {
+    let expected = Instruction::ScW {
         dest: IRegister::ReturnAddress,
         addr: IRegister::T4,
         src: IRegister::A1,
@@ -59,7 +59,7 @@ fn store_conditional_word() {
 
 #[test]
 fn amo_swap_word() {
-    let expected = Instruction::AMOSWAPW {
+    let expected = Instruction::AmoswapW {
         dest: IRegister::T2,
         addr: IRegister::ReturnAddress,
         src: IRegister::T5,
@@ -87,7 +87,7 @@ fn amo_swap_word() {
 
 #[test]
 fn amo_add_word() {
-    let expected = Instruction::AMOADDW {
+    let expected = Instruction::AmoaddW {
         dest: IRegister::A4,
         addr: IRegister::GlobalPointer,
         src: IRegister::S4,
@@ -115,7 +115,7 @@ fn amo_add_word() {
 
 #[test]
 fn amo_xor_word() {
-    let expected = Instruction::AMOXORW {
+    let expected = Instruction::AmoxorW {
         dest: IRegister::A4,
         addr: IRegister::GlobalPointer,
         src: IRegister::S4,
@@ -143,7 +143,7 @@ fn amo_xor_word() {
 
 #[test]
 fn amo_and_word() {
-    let expected = Instruction::AMOANDW {
+    let expected = Instruction::AmoandW {
         dest: IRegister::A4,
         addr: IRegister::GlobalPointer,
         src: IRegister::S4,
@@ -171,7 +171,7 @@ fn amo_and_word() {
 
 #[test]
 fn amo_or_word() {
-    let expected = Instruction::AMOORW {
+    let expected = Instruction::AmoorW {
         dest: IRegister::A4,
         addr: IRegister::GlobalPointer,
         src: IRegister::S4,
@@ -199,7 +199,7 @@ fn amo_or_word() {
 
 #[test]
 fn amo_min_word() {
-    let expected = Instruction::AMOMINW {
+    let expected = Instruction::AmominW {
         dest: IRegister::A4,
         addr: IRegister::GlobalPointer,
         src: IRegister::S4,
@@ -227,7 +227,7 @@ fn amo_min_word() {
 
 #[test]
 fn amo_max_word() {
-    let expected = Instruction::AMOMAXW {
+    let expected = Instruction::AmomaxW {
         dest: IRegister::A4,
         addr: IRegister::GlobalPointer,
         src: IRegister::S4,
@@ -255,7 +255,7 @@ fn amo_max_word() {
 
 #[test]
 fn amo_min_unsigned_word() {
-    let expected = Instruction::AMOMINUW {
+    let expected = Instruction::AmominuW {
         dest: IRegister::A4,
         addr: IRegister::GlobalPointer,
         src: IRegister::S4,
@@ -283,7 +283,7 @@ fn amo_min_unsigned_word() {
 
 #[test]
 fn amo_max_unsigned_word() {
-    let expected = Instruction::AMOMAXUW {
+    let expected = Instruction::AmomaxuW {
         dest: IRegister::A4,
         addr: IRegister::GlobalPointer,
         src: IRegister::S4,
@@ -311,7 +311,7 @@ fn amo_max_unsigned_word() {
 
 #[test]
 fn load_reserved_doubleword() {
-    let expected = Instruction::LRD {
+    let expected = Instruction::LrD {
         dest: IRegister::S6,
         addr: IRegister::S7,
         aq: false,
@@ -338,7 +338,7 @@ fn load_reserved_doubleword() {
 
 #[test]
 fn store_conditional_doubleword() {
-    let expected = Instruction::SCD {
+    let expected = Instruction::ScD {
         dest: IRegister::ThreadPointer,
         addr: IRegister::S10,
         src: IRegister::A2,
@@ -366,7 +366,7 @@ fn store_conditional_doubleword() {
 
 #[test]
 fn amo_swap_doubleword() {
-    let expected = Instruction::AMOSWAPD {
+    let expected = Instruction::AmoswapD {
         dest: IRegister::T2,
         addr: IRegister::ReturnAddress,
         src: IRegister::T5,
@@ -394,7 +394,7 @@ fn amo_swap_doubleword() {
 
 #[test]
 fn amo_add_doubleword() {
-    let expected = Instruction::AMOADDD {
+    let expected = Instruction::AmoaddD {
         dest: IRegister::A4,
         addr: IRegister::GlobalPointer,
         src: IRegister::S4,
@@ -422,7 +422,7 @@ fn amo_add_doubleword() {
 
 #[test]
 fn amo_xor_doubleword() {
-    let expected = Instruction::AMOXORD {
+    let expected = Instruction::AmoxorD {
         dest: IRegister::A4,
         addr: IRegister::GlobalPointer,
         src: IRegister::S4,
@@ -450,7 +450,7 @@ fn amo_xor_doubleword() {
 
 #[test]
 fn amo_and_doubleword() {
-    let expected = Instruction::AMOANDD {
+    let expected = Instruction::AmoandD {
         dest: IRegister::A4,
         addr: IRegister::GlobalPointer,
         src: IRegister::S4,
@@ -478,7 +478,7 @@ fn amo_and_doubleword() {
 
 #[test]
 fn amo_or_doubleword() {
-    let expected = Instruction::AMOORD {
+    let expected = Instruction::AmoorD {
         dest: IRegister::A4,
         addr: IRegister::GlobalPointer,
         src: IRegister::S4,
@@ -506,7 +506,7 @@ fn amo_or_doubleword() {
 
 #[test]
 fn amo_min_doubleword() {
-    let expected = Instruction::AMOMIND {
+    let expected = Instruction::AmominD {
         dest: IRegister::A4,
         addr: IRegister::GlobalPointer,
         src: IRegister::S4,
@@ -534,7 +534,7 @@ fn amo_min_doubleword() {
 
 #[test]
 fn amo_max_doubleword() {
-    let expected = Instruction::AMOMAXD {
+    let expected = Instruction::AmomaxD {
         dest: IRegister::A4,
         addr: IRegister::GlobalPointer,
         src: IRegister::S4,
@@ -562,7 +562,7 @@ fn amo_max_doubleword() {
 
 #[test]
 fn amo_min_unsigned_doubleword() {
-    let expected = Instruction::AMOMINUD {
+    let expected = Instruction::AmominuD {
         dest: IRegister::A4,
         addr: IRegister::GlobalPointer,
         src: IRegister::S4,
@@ -590,7 +590,7 @@ fn amo_min_unsigned_doubleword() {
 
 #[test]
 fn amo_max_unsigned_doubleword() {
-    let expected = Instruction::AMOMAXUD {
+    let expected = Instruction::AmomaxuD {
         dest: IRegister::A4,
         addr: IRegister::GlobalPointer,
         src: IRegister::S4,
