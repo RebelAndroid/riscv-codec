@@ -511,7 +511,13 @@ pub fn make_immediate(input: TokenStream) -> TokenStream {
             .unwrap();
 
         // the type to use for the immediate
-        let typ = if signed { "i32" } else { "u32" };
+        // let typ = if signed { "i32" } else { "u32" };
+        let typ = match (signed, size > 16) {
+            (true, true) => "i32",
+            (false, true) => "u32",
+            (true, false) => "i16",
+            (false, false) => "u16",
+        };
         // the type to use for the instruction
         let instr_typ = if compressed { "u16" } else { "u32" };
 
@@ -578,12 +584,17 @@ pub fn make_immediate(input: TokenStream) -> TokenStream {
                 .map(|(i, part)| part.insert_immediate(i))
                 .collect();
 
-            let insert = format!("let i: i32 = ({insertions}) as i32;");
+            let insert = format!("let i: {typ} = ({insertions}) as {typ};");
 
             let sign_extension = if signed {
-                format!("let i2: i32 = (i << {}) >> {};", 32 - size, 32 - size)
+                if typ == "i16" {
+                    format!("let i2: i16 = (i << {}) >> {};", 16 - size, 16 - size)
+                }else {
+                    format!("let i2: i32 = (i << {}) >> {};", 32 - size, 32 - size)
+                }
+                
             } else {
-                "let i2: u32 = i as u32;".to_owned()
+                format!("let i2: {typ} = i as {typ};")
             };
 
             let ret = format!("{name} {{ val: i2}}");
